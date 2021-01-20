@@ -1,0 +1,32 @@
+19/01/21 - J1
+Installation outils ordinateur - R, git, conda...
+Installation MetHis et test réussi sur exemple jouet (! librarie gsl 25 loc ?)
+
+Début bibliographie
+Articles fournis
+Méthodes bayésiennes (ABC) nb : approches pour estimer posterior via prior avec simulations
+Pas besoin de connaître vraisemblance
+Random forest
+
+1ère lecture modèle admixture verdu rosenberg
+stat initiale de population hybride + stat participation population source selon génération
+à approfondir (distributions, équations...)
+
+Lecture biblio annexe sans rapport direct
+Admixture sur populations isolées
+Populations néandertaliennes, moyen-âge (homo naledi)
+nb : mots clés scholar -> admixture / admixture model (par date, art. 2021)
+
+20/01/21
+Continuation dans biblio (nb cf biblio.txt dans Biblio pour détails sur certains articles)
+Méthodes de calcul de population admixture / étude évolution P(allèle) dans population
+Utilisation de MetHis dans ce sens
+Objectif : trouver des scénarios et modèles de population admixture non effectués
+Cours genet pop M1 relus (modèle HW)
+Méthodes abc sur R permettent analyses des statistiques / inférences à partir des modèles
+Relire articles abc dans cette optique
+
+Commencer à rélféchir aux différents modèles possibles (en proposer 1 demain ?)
+Relire mails pour bien être sûr de ne pas se perdre
+Participation d'une autre population hybride comme source en tant que pop parentale ?
+Déterminé intérêt scientifique
