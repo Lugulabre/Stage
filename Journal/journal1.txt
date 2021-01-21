@@ -1,4 +1,4 @@
-19/01/21 - J1
+19/01/21
 Installation outils ordinateur - R, git, conda...
 Installation MetHis et test réussi sur exemple jouet (! librarie gsl 25 loc ?)
 
@@ -30,3 +30,20 @@ Commencer à rélféchir aux différents modèles possibles (en proposer 1 demai
 Relire mails pour bien être sûr de ne pas se perdre
 Participation d'une autre population hybride comme source en tant que pop parentale ?
 Déterminé intérêt scientifique
+
+21/01/21
+Objectifs du jour (après relecture des mails pour bien préciser l'axe)
+Se concentrer sur croiss/décroiss/goulots
+Relire modèles déjà présentés articles
+Indicateurs diversités en fonction pressions exercées
+
+Modèles d'admixture : pulse ou récurrents ?
+
+* Se concentrer mat/met + supp 1 sur MetHis
+
+* article théorique sur modèles qui m'intéressent -> prendre notes dans biblio
+
+Faire une biblio pacpac avec les mots clés : Effective population sizes in admixed populations
+
+ABC -> pour l'instant pour plus tard (2nde partie) retenir mais approfondir 1ère part pour le moment
+

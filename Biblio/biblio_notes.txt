@@ -21,3 +21,18 @@ Etudes sur data réelles / populations
 Analyse taille effective populations hybrides et parentes états unis
 IBD -> identity by descent segments
 http://faculty.washington.edu/browning/ibdne.html
+
+>>> A General Mechanistic Model for Admixture Histories of Hybrid Populations, Paul Verdu and Noah A. Rosenberg, Genetics December 1, 2011 vol. 189 no. 4 1413-1426; https://doi.org/10.1534/genetics.111.132787
+
+
+Equations en suite pour suivre contribution de population 1 à la population hybride selon différents scénarios (si s1s1, s1s2 ou s2s2)
+On modifie la proportion initiale et la contribution au fur et à mesure des générations
+
+>>> MetHis Supp Notes 1
+
+Comment les différents modèles évoqués dans l'article ci-dessus ont été implémentés
+Quels sont les paramètres sur lesquels on peut jouer : 
+9 scénarios avec modification de la contribution, par pulse ou récurrent (croissant/décroissant)
+Possibilité modifier taille de la population hybride au fur et à mesure des générations -> pôint focus
+
+
