@@ -43,7 +43,12 @@ Modèles d'admixture : pulse ou récurrents ?
 
 * article théorique sur modèles qui m'intéressent -> prendre notes dans biblio
 
-Faire une biblio pacpac avec les mots clés : Effective population sizes in admixed populations
+* Faire une biblio pacpac avec les mots clés : Effective population sizes in admixed populations
 
 ABC -> pour l'instant pour plus tard (2nde partie) retenir mais approfondir 1ère part pour le moment
+
+22/01/21
+
+Article MetHis -> Simule un très grand nombre de scénarios pour déterminer lequel correspond aux données réelles
+Choix du meilleur modèle pour appliquer données et retrouver paramètres
 
