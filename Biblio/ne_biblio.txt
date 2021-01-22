@@ -31,9 +31,22 @@ Calcul Ne à partir du taux de mutation moyen et du temps de divergence estimé 
 
 >>> Zaidi, A.A., Makova, K.D. Investigating mitonuclear interactions in human admixed populations. Nat Ecol Evol 3, 213–222 (2019). https://doi.org/10.1038/s41559-018-0766-1
 
+A approfondir -> différence adn mitochondiral sur populations issues d'admixture
+Discordance adnmt/nuclear ancestry
+-> effets phénotypiques
+
 >>> Whole Genome Linkage Disequilibrium and Effective Population Size in a Coho Salmon (Oncorhynchus kisutch) Breeding Population Using a High-Density SNP Array https://doi.org/10.3389/fgene.2019.00498
+
+Application calcul Ne via LD sur saumons (formule Do 2014, NeEstimator v2)
 
 >>> Paul Verdu, Noémie S.A. Becker, Alain Froment, Myriam Georges, Viola Grugni, Lluis Quintana-Murci, Jean-Marie Hombert, Lolke Van der Veen, Sylvie Le Bomin, Serge Bahuchet, Evelyne Heyer, Frédéric Austerlitz, Sociocultural Behavior, Sex-Biased Admixture, and Effective Population Sizes in Central African Pygmies and Non-Pygmies, Molecular Biology and Evolution, Volume 30, Issue 4, April 2013, Pages 918–937, https://doi.org/10.1093/molbev/mss328
 
 >>> Effects of Supportive Breeding on the Genetically Effective Population Size 
 
+>>> Do, C., Waples, R. S., Peel, D., Macbeth, G. M., Tillett, B. J., and Ovenden, J. R. (2014). NeEstimator v2: re-implementation of software for the estimation of contemporary effective population size (Ne) from genetic data. Mol. Ecol. Resour. 14, 209–214. doi: 10.1111/1755-0998.12157
+
+Implémentation méthodes calcul Ne via LD utilisée Whole-Genome salmon...
+
+>>> Waples, R. S., and Do, C. (2008). LDNE: a program for estimating effective population size from data on linkage disequilibrium. Mol. Ecol. Resour. 8, 753–756. doi: 10.1111/j.1755-0998.2007.02061.x 
+
+Programme d'approximation de Ne via LD (nb calculs détaillés)
