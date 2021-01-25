@@ -1,0 +1,41 @@
+>>> Lawson, D.J., van Dorp, L. & Falush, D. A tutorial on how not to over-interpret STRUCTURE and ADMIXTURE bar plots. Nat Commun 9, 3258 (2018). https://doi.org/10.1038/s41467-018-05257-7
+
+>>> The Effect of Recent Admixture on Inference of Ancient Human Population History, Kirk E. Lohmueller, Carlos D. Bustamante and Andrew G. Clark, Genetics June 1, 2010 vol. 185 no. 2 611-622; https://doi.org/10.1534/genetics.109.113761
+
+inférence taille population sur l'estimation de paramètres statistiques
+
+>>> Świsłocka, M., Czajkowska, M., Duda, N. et al. Admixture promotes genetic variation in bottlenecked moose populations in eastern Poland. Mamm Res 60, 169–179 (2015). https://doi.org/10.1007/s13364-015-0221-5
+
+assez peu sûr de l'utilité
+
+>>> The Projection of a Test Genome onto a Reference Population and Applications to Humans and Archaic Hominins, Melinda A. Yang, Kelley Harris and Montgomery Slatkin, Genetics December 1, 2014 vol. 198 no. 4 1655-1670; https://doi.org/10.1534/genetics.112.145359
+
+
+>>> Di Rienzo A, Peterson AC, Garza JC, Valdes AM, Slatkin M, Freimer NB. Mutational processes of simple-sequence repeat loci in human populations. Proc Natl Acad Sci U S A. 1994;91(8):3166-3170. doi:10.1073/pnas.91.8.3166
+
+>>> Garza JC, Williamson EG (2001) Detection of reduction in population size using data from microsatellite loci. Mol. Ecol., 305–318
+
+>>> A Genetic Atlas of Human Admixture History, By Garrett Hellenthal, George B. J. Busby, Gavin Band, James F. Wilson, Cristian Capelli, Daniel Falush, Simon Myers, Science14 Feb 2014 : 747-751 
+
+### NON CONSULTES
+>>> Bayesian identification of admixture events using multilocus molecular markers
+
+>>> Bayesian Analysis of an Admixture Model With Mutations and Arbitrarily Linked Markers
+
+>>> Admixture, Population Structure, and F-Statistics
+
+>>> Population Structure in Admixed Populations: Effect of Admixture Dynamics on the Pattern of Linkage Disequilibrium
+
+###
+
+>>> Ettore Randi, Massimo Pierpaoli, Mark Beaumont, Bernardino Ragni, Andrea Sforzi, Genetic Identification of Wild and Domestic Cats (Felis silvestris) and Their Hybrids Using Bayesian Clustering Methods, Molecular Biology and Evolution, Volume 18, Issue 9, September 2001, Pages 1679–1693, https://doi.org/10.1093/oxfordjournals.molbev.a003956
+
+>>> Schilling, M.P., Gompert, Z., Li, FW. et al. Admixture, evolution, and variation in reproductive isolation in the Boechera puberula clade. BMC Evol Biol 18, 61 (2018). https://doi.org/10.1186/s12862-018-1173-6
+
+Admixture plantes via GBS
+
+>>> The contribution of ancient admixture to reproductive isolation between European sea bass lineages
+
+Calcul du temps où a eu lieu admixture sur lignées loup de mer
+
+

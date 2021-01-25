@@ -23,9 +23,7 @@ Estimation Ne à partir déséquilibre de liaison
 
 Same que précédent
 
->>> Nucleotide Diversity in Gorillas
-Ning Yu, Michael I. Jensen-Seaman, Leona Chemnick, Oliver Ryder and Wen-Hsiung Li
-Genetics March 1, 2004 vol. 166 no. 3 1375-1383; https://doi.org/10.1534/genetics.166.3.1375
+>>> Nucleotide Diversity in Gorillas, Ning Yu, Michael I. Jensen-Seaman, Leona Chemnick, Oliver Ryder and Wen-Hsiung Li, Genetics March 1, 2004 vol. 166 no. 3 1375-1383; https://doi.org/10.1534/genetics.166.3.1375
 
 Calcul Ne à partir du taux de mutation moyen et du temps de divergence estimé entre les primates
 
@@ -50,3 +48,6 @@ Implémentation méthodes calcul Ne via LD utilisée Whole-Genome salmon...
 >>> Waples, R. S., and Do, C. (2008). LDNE: a program for estimating effective population size from data on linkage disequilibrium. Mol. Ecol. Resour. 8, 753–756. doi: 10.1111/j.1755-0998.2007.02061.x 
 
 Programme d'approximation de Ne via LD (nb calculs détaillés)
+
+>>> https://www.sciencedirect.com/topics/earth-and-planetary-sciences/effective-population-size
+

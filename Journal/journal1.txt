@@ -52,3 +52,13 @@ ABC -> pour l'instant pour plus tard (2nde partie) retenir mais approfondir 1èr
 Article MetHis -> Simule un très grand nombre de scénarios pour déterminer lequel correspond aux données réelles
 Choix du meilleur modèle pour appliquer données et retrouver paramètres
 
+essai pour faire tourner abc sur exemple jouet de MetHis
+
+25/01/21
+
+Faire des choix de modèles à partir documentation
+Préparer questions pour réunion
+abc -> pour le moment échec
+
+Approfondir biblio Ne
+

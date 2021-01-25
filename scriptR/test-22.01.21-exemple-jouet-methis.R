@@ -15,6 +15,8 @@ for (i in c(1:10)) {
   }
 }
 
+hist(mat_stat$mean.het.s1)
+
 abc(mat_stat)
 
 
@@ -52,3 +54,20 @@ hist(linhc, breaks=30, caption=c(expression(mu),
 ##
 plot(lin, param=par.sim)
 plot(linhc, param=par.sim)
+
+
+## Exemple article
+data(human)
+cv.modsel <- cv4postpr(models, stat.3pops.sim,
+                       nval = 50, tol = .01,
+                       method = "mnlogistic")
+plot(cv.modsel)
+stat.italy.sim <- subset(stat.3pops.sim,
+                         subset=models=="bott")
+cv.res.reg <- cv4abc(data.frame(Na = par.italy.sim [,"Ne"]),
+                     stat.italy.sim, nval = 200,
+                     tols = c(.005,.001), method = "loclinear")
+plot(cv.res.reg, caption = "Ne")
+res <- abc(target = stat.voight["italian",], param = data.frame(Na = par.italy.sim [, "Ne"]),
+             + sumstat = stat.italy.sim, tol = 0.005, transf = c("log"), method = "neuralnet")
+plot(res, param = par.italy.sim [, "Ne"])
