@@ -62,3 +62,9 @@ abc -> pour le moment échec
 
 Approfondir biblio Ne
 
+26/01/21
+
+Refaire biblio Ne -> comment calculer ok, mais orienter la biblio sur l'impact de Ne sur diversité génétique
+Réunion, cf notes de réunion
+Faire modèles sur le papier
+Définir paramètres, lancer simulations sur MetHis avec augmenter génération de 1 

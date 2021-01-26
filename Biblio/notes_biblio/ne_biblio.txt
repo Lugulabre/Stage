@@ -51,3 +51,16 @@ Programme d'approximation de Ne via LD (nb calculs détaillés)
 
 >>> https://www.sciencedirect.com/topics/earth-and-planetary-sciences/effective-population-size
 
+>>> Effective population size and patterns of molecular evolution and variation
+
+>>> Does population size affect genetic diversity? A test with sympatric lizard species
+
+>>> Ecological consequences of genetic diversity, Hugues
+
+>>> Effective Population Size, Genetic Diversity, and Coalescence Time in Subdivided Populations, Nei
+
+>>> Correlation between Fitness and Genetic Diversity, Reed
+
+>>> Admixture, Population Structure, and F-Statistics, Peter
+
+>>> Reconstructing Indian Population History, Reich
