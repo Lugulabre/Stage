@@ -1,0 +1,14 @@
+>>> Gao X, Martin ER. Using allele sharing distance for detecting human population stratification. Hum Hered. 2009;68(3):182-191. doi:10.1159/000224638
+
+>>> On the Apportionment of Population Structure
+Granot Y, Tal O, Rosset S, Skorecki K (2016) On the Apportionment of Population Structure. PLOS ONE 11(8): e0160413. https://doi.org/10.1371/journal.pone.0160413
+
+>>> Kitada S, Kitakado T, Kishino H. Empirical Bayes inference of pairwise F(ST) and its distribution in the genome. Genetics. 2007;177(2):861-873. doi:10.1534/genetics.107.077263
+
+>>> Palstra FP, Fraser DJ. Effective/census population size ratio estimation: a compendium and appraisal. Ecol Evol. 2012;2(9):2357-2365. doi:10.1002/ece3.329
+
+>>> Hague MT, Routman EJ. Does population size affect genetic diversity? A test with sympatric lizard species. Heredity (Edinb). 2016;116(1):92-98. doi:10.1038/hdy.2015.76
+
+>>> Temporal variation in genetic diversity and effective population size of Mediterranean and subalpine Arabidopsis thaliana populations
+
+>>> The Genetic Variation in a Population Is Caused by Multiple Factors

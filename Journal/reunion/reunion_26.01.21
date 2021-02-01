@@ -1,0 +1,170 @@
+système théorique -> règle à définir
+    -> paramètre dans cet univers fermé
+
+Question -> réalité recoupe
+-> comment apprendre
+    -> développement méthodo (dans le sens méthode)
+       comparer data réelles à la théorie
+
+Théorie -> méthodo -> réel
+
+Travail dans un 1er temps -> interface 1 peu des 2
+
+article 2011 Verdu/Rosenberg -> que de la théorie
+                                stat théorie
+                                -> % admixture/individu dans population hybride
+-> Comment réagit à des histoires différentes
+
+% admixture -> distribution capture information histoire métissage
+
+=> Simplification
+! développement par rapport à la réalité
+
+Chacun des sites -> en moyenne, même histoire
+-> nécessaire que chaque site soit indépendant
+   histoire ne doit pas doubler sur un même site
+   -> modèle infinite-site
+
+() Parenthèse
+Dans vraie vie -> marche sur de très grands génomes
+En théorie, petits génomes non pris en compte
+
+Reproduction sexuée et diploïde
+Animaux/plantes diploïdes (ajouter terme dans recherches) -> beaucoup d'espèces en réservoir
+Faire attention à cette mention dans les articles étudiés
+()
+
+Données utilisées
+Humains / jeu de données arbres Bénin-Togo
+
+=> Simulation / aspect théorique
+Taille efficace de la population (Ne) -> condition (art 2011)
+
+Si population de 10 individus -> pas dans le modèle théorique
+
+Ajouter Ne
+* Relire 1ère équation en détail
+équation conditionnelle / discrète / récurrence
+-> Limite computationelle assez rapide à cause de la récurrence (13ème génération, 2¹³ paramètres)
+
+Exploration empirique de la question
+
+MetHis -> mime reproduction + statistiques
+
+Simulation avec taille de la population différente
+Maintenant que l'outil est construit -> possibilité d'explorer
+Répondre à question théorique sans le faire de manière exacte
+Prédiction vraie vie avec vraies données
+
+Dans ces paramètres -> tous les présupposés des simulations
+Panmictique / diploïde -> non controlés
+pulse, récurrent... -> peut varier
+
+Histoire métissage -> quand et quel taux
+
+Discussion
+-> focus -> approximation mais avec cette méthode on peut apprendre des choses
+
+-> Travailler sur changement Ne, explorer quand modification
+Regarder distribution
+
+-> ABC
+   méthodes stats beaucoup utilisées en génétique
+
+Modèles très compliqués -> P(A|B), max vraisemblance difficile à calculer
+Même si écrite, équation compliqué à résoudre
+Méthode  ABC repose sur vraisemblance trop complexe
+2 approximations P(A|B) (A : data, B : paramètres)
+
+ABC se base sur stats résumées (diversité génétique, métissage...)
+Au lieu d'expliquer ATGC -> approcher par stats résumées
+Vraisemblance stats résumées en fonction paramètres modèles
+
+Si stats résumées capturent paramètres du modèle
+-> Vraisemblance est la même
+-> Stats parfaitement informatives
+-> Souvent trop de paramètres, donc capture seulement une partie du modèle
+
+ABC -> même si pas capable d'apprendre, utiliser simulations
+Si on peut simuler, on peut faire ABC
+-> data simulées proches de l'observation réelles
+
+=> D'abord simuler
+   -> comment stats réagissent à paramètres
+
+Simulations en boucle
+Modèles intéressants
+Classer modèles intéressants Ne + pulse admixture
+
+Stats résumées -> comment se comporte distribution en fonction paramètres
+
+Restriction aux cas d'étude
+
+- 1er levier technique
+    - Hétérozygotie (Htzg)
+        -> pop métissée, comment évolue Htzg chez idv
+
+ex 2 pop souris (p7 notes écrites)
+
+Développer calcul Htzg à chaque génération 
+patch assez lourd
+-> implémenter possibilité ou non de sortir stats à chaque génération
+Option nécessitant de reconstruire le code
+
+Pq -> prédiction (ex loup p8 notes écrites)
+
+Choisir modèle simple pour vérifier qualité
+combien de temps de calcul ?
+même paramètre -> 100 itérations sous un seul modèle
+
+Lancer MetHis pour chaque génération
+Commencer par histoire simples car résultats attendus
+Permet check simu
+-> Itératif -> si histoire plus complexe on revient sur le modèle (tournevis)
+
+Paramètres d'intérêt principaux : 
+% d'admixture, temps d'admixture et Ne
+
+-> 1 seul temps admis
+-> Si ajout variation Ne pop, modification
+   DTS -> papiers sur calcul
+Modèle simple avec un évènement admis
+% d'admixture varie entre 0 et 1 (avec S2 = 1 - S1)
+
+Différents modèles où Ne change :
+
+I. Modèle avec taille constante au cours des générations, mais modification à chaque simulation
+   (prior entre 10 et 10 000)
+   
+II. Modèle avec même S1, mais Ne croissance exponentielle au cours des générations
+    Paramètres : No, Ng et Nu entre 0 et 1/2 (courbure fonction)
+    No entre 10 et 100, Ng entre 10 et 10 000
+    (Si Ng - No < -1, pas intéressant)
+    Emnboîtement des modèles-> combinaison de paramètres est la même que sous un autre scénario
+
+III. Construire liste de paramètres quand bottleneck
+     Autres options / développement pour admix tools
+     Bottleneck -> réduction taille population puis recroissance
+     Derrière : - No, prior uniforme
+                - Nbottleneck, dépénd de No, intensité bottleneck
+                - temps de génération de bottleneck
+                - N post bottleneck
+     Faire varier différents paramètres pour influencer sur la diversité
+
+IV. Modèle de décroissance population -> pas prioritaire
+    En théorie, si population décroit, diversité génétique décroit aussi
+    Pb d'échantillonnage
+
+Nombre générations -> dépend temps de calcul
+G = 20, temps de génération pour admixture esclavage data cap vert
+G = 100, temps de génération standard, à utiliser
+Pour exemple data arbres -> g = [66;633]
+
+-> Quelle est la question d'intérêt
+
+Ne petite : forte dérive / influence hasard
+
+Qu'est ce qui est échantillonné -> quel sample (ici 25 standard à chaque gen)
+
+Intérêt -> est-ce que les stats sont bien estimées -> ABC dépend plus de la bonne estimation que de la taille d'échantillonnage
+Peu d'admixture -> influence dérive forte en théorie

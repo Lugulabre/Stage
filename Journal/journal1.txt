@@ -43,7 +43,40 @@ Modèles d'admixture : pulse ou récurrents ?
 
 * article théorique sur modèles qui m'intéressent -> prendre notes dans biblio
 
-Faire une biblio pacpac avec les mots clés : Effective population sizes in admixed populations
+* Faire une biblio pacpac avec les mots clés : Effective population sizes in admixed populations
 
 ABC -> pour l'instant pour plus tard (2nde partie) retenir mais approfondir 1ère part pour le moment
 
+22/01/21
+
+Article MetHis -> Simule un très grand nombre de scénarios pour déterminer lequel correspond aux données réelles
+Choix du meilleur modèle pour appliquer données et retrouver paramètres
+
+essai pour faire tourner abc sur exemple jouet de MetHis
+
+25/01/21
+
+Faire des choix de modèles à partir documentation
+Préparer questions pour réunion
+abc -> pour le moment échec
+
+Approfondir biblio Ne
+
+26/01/21
+
+Refaire biblio Ne -> comment calculer ok, mais orienter la biblio sur l'impact de Ne sur diversité génétique
+Réunion, cf notes de réunion
+Faire modèles sur le papier
+Définir paramètres, lancer simulations sur MetHis avec augmenter génération de 1 
+
+28/01/21
+
+Simulations (stat gen par gen en recommençant à chaque itération) ont tournées
+Erreur perso sur taille échantillonnage
+Nécessite de refaire
+
+Script R d'analyse des stats gen par gen opérationnel -> réecrire en Rmd pour plus de compréhension
+
+01/02/21
+Analyses R pour pop increase (30-110 à 100-8100)
+Faire biblio sur Ne exemples connus
