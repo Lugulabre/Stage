@@ -68,3 +68,15 @@ Refaire biblio Ne -> comment calculer ok, mais orienter la biblio sur l'impact d
 Réunion, cf notes de réunion
 Faire modèles sur le papier
 Définir paramètres, lancer simulations sur MetHis avec augmenter génération de 1 
+
+28/01/21
+
+Simulations (stat gen par gen en recommençant à chaque itération) ont tournées
+Erreur perso sur taille échantillonnage
+Nécessite de refaire
+
+Script R d'analyse des stats gen par gen opérationnel -> réecrire en Rmd pour plus de compréhension
+
+01/02/21
+Analyses R pour pop increase (30-110 à 100-8100)
+Faire biblio sur Ne exemples connus

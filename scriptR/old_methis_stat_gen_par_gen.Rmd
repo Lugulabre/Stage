@@ -1,0 +1,158 @@
+---
+title: "test_stat_gen_par_gen"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/old_methis_pop_size_diff/")
+```
+
+## Librairies utilisées
+
+```{r}
+library(stringr)
+library(ggplot2)
+```
+
+## Fonction de lecture d'une stat
+
+```{bash}
+
+set_resum_stat()
+{
+  list_Ne=$(ls -d Ne*)
+  
+  for Ne in $list_Ne; do
+      cd $Ne
+      list_gen=$(ls -d gen*)
+  
+      for gen in $list_gen; do
+          cd $gen
+          cat simu_*/final_sumstats.txt > tmp.txt
+          nl tmp.txt | sort --key 2 --unique | sort --key 1 --numeric-sort > final_sumstats.txt
+          rm tmp.txt
+          cd ../
+      done
+  
+      echo $Ne
+      cd ../
+  done
+}
+
+set_resum_stat
+
+cd ../old_methis_pop_increase
+set_resum_stat
+
+```
+
+Chaque répertoire correspondant à un effectif efficace Ne contient autant de sous-répertoires qu'il y a de générations (ici 100 générations). Chaque répertoire correspondant à une génération contient autant de sous-répertoires qu'il y a de simulations (ici 100 aussi). Enfin, dans chaque sous répertoire de simulations, on trouve un fichier "final_sumstats.txt" donnant les statistiques résumées de la simulation concernée.
+
+On choisit donc ici :
+- de concaténer pour chaque génération de chaque effectif efficace l'ensemble des statistiques calculées sur les x simulations (bash)
+- de calculer la moyenne pour chaque statistique sur l'ensemble des simulations, ce qui correspondra aux statistiques pour la génération donnée 
+- on peut ensuite observer une statistique choisie en fonction des générations, pour observer l'évolution de cet indicateur au cours du temps.
+
+La fonction décrite ci-dessus respecte donc ce schéma, en enregistrant les données dans une matrice à 62 colonnes, avec l'effectif efficace sur la première colonne, la génération sur la deuxième, et les statistiques sur les colonnes 3 à 62.
+
+
+```{r}
+#Data frame construction
+data.frame.stat = function(seq_ne, max_gen){
+  
+  #Créer matrice vide qui contiendra les stats
+  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen, ncol = 62)
+  #Compteur pour indiquer les lignes à remplir
+  cpt = 0
+  
+  for (ne in seq_ne) {
+    dir_ne = str_c("Ne", toString(ne), "/") #Répertoire de taille effective
+    row_min = cpt*100+1                     #Ligne min. où on écrit les stats pour le Ne donné 
+    row_max = (cpt+1)*100                   #Ligne max. où on écrit les stats  
+    mat_stat[row_min:row_max,1] = str_c("Ne", toString(ne)) #Ecriture du Ne correspondant pour les stats qui seront écrites
+    cpt = cpt+1                             #Incrémentation du compteur
+    
+    for (nb_gen in 1:max_gen) {
+      dir_gen = str_c("gen", toString(nb_gen), "/") #Répertoire de génération
+      mat_stat[row_min+nb_gen-1,2] = nb_gen         #Ecriture génération correspondante
+      file_path = str_c(dir_ne, dir_gen, "final_sumstats.txt")
+      file_stat = read.table(file_path, header = TRUE) #Lecture fichier stat résumées
+      #Suppression 1ère colonne, contenant uniquement chiffres pour tri en bash. 
+      #+ calcul de la moyenne pour chaque stat, écrites dans la matrice
+      file_stat = apply(file_stat[,-1], 2, mean) 
+      mat_stat[row_min+nb_gen-1,3:62] = file_stat
+    }
+  }
+  
+  #Passage de la matrice en data frame pour ggplot
+  mat_stat = as.data.frame(mat_stat)
+  #Attribution nom colonnes selon appelation stat par MetHis
+  colnames(mat_stat) = c("Ne", "gen", names(file_stat))
+  #Passage générations en entier
+  mat_stat$gen = as.integer(mat_stat$gen)
+  #Passage stats en double
+  for (numcol in 3:ncol(mat_stat)) {
+    mat_stat[,numcol] = as.double(mat_stat[,numcol])
+  }
+  
+  return(mat_stat)
+}
+  
+```
+
+```{r}
+#Plot function
+#Affichage d'une stat au cours des générations
+plot_stat_gen = function(df, gen, stat, Ne){
+  p = ggplot(df, aes(x = gen, y = stat, color = Ne)) +
+  ggtitle("Stat en fonction des générations\n selon différentes Ne initiales")
+  #smooth de la courbe pour obtenir régression et tempérer variabilité due au TCL
+  p = p + geom_point(size = 1)+ geom_smooth()
+  print(p)
+}
+```
+
+
+```{r}
+seq_64_8192 = 2**seq(6,13,1)
+seq_60_100 = 10*seq(6,10,1)
+seq_tot = c(seq_60_100, seq_64_8192)
+
+mat_tot = data.frame.stat(seq_tot, 100)
+mat_60_100 = data.frame.stat(seq_60_100, 100)
+mat_64_8192 = data.frame.stat(seq_64_8192, 100)
+
+plot_stat_gen(mat_tot, mat_tot$gen, 
+              mat_tot$mean.het.adm, mat_tot$Ne)
+plot_stat_gen(mat_60_100, mat_60_100$gen, 
+              mat_60_100$mean.het.adm, mat_60_100$Ne)
+plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
+              mat_64_8192$mean.het.adm, mat_64_8192$Ne)
+```
+
+```{r}
+setwd("../old_methis_pop_increase/")
+seq_tot = c()
+for (i in seq(30,110, by = 20)) {
+  for (j in c(0:4)) {
+    seq_tot = append(seq_tot, str_c(i, "-", 100*(3**j)))
+  }
+}
+seq_tot = seq_tot[-which(seq_tot == "110-100")]
+seq_end_900 = seq_tot[which(str_detect(seq_tot, "-900"))]
+seq_start_30 = seq_tot[which(str_detect(seq_tot, "30-"))]
+
+mat_tot = data.frame.stat(seq_tot, 100)
+mat_end_900 = data.frame.stat(seq_end_900, 100)
+mat_start_30 = data.frame.stat(seq_start_30, 100)
+
+plot_stat_gen(mat_tot, mat_tot$gen,
+              mat_tot$mean.het.adm, mat_tot$Ne)
+plot_stat_gen(mat_end_900, mat_end_900$gen,
+              mat_end_900$mean.het.adm, mat_end_900$Ne)
+plot_stat_gen(mat_start_30, mat_start_30$gen,
+              mat_start_30$mean.het.adm, mat_start_30$Ne)
+```
+
+

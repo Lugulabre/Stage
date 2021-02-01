@@ -135,6 +135,7 @@ Différents modèles où Ne change :
 
 I. Modèle avec taille constante au cours des générations, mais modification à chaque simulation
    (prior entre 10 et 10 000)
+   
 II. Modèle avec même S1, mais Ne croissance exponentielle au cours des générations
     Paramètres : No, Ng et Nu entre 0 et 1/2 (courbure fonction)
     No entre 10 et 100, Ng entre 10 et 10 000
