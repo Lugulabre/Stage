@@ -19,6 +19,7 @@ library(ggplot2)
 
 ```{bash}
 
+#Script bash pour réduire le nombre d'ouvertures de fichier en R.
 set_resum_stat()
 {
   list_Ne=$(ls -d Ne*)
