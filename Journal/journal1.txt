@@ -80,3 +80,14 @@ Script R d'analyse des stats gen par gen opérationnel -> réecrire en Rmd pour 
 01/02/21
 Analyses R pour pop increase (30-110 à 100-8100)
 Faire biblio sur Ne exemples connus
+
+Au final : affinage du code R d'analyse et écriture des fonctions
+(extraction sous-matrice, facilité affichage légende)
+
+à lire demain :
+https://www.sciencedirect.com/topics/earth-and-planetary-sciences/effective-population-size
+https://www.nature.com/scitable/topicpage/genetic-drift-and-effective-population-size-772523/
+https://onlinelibrary.wiley.com/doi/full/10.1111/mec.12770
+
+Schémas de bottleneck complexes
+Pop increase pas possible fixer Nu (cf code generate_params.py l. 278)

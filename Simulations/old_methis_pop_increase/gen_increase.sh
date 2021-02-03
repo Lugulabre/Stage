@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#depuis répertoire Stage/Simulations/old_methis_gen_increase
+#depuis répertoire Stage/Simulations/old_methis_pop_increase
 
 debut=$(date +%s)
 

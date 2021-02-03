@@ -12,3 +12,13 @@ Granot Y, Tal O, Rosset S, Skorecki K (2016) On the Apportionment of Population 
 >>> Temporal variation in genetic diversity and effective population size of Mediterranean and subalpine Arabidopsis thaliana populations
 
 >>> The Genetic Variation in a Population Is Caused by Multiple Factors
+
+>>> Prediction and estimation of effective population size
+
+>>> Recent Common Origin, Reduced Population Size, and Marked Admixture Have Shaped European Roma Genomes
+
+>>> Ancient Admixture in Human History
+
+>>> Estimating Contemporary Effective Population Size on the Basis of Linkage Disequilibrium in the Face of Migration
+
+>>> Admixture and Genetic Diversity Distribution Patterns of Non-Recombining Lineages of Native American Ancestry in Colombian Populations

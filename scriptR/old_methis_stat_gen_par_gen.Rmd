@@ -15,10 +15,11 @@ library(stringr)
 library(ggplot2)
 ```
 
-## Fonction de lecture d'une stat
+## Résumé des lectures de stat
 
 ```{bash}
 
+#Script bash pour réduire le nombre d'ouvertures de fichier en R.
 set_resum_stat()
 {
   list_Ne=$(ls -d Ne*)
@@ -35,7 +36,7 @@ set_resum_stat()
           cd ../
       done
   
-      echo $Ne
+      #echo $Ne
       cd ../
   done
 }
@@ -56,6 +57,7 @@ On choisit donc ici :
 
 La fonction décrite ci-dessus respecte donc ce schéma, en enregistrant les données dans une matrice à 62 colonnes, avec l'effectif efficace sur la première colonne, la génération sur la deuxième, et les statistiques sur les colonnes 3 à 62.
 
+## Fonctions utilisées
 
 ```{r}
 #Data frame construction
@@ -70,7 +72,7 @@ data.frame.stat = function(seq_ne, max_gen){
     dir_ne = str_c("Ne", toString(ne), "/") #Répertoire de taille effective
     row_min = cpt*100+1                     #Ligne min. où on écrit les stats pour le Ne donné 
     row_max = (cpt+1)*100                   #Ligne max. où on écrit les stats  
-    mat_stat[row_min:row_max,1] = str_c("Ne", toString(ne)) #Ecriture du Ne correspondant pour les stats qui seront écrites
+    mat_stat[row_min:row_max,1] = toString(ne) #Ecriture du Ne correspondant pour les stats qui seront écrites
     cpt = cpt+1                             #Incrémentation du compteur
     
     for (nb_gen in 1:max_gen) {
@@ -89,6 +91,8 @@ data.frame.stat = function(seq_ne, max_gen){
   mat_stat = as.data.frame(mat_stat)
   #Attribution nom colonnes selon appelation stat par MetHis
   colnames(mat_stat) = c("Ne", "gen", names(file_stat))
+  #Passage des Ne en facteur
+  mat_stat$Ne = factor(as.factor(mat_stat$Ne), levels = as.character(seq_ne))
   #Passage générations en entier
   mat_stat$gen = as.integer(mat_stat$gen)
   #Passage stats en double
@@ -104,33 +108,54 @@ data.frame.stat = function(seq_ne, max_gen){
 ```{r}
 #Plot function
 #Affichage d'une stat au cours des générations
-plot_stat_gen = function(df, gen, stat, Ne){
-  p = ggplot(df, aes(x = gen, y = stat, color = Ne)) +
-  ggtitle("Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen = function(df, gen, stat, Ne, titre){
+  p = ggplot(df, aes(x = gen, y = stat, color = Ne)) + ggtitle(titre)
   #smooth de la courbe pour obtenir régression et tempérer variabilité due au TCL
   p = p + geom_point(size = 1)+ geom_smooth()
   print(p)
 }
 ```
 
+```{r}
+extract_sub_mat = function(all_mat, list_ne){
+  all_rows = c()
+  for (ne in as.character(list_ne)) {
+    all_rows = append(all_rows, which(all_mat[,1] == ne))
+  }
+  return(all_mat[all_rows,])
+}
+```
 
+
+## Population constante de tailles initiales différentes
+
+Calcul des matrices de stats
 ```{r}
 seq_64_8192 = 2**seq(6,13,1)
 seq_60_100 = 10*seq(6,10,1)
-seq_tot = c(seq_60_100, seq_64_8192)
+seq_tot = sort(c(seq_60_100, seq_64_8192))
 
 mat_tot = data.frame.stat(seq_tot, 100)
-mat_60_100 = data.frame.stat(seq_60_100, 100)
-mat_64_8192 = data.frame.stat(seq_64_8192, 100)
-
-plot_stat_gen(mat_tot, mat_tot$gen, 
-              mat_tot$mean.het.adm, mat_tot$Ne)
-plot_stat_gen(mat_60_100, mat_60_100$gen, 
-              mat_60_100$mean.het.adm, mat_60_100$Ne)
-plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
-              mat_64_8192$mean.het.adm, mat_64_8192$Ne)
+mat_60_100 = extract_sub_mat(mat_tot, seq_60_100)
+mat_64_8192 = extract_sub_mat(mat_tot, seq_64_8192)
 ```
 
+Graphiques obtenus
+```{r}
+plot_stat_gen(mat_tot, mat_tot$gen, 
+              mat_tot$mean.het.adm, mat_tot$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_60_100, mat_60_100$gen, 
+              mat_60_100$mean.het.adm, mat_60_100$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
+              mat_64_8192$mean.het.adm, mat_64_8192$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+```
+
+## Populations croissantes avec des N0 variant entre 30 et 110, et des Ng variant entre 100 et 8100.
+
+Calcul des matrices
 ```{r}
 setwd("../old_methis_pop_increase/")
 seq_tot = c()
@@ -141,18 +166,29 @@ for (i in seq(30,110, by = 20)) {
 }
 seq_tot = seq_tot[-which(seq_tot == "110-100")]
 seq_end_900 = seq_tot[which(str_detect(seq_tot, "-900"))]
+seq_end_8100 = seq_tot[which(str_detect(seq_tot, "-8100"))]
 seq_start_30 = seq_tot[which(str_detect(seq_tot, "30-"))]
 
 mat_tot = data.frame.stat(seq_tot, 100)
-mat_end_900 = data.frame.stat(seq_end_900, 100)
-mat_start_30 = data.frame.stat(seq_start_30, 100)
+mat_end_900 = extract_sub_mat(mat_tot, seq_end_900)
+mat_end_8100 = extract_sub_mat(mat_tot, seq_end_8100)
+mat_start_30 = extract_sub_mat(mat_tot, seq_start_30)
+```
 
+Graphiques obtenus)
+```{r}
 plot_stat_gen(mat_tot, mat_tot$gen,
-              mat_tot$mean.het.adm, mat_tot$Ne)
+              mat_tot$mean.het.adm, mat_tot$Ne,
+              "Stat en fonction des générations\n selon différentes croissance de Ne")
 plot_stat_gen(mat_end_900, mat_end_900$gen,
-              mat_end_900$mean.het.adm, mat_end_900$Ne)
+              mat_end_900$mean.het.adm, mat_end_900$Ne,
+              "Stat en fonction des générations\n selon différentes croissance de Ne")
+plot_stat_gen(mat_end_8100, mat_end_8100$gen,
+              mat_end_8100$mean.het.adm, mat_end_8100$Ne,
+              "Stat en fonction des générations\n selon différentes croissance de Ne")
 plot_stat_gen(mat_start_30, mat_start_30$gen,
-              mat_start_30$mean.het.adm, mat_start_30$Ne)
+              mat_start_30$mean.het.adm, mat_start_30$Ne,
+              "Stat en fonction des générations\n selon différentes croissance de Ne")
 ```
 
 
