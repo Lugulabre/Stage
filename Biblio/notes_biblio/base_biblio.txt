@@ -1,0 +1,38 @@
+>>> Long, 1991, The genetic structure of admixed populations, Genetics, 127 (1991), pp. 417-428
+
+Contribution alléliques des populations parentes dans admixture diffère selon les loci étudiés
+Erreur échantillonnage, dérive génétique, sélection naturelle...
+
+genetic drift Fst (wright)
+
+test du chi2 pour différencier sélection naturelle de hétérogénéité
+limites : 
+	- confusion sélection et dérive
+	- allèles statistiquement indépendants
+
+Formule fréquence d'un allèle dans population hybride 
+dépend fréquences et contributions populations parentes, genetic drift
+
+Etudes sur data réelles / populations
+
+>>> Browning SR, Browning BL, Daviglus ML, Durazo-Arvizu RA, Schneiderman N, et al. (2018) Ancestry-specific recent effective population size in the Americas. PLOS Genetics 14(5): e1007385. https://doi.org/10.1371/journal.pgen.1007385
+
+
+Analyse taille effective populations hybrides et parentes états unis
+IBD -> identity by descent segments
+http://faculty.washington.edu/browning/ibdne.html
+
+>>> A General Mechanistic Model for Admixture Histories of Hybrid Populations, Paul Verdu and Noah A. Rosenberg, Genetics December 1, 2011 vol. 189 no. 4 1413-1426; https://doi.org/10.1534/genetics.111.132787
+
+
+Equations en suite pour suivre contribution de population 1 à la population hybride selon différents scénarios (si s1s1, s1s2 ou s2s2)
+On modifie la proportion initiale et la contribution au fur et à mesure des générations
+
+>>> MetHis Supp Notes 1
+
+Comment les différents modèles évoqués dans l'article ci-dessus ont été implémentés
+Quels sont les paramètres sur lesquels on peut jouer : 
+9 scénarios avec modification de la contribution, par pulse ou récurrent (croissant/décroissant)
+Possibilité modifier taille de la population hybride au fur et à mesure des générations -> pôint focus
+
+
