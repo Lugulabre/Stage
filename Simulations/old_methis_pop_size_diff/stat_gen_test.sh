@@ -12,9 +12,9 @@ for (( pow = 6; pow < 14; pow++ )); do
     mkdir "Ne$size_ne"
     for (( nb_gen = 1; nb_gen < 101; nb_gen++ )); do
 
-        ../../tools/MetHis/generate_params.py -S 100 -N $nb_gen -P "Ne$size_ne/gen$nb_gen" --Ne "$size_ne/Con/$size_ne-$size_ne" --contrib_s1 default/Pulse/1/default --contrib_s2 default/Pulse/1/default --force-rewrite
+        ../../tools/MetHis/generate_params.py -S 100 -N $nb_gen -P "Ne$size_ne/gen$nb_gen" --Ne "$size_ne/Con/$size_ne-$size_ne" --contrib_s1 default/Pulse/0 --contrib_s2 default/Pulse/0 --force-rewrite
 
-        ../../tools/MetHis/MetHis --sampling 25/25/25 --nb-snp 500 --max-Ne $size_max_ne --prefix "Ne$size_ne/gen$nb_gen" --nb-simul 100 --nb-thread 18 --input-path ../../tools/MetHis/example_dataset/input_example.txt 
+        ../../tools/MetHis/MetHis --sampling 25/25/25 --nb-snp 500 --max-Ne $size_max_ne --prefix "Ne$size_ne/gen$nb_gen" --nb-simul 100 --nb-thread 10 --input-path ../../tools/MetHis/example_dataset/input_example.txt 
 
     done
 done
