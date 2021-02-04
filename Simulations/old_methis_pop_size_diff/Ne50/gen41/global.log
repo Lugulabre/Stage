@@ -1,11 +1,11 @@
 This is MetHis.
-Local time is 29-01-2021 14:53:42
+Local time is 04-02-2021 11:04:55
 Command line interpreted as:
 	save-data: False
 	nb-snp: 500
 	max-Ne: 100
 	nb-simul: 1-100
-	nb-thread: 18
+	nb-thread: 20
 	sampling: 25/25/25
 	input-path: ../../tools/MetHis/example_dataset/input_example.txt
 Starting simulation 1
