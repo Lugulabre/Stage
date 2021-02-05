@@ -91,3 +91,14 @@ https://onlinelibrary.wiley.com/doi/full/10.1111/mec.12770
 
 Schémas de bottleneck complexes
 Pop increase pas possible fixer Nu (cf code generate_params.py l. 278)
+
+03/02/21
+Réunion Paul
+!! échantillonage
+stats f3, angles, props, Fst, F
+
+05/02/21
+Code Methis semble ok pour séquentiel
+Lancement simulations
+Beaucoup de simulations à faire, plus de moyennes de moyennes grâce aux séquentiels
+50 000 SNP pour résoudre 

@@ -85,6 +85,7 @@ summary(mat_prior_64_8192$s1[which(mat_prior_64_8192$Ne == "8192")])
 #Attention !!! Script à utiliser s'il y a de nouvelles simulations
 #et doit être modifié si de nouveaux sous-répertoires sont ajoutés
 #2 lignes à ajouter dans ce cas : "cd $path_to_directory" et "set_resum_stat"
+#Ne pas utiliser si répertoire cloné du github
 
 set_resum_stat()
 {
