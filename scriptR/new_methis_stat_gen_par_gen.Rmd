@@ -253,8 +253,7 @@ plot_stat_gen(mat_tot_mean, mat_tot_mean$gen,
               "Stat en fonction des générations\n selon différentes Ne initiales")
 plot_stat_gen(mat_tot, mat_tot$gen, 
               mat_tot$Fst.s1.adm, mat_tot$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales",
-              TRUE)
+              "Stat en fonction des générations\n selon différentes Ne initiales")
 #plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
 #              mat_64_8192$f3, mat_64_8192$Ne,
 #              "Stat en fonction des générations\n selon différentes Ne initiales")

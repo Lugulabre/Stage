@@ -1,0 +1,284 @@
+---
+title: "Représentation des stats calculées par MetHis (50 000 SNP)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/new_methis_pop_size_diff_50000_snp/")
+```
+
+## Librairies utilisées
+
+```{r}
+library(stringr)
+library(ggplot2)
+require(MASS)
+```
+
+## Vérification des priors utilisés
+
+Fonction
+```{r}
+
+#Data frame prior
+data.frame.prior = function(seq_ne, max_simu){
+
+  #Créer matrice vide qui contiendra les stats
+  mat_prior = matrix(data = NA, nrow = length(seq_ne)*max_simu, ncol = 4)
+  #Attribution nom colonnes selon appelation stat par MetHis
+  colnames(mat_prior) = c("Ne", "simu", "s1", "s2")  
+  mat_prior = as.data.frame(mat_prior)
+  #Compteur pour indiquer les lignes à remplir
+  cpt = 0
+  
+  for (ne in seq_ne) {
+    dir_ne = str_c("Ne", toString(ne), "/") #Répertoire de taille effective
+    row_min = cpt*max_simu+1
+    row_max = (cpt+1)*max_simu
+    mat_prior[row_min:row_max,1] = toString(ne)
+    cpt = cpt+1
+    
+    for (nb_simu in 1:max_simu) {
+      mat_prior[row_min+nb_simu-1,2] = nb_simu
+      dir_simu = str_c("simu_", toString(nb_simu), "/")
+      file_path = str_c(dir_ne, dir_simu, "simu_", nb_simu, ".txt")
+      df_tmp = read.table(file_path, header = TRUE)
+      mat_prior[row_min+nb_simu-1,3:4] = df_tmp[1,5:6]
+    }
+  }
+  
+
+  #Passage des Ne en facteur
+  mat_prior$Ne = factor(as.factor(mat_prior$Ne), levels = as.character(seq_ne))
+  #Passage simuulations en entier
+  mat_prior$simu = as.integer(mat_prior$simu)  
+
+  return(mat_prior)
+}
+
+```
+
+Application
+```{r}
+seq_1024_16384 = 2**seq(10,14,1)
+#seq_60_100 = 10*seq(5,10,1)
+#seq_tot = sort(c(seq_60_100, seq_64_8192))
+mat_prior_1024_16384 = data.frame.prior(seq_1024_16384, 100)
+summary(mat_prior_1024_16384$s1)
+```
+
+
+## Résumé des lectures de stat
+
+
+
+## Fonctions utilisées
+
+```{r}
+#Data frame construction
+data.frame.stat = function(seq_ne, max_gen, max_simu){
+
+  #Créer matrice vide qui contiendra les stats
+  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 63)
+  mat_stat = as.data.frame(mat_stat)
+  #Compteur pour indiquer les lignes à remplir
+  cpt = 0
+
+  for (ne in seq_ne) {
+    if (dir.exists(str_c("Ne", toString(ne), "/"))) {
+      dir_ne = str_c("Ne", toString(ne), "/") #Répertoire de taille effective
+      row_min = cpt*max_gen*max_simu+1 #Ligne min. où on écrit les stats pour le Ne donné
+      row_max = (cpt+1)*max_gen*max_simu         #Ligne max. où on écrit les stats  
+      mat_stat[row_min:row_max,1] = toString(ne) #Ecriture du Ne correspondant pour les stats qui seront écrites
+      cpt = cpt+1                             #Incrémentation du compteur
+  
+      for (nb_simu in 1:max_simu) {
+        dir_simu = str_c("simu_", toString(nb_simu), "/")
+        row_min_simu = (nb_simu-1)*max_gen + row_min
+        row_max_simu = nb_simu*max_gen + row_min -1
+        mat_stat[row_min_simu:row_max_simu,2] = nb_simu
+        file_path = str_c(dir_ne, dir_simu, "final_sumstats.txt")
+        file_stat = read.table(file_path, header = TRUE) #Lecture fichier stat résumées
+        #Suppression 1ère colonne, contenant uniquement chiffres pour tri en bash. 
+        mat_stat[row_min_simu:row_max_simu,3:63] = file_stat
+      }
+    }
+  }
+  
+
+  #Attribution nom colonnes selon appelation stat par MetHis
+  colnames(mat_stat) = c("Ne", "simu", names(file_stat))
+  #Passage des Ne en facteur
+  mat_stat$Ne = factor(as.factor(mat_stat$Ne), levels = as.character(seq_ne))
+  #Passage simulations en entier
+  mat_stat$simu = as.integer(mat_stat$simu)
+  #Passage générations en entier
+  mat_stat$Generation = as.integer(mat_stat$Generation)
+  #Passage stats en double
+  for (numcol in 4:ncol(mat_stat)) {
+    mat_stat[,numcol] = as.double(mat_stat[,numcol])
+  }
+  
+  return(mat_stat)
+}
+  
+```
+
+
+```{r}
+#Passage en moyenne
+data.frame.mean = function(df_stat, max_gen, seq_ne){
+  
+  lrow = length(seq_ne)
+  df_mean = matrix(data = NA, nrow = lrow*max_gen, ncol = 62 )
+  df_mean = as.data.frame(df_mean)
+  cpt = 0
+
+  for (ne in seq_ne) {
+    df_tmp = df_stat[which(df_stat$Ne == ne),]
+    
+    row_min = cpt*max_gen+1
+    row_max = (cpt+1)*max_gen
+    df_mean[row_min:row_max, 1] = toString(ne) 
+    cpt = cpt+1
+    
+    for (gen in 0:(max_gen-1) ) {
+      df_mean[row_min+gen, 2] = gen
+      vec_tmp = apply(df_tmp[which(df_tmp$Generation == gen), 4:63], 2, mean)
+      df_mean[row_min+gen, 3:62] = vec_tmp
+    }
+  }
+  
+  colnames(df_mean) = colnames(df_stat)[-2]
+  df_mean$Ne = factor(as.factor(df_mean$Ne), levels = seq_ne )
+  return(df_mean)
+}
+
+```
+
+
+```{r}
+#Plot function
+#Affichage d'une stat au cours des générations
+plot_stat_gen = function(df, gen, stat, Ne, titre, ligne = FALSE, legd = TRUE){
+  p = ggplot(df, aes(x = gen, y = stat, color = Ne)) + ggtitle(titre)
+  if (ligne) {
+    p = p + geom_point(size = 0.1, show.legend = legd)+ geom_line(show.legend = legd)
+  }else{
+    #smooth de la courbe pour obtenir régression et tempérer variabilité due au TCL
+    p = p + geom_point(size = 0.1, show.legend = legd)+ geom_smooth(show.legend = legd)
+  }
+  
+  print(p)
+}
+```
+
+
+```{r}
+extract_sub_mat = function(all_mat, list_ne){
+  all_rows = c()
+  for (ne in as.character(list_ne)) {
+    all_rows = append(all_rows, which(all_mat[,1] == ne))
+  }
+  return(all_mat[all_rows,])
+}
+```
+
+
+## Population constante de tailles initiales différentes
+
+Calcul des matrices de stats
+
+```{r}
+seq_1024_16384 = 2**seq(10,14,1)
+seq_50_1000 = seq(50,600,1)
+seq_tot = sort(c(seq_50_1000, seq_1024_16384))
+
+mat_tot = data.frame.stat(seq_tot, 101, 10)
+#mat_60_100 = extract_sub_mat(mat_tot, seq_50_1000)
+mat_1024_16384 = extract_sub_mat(mat_tot, seq_1024_16384)
+
+mat_1024_16384_mean = data.frame.mean(mat_1024_16384, 101, seq_1024_16384)
+
+```
+
+
+Graphiques obtenus
+
+```{r}
+plot_stat_gen(mat_tot, mat_tot$Generation, 
+              mat_tot$Fst.s1.adm, mat_tot$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
+              mat_1024_16384$Fst.s1.adm, mat_1024_16384$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
+              mat_1024_16384$mean.adm.props, mat_1024_16384$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation, 
+              mat_1024_16384_mean$Fst.s1.adm, mat_1024_16384_mean$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation, 
+              mat_1024_16384_mean$mean.het.adm, mat_1024_16384_mean$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+#plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
+#              mat_64_8192$mean.adm.props, mat_64_8192$Ne,
+#              "Stat en fonction des générations\n selon différentes Ne initiales", #TRUE)
+```
+
+
+
+## Populations croissantes
+
+```{r}
+setwd("../new_methis_pop_increase_50000_snp/")
+seq_ne_ini = seq(50,100,2)
+seq_ne_fin = seq(100, 10000, 100)
+seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
+seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
+
+for (ne_ini in seq_ne_ini) {
+  if (dir.exists(str_c("Ne", ne_ini, "-XXX/"))) {
+    dir_ne = str_c("Ne", ne_ini, "-XXX/")
+    setwd(dir_ne)
+    motif_detect = str_c("^",ne_ini,"-")
+    vec_ne_tmp = seq_combi[which(str_detect(seq_combi, motif_detect))]
+    mat_tmp = data.frame.stat(seq_ne = vec_ne_tmp, max_gen = 101, max_simu = 1)
+    if (ne_ini == seq_ne_ini[1]) {
+      mat_pop_inc = mat_tmp
+    }else{
+      mat_pop_inc = rbind(mat_pop_inc, mat_tmp)
+    }
+    setwd("../")
+  }
+}
+
+mat_pop_inc = na.omit(mat_pop_inc)
+
+mat_end_10000 = extract_sub_mat(mat_pop_inc,
+                                as.data.frame(outer(seq_ne_ini,
+                                                    seq_ne_fin,
+                                                    FUN="paste",
+                                                    sep="-"))[,1])
+
+```
+
+
+```{r}
+plot_stat_gen(mat_pop_inc, mat_pop_inc$Generation, 
+              mat_pop_inc$f3, mat_pop_inc$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              FALSE, legd = FALSE)
+plot_stat_gen(mat_pop_inc, mat_pop_inc$Generation, 
+              mat_pop_inc$mean.het.adm, mat_pop_inc$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              FALSE, legd = FALSE)
+plot_stat_gen(mat_end_10000, mat_end_10000$Generation, 
+              mat_end_10000$mean.het.adm, mat_end_10000$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+```
+
+

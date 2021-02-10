@@ -64,3 +64,5 @@ Programme d'approximation de Ne via LD (nb calculs détaillés)
 >>> Admixture, Population Structure, and F-Statistics, Peter
 
 >>> Reconstructing Indian Population History, Reich
+
+>>> Genetic Drift and the Loss of Alleles Versus Heterozygosity, Allendorf
