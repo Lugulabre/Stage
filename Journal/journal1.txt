@@ -91,3 +91,25 @@ https://onlinelibrary.wiley.com/doi/full/10.1111/mec.12770
 
 Schémas de bottleneck complexes
 Pop increase pas possible fixer Nu (cf code generate_params.py l. 278)
+
+03/02/21
+Réunion Paul
+!! échantillonage
+stats f3, angles, props, Fst, F
+
+05/02/21
+Code Methis semble ok pour séquentiel
+Lancement simulations
+Beaucoup de simulations à faire, plus de moyennes de moyennes grâce aux séquentiels
+50 000 SNP pour résoudre
+
+10/02/21
+Simulations lancées les 3 derniers jours
+Pas mal d'erreur dans le code de lancement des simu, nécessité d'en relancer
++ beaucoup plus de temps que prévu, certaines simu stoppées car calculées comme beaucoup trop longues
+Simu plus courte (ex passage de pas de 1 à pas de 2 ou pas de 10 à pas de 100)
+Lancement simu selon Nu
+Simu à "trous" -> tout n'est pas couvert, voir au fur et à mesure et faire attention à ne pas écraser simu déjà finies
+Séquentiel marche bien
+
+Biblio sur bottleneck
