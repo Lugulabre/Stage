@@ -6,13 +6,16 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/new_methis_pop_size_diff_50000_snp/")
+#knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/new_methis_pop_increase_50000_snp_Nu_var/")
+
 ```
 
 ## Librairies utilisées
 
 ```{r}
-library(stringr)
 library(ggplot2)
+library(plot3D)
+library(stringr)
 require(MASS)
 ```
 
@@ -61,11 +64,11 @@ data.frame.prior = function(seq_ne, max_simu){
 
 Application
 ```{r}
-seq_1024_16384 = 2**seq(10,14,1)
+#seq_1024_16384 = 2**seq(10,14,1)
 #seq_60_100 = 10*seq(5,10,1)
 #seq_tot = sort(c(seq_60_100, seq_64_8192))
-mat_prior_1024_16384 = data.frame.prior(seq_1024_16384, 100)
-summary(mat_prior_1024_16384$s1)
+#mat_prior_1024_16384 = data.frame.prior(seq_1024_16384, 100)
+#summary(mat_prior_1024_16384$s1)
 ```
 
 
@@ -161,8 +164,9 @@ data.frame.mean = function(df_stat, max_gen, seq_ne){
 ```{r}
 #Plot function
 #Affichage d'une stat au cours des générations
-plot_stat_gen = function(df, gen, stat, Ne, titre, ligne = FALSE, legd = TRUE){
-  p = ggplot(df, aes(x = gen, y = stat, color = Ne)) + ggtitle(titre)
+plot_stat_gen = function(df, gen, stat, color_col, titre, ligne = FALSE, legd = TRUE){
+  p = ggplot(df, aes(x = gen, y = stat, color = color_col)) + ggtitle(titre)
+  
   if (ligne) {
     p = p + geom_point(size = 0.1, show.legend = legd)+ geom_line(show.legend = legd)
   }else{
@@ -192,14 +196,14 @@ Calcul des matrices de stats
 
 ```{r}
 seq_1024_16384 = 2**seq(10,14,1)
-seq_50_1000 = seq(50,600,1)
+seq_50_1000 = seq(50,1000,1)
 seq_tot = sort(c(seq_50_1000, seq_1024_16384))
 
-mat_tot = data.frame.stat(seq_tot, 101, 10)
-#mat_60_100 = extract_sub_mat(mat_tot, seq_50_1000)
+mat_tot = data.frame.stat(seq_tot, 101, 1)
+mat_50_1000 = extract_sub_mat(mat_tot, seq_50_1000)
 mat_1024_16384 = extract_sub_mat(mat_tot, seq_1024_16384)
 
-mat_1024_16384_mean = data.frame.mean(mat_1024_16384, 101, seq_1024_16384)
+#mat_1024_16384_mean = data.frame.mean(mat_1024_16384, 101, seq_1024_16384)
 
 ```
 
@@ -211,18 +215,19 @@ plot_stat_gen(mat_tot, mat_tot$Generation,
               mat_tot$Fst.s1.adm, mat_tot$Ne,
               "Stat en fonction des générations\n selon différentes Ne initiales",
               legd = FALSE)
+plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
+              mat_50_1000$Fst.s1.adm, mat_50_1000$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
 plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
               mat_1024_16384$Fst.s1.adm, mat_1024_16384$Ne,
               "Stat en fonction des générations\n selon différentes Ne initiales")
-plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
-              mat_1024_16384$mean.adm.props, mat_1024_16384$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
-plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation, 
-              mat_1024_16384_mean$Fst.s1.adm, mat_1024_16384_mean$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
-plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation, 
-              mat_1024_16384_mean$mean.het.adm, mat_1024_16384_mean$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
+#plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation, 
+#              mat_1024_16384_mean$Fst.s1.adm, mat_1024_16384_mean$Ne,
+#              "Stat en fonction des générations\n selon différentes Ne initiales")
+#plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation, 
+#              mat_1024_16384_mean$mean.het.adm, mat_1024_16384_mean$Ne,
+#              "Stat en fonction des générations\n selon différentes Ne initiales")
 #plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
 #              mat_64_8192$mean.adm.props, mat_64_8192$Ne,
 #              "Stat en fonction des générations\n selon différentes Ne initiales", #TRUE)
@@ -233,33 +238,42 @@ plot_stat_gen(mat_1024_16384_mean, mat_1024_16384_mean$Generation,
 ## Populations croissantes
 
 ```{r}
+data.frame.increase = function(seq_ne_ini, seq_combi){
+  for (ne_ini in seq_ne_ini) {
+    if (dir.exists(str_c("Ne", ne_ini, "-XXX/"))) {
+      dir_ne = str_c("Ne", ne_ini, "-XXX/")
+      setwd(dir_ne)
+      motif_detect = str_c("^",ne_ini,"-")
+      vec_ne_tmp = seq_combi[which(str_detect(seq_combi, motif_detect))]
+      mat_tmp = data.frame.stat(seq_ne = vec_ne_tmp, max_gen = 101, max_simu = 1)
+      if (ne_ini == seq_ne_ini[1]) {
+        mat_pop_inc = mat_tmp
+      }else{
+        mat_pop_inc = rbind(mat_pop_inc, mat_tmp)
+      }
+      setwd("../")
+    }
+  }
+  return(na.omit(mat_pop_inc))
+}
+
+
+```
+
+
+```{r}
 setwd("../new_methis_pop_increase_50000_snp/")
 seq_ne_ini = seq(50,100,2)
 seq_ne_fin = seq(100, 10000, 100)
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
 
-for (ne_ini in seq_ne_ini) {
-  if (dir.exists(str_c("Ne", ne_ini, "-XXX/"))) {
-    dir_ne = str_c("Ne", ne_ini, "-XXX/")
-    setwd(dir_ne)
-    motif_detect = str_c("^",ne_ini,"-")
-    vec_ne_tmp = seq_combi[which(str_detect(seq_combi, motif_detect))]
-    mat_tmp = data.frame.stat(seq_ne = vec_ne_tmp, max_gen = 101, max_simu = 1)
-    if (ne_ini == seq_ne_ini[1]) {
-      mat_pop_inc = mat_tmp
-    }else{
-      mat_pop_inc = rbind(mat_pop_inc, mat_tmp)
-    }
-    setwd("../")
-  }
-}
+mat_pop_inc = data.frame.increase(seq_ne_ini, seq_combi)
 
-mat_pop_inc = na.omit(mat_pop_inc)
 
 mat_end_10000 = extract_sub_mat(mat_pop_inc,
                                 as.data.frame(outer(seq_ne_ini,
-                                                    seq_ne_fin,
+                                                    c("10000"),
                                                     FUN="paste",
                                                     sep="-"))[,1])
 
@@ -278,7 +292,157 @@ plot_stat_gen(mat_pop_inc, mat_pop_inc$Generation,
 plot_stat_gen(mat_end_10000, mat_end_10000$Generation, 
               mat_end_10000$mean.het.adm, mat_end_10000$Ne,
               "Stat en fonction des générations\n selon différentes Ne initiales",
-              legd = FALSE)
+              legd = TRUE)
 ```
 
+
+## Variation Nu
+
+```{r}
+setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+seq_nu = sprintf("%.2f", seq(0.05, 0.45, 0.05))
+seq_ne_ini = seq(50,100,10)
+seq_ne_fin = seq(100, 10000, 200)
+seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
+seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
+
+list_df_nu = list()
+cpt = 1
+
+for (nu in seq_nu) {
+  if(dir.exists(str_c("Nu", nu ))){
+    dir_nu = str_c("Nu", nu, "/")
+    setwd(dir_nu)
+    list_df_nu[[cpt]] = data.frame.increase(seq_ne_ini, seq_combi)
+    cpt = cpt+1
+    setwd("../")
+  }
+}
+
+for (combi_lst in 1:length(list_df_nu)) {
+  if (combi_lst == 1) {
+    mat_pop_nu = list_df_nu[[combi_lst]]
+    mat_pop_nu = data.frame(mat_pop_nu, Nu = seq_nu[combi_lst])
+  }else{
+    mat_tmp = list_df_nu[[combi_lst]]
+    mat_tmp = data.frame(mat_tmp, Nu = seq_nu[combi_lst])
+    mat_pop_nu = rbind(mat_pop_nu, mat_tmp)
+  }
+}
+
+mat_pop_nu$Nu = as.factor(mat_pop_nu$Nu)
+
+```
+
+
+```{r}
+plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation, 
+              mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              FALSE, legd = FALSE)
+plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation, 
+              mat_pop_nu$mean.het.adm, mat_pop_nu$Nu,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              FALSE, legd = FALSE)
+plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation, 
+              mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              TRUE, legd = FALSE)
+plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation, 
+              mat_pop_nu$mean.het.adm, mat_pop_nu$Nu,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              TRUE, legd = FALSE)
+
+```
+
+```{r}
+
+for (rg_list in 1:length(list_df_nu)) {
+  plot_stat_gen(list_df_nu[[rg_list]], list_df_nu[[rg_list]]$Generation, 
+              list_df_nu[[rg_list]]$mean.het.adm, list_df_nu[[rg_list]]$Ne,
+              str_c("Nu = ",seq_nu[rg_list]), TRUE,legd = FALSE)
+
+}
+
+```
+
+
+```{r}
+
+for (rg_list in 1:length(list_df_nu)) {
+  
+  list_ne = list_df_nu[[rg_list]]$Ne[which(list_df_nu[[rg_list]]$Generation == 100)]
+  list_ne = as.integer(unlist(str_split(list_ne, "-")))
+  list_ne0 = list_ne[seq(1, length(list_ne), 2)]
+  list_nef = list_ne[seq(2, length(list_ne), 2)]
+  mat_tmp = list_df_nu[[rg_list]][which(list_df_nu[[rg_list]]$Generation == 100),]
+  
+  scatter3D(x = list_ne0, y = list_nef, z = mat_tmp$mean.het.adm,
+            bty = "g", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
+            theta = 120, phi = 0, type = "s", cex = 0.6,
+            xlab = "Ne0", ylab = "Nef", zlab = "Stat")
+
+}
+
+
+```
+
+```{r}
+setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+
+mat_ne_inc = data.frame()
+test = c()
+cpt = 1
+
+for (nu in seq_nu) {
+  if(dir.exists(str_c("Nu", nu ))){
+    dir_nu = str_c("Nu", nu, "/")
+    setwd(dir_nu)
+    for (ne_ini in seq_ne_ini) {
+      if (dir.exists(str_c("Ne", ne_ini, "-XXX/"))) {
+        dir_ne = str_c("Ne", ne_ini, "-XXX/")
+        setwd(dir_ne)
+        seq_combi = as.data.frame(outer(ne_ini, seq_ne_fin,
+                                        FUN="paste", sep="-"))
+        seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
+        for (combi in seq_combi) {
+          if (dir.exists(str_c("Ne", combi))) {
+            dir_ne_bis = str_c("Ne", combi, "/simu_1/")
+            setwd(dir_ne_bis)
+            test[cpt] = dir_ne_bis
+            cpt = cpt + 1
+            file_tmp = read.table("simu_1.par", header = TRUE)
+            if (nu == seq_nu[1] && ne_ini==seq_ne_ini[1] && combi == seq_combi[1]) {
+              mat_ne_inc = as.data.frame(file_tmp[,2])
+            }else{
+              mat_ne_inc = cbind(mat_ne_inc, file_tmp[,2])
+            }
+            
+            setwd("../../")
+          }
+        }
+        setwd("../")
+      }
+    }
+    setwd("../")
+
+  }
+}
+
+vec_tot = c()
+for (i in c(1:299)) {
+  vec_tot = c(vec_tot, mat_ne_inc[,i])
+}
+
+dim(mat_ne_inc[,1:299])
+
+a$Generation
+length(a$mean.het.adm)
+
+scatter3D(x = a$Generation, y = vec_tot, z = a$mean.het.adm,
+            bty = "g", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
+            theta = 30, phi = 30, type = "s", cex = 0.6,
+            xlab = "Gen", ylab = "Ne", zlab = "Stat")
+
+```
 
