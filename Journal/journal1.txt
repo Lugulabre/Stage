@@ -113,3 +113,7 @@ Simu à "trous" -> tout n'est pas couvert, voir au fur et à mesure et faire att
 Séquentiel marche bien
 
 Biblio sur bottleneck
+
+15/02/21
+A FAIRE :
+Rajouter les hétérozygoties initiales sur les graphes
