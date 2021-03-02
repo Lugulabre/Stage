@@ -735,11 +735,6 @@ mat_bottle_time_80 = mat_bottle[which(mat_bottle$time_botl == 80),]
 
 ```
 
-```{r}
-summary(mat_bottle$alpha_u)
-```
-
-
 
 ```{r}
 
