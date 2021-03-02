@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp/")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp")
 #knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
 
 ```
@@ -15,7 +15,9 @@ knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SN
 ```{r}
 library(ggplot2)
 library(ggthemes)
+library(lattice)
 library(plot3D)
+library(rriskDistributions)
 library(stringr)
 require(MASS)
 ```
@@ -460,6 +462,10 @@ scatter3D(x = list_ne0, y = list_nef, z = mat_tmp$mean.het.adm,
                       facets = NA))
 
 ```
+```{r}
+print(wireframe(mat_tmp$mean.het.adm ~ list_ne0 * list_nef, data = mat_tmp,
+                screen = list(z = 40, x = -60)))
+```
 
 
 Calcul matrice pour connaître Ne à chaque génération. 
@@ -527,22 +533,21 @@ for (rg_nu in seq_nu) {
   rg_nu
   df_tmp = mat_pop_nu[which(mat_pop_nu$Nu == rg_nu),]
   
-  grid.lines = 30
-  fit <- loess(df_tmp$mean.het.adm ~ df_tmp$Generation + as.numeric(df_tmp$ne_gen))
-  x.pred <- seq(min(df_tmp$Generation), max(df_tmp$Generation), length.out = grid.lines)
-  y.pred <- seq(min(as.numeric(df_tmp$ne_gen)),
-                max(as.numeric(df_tmp$ne_gen)), length.out = grid.lines)
-  xy <- expand.grid( x = x.pred, y = y.pred)
-  z.pred <- matrix(predict(fit, newdata = xy), 
-                 nrow = grid.lines, ncol = grid.lines)
+  #grid.lines = 30
+  #fit <- loess(df_tmp$mean.het.adm ~ df_tmp$Generation + as.numeric(df_tmp$ne_gen))
+  #x.pred <- seq(min(df_tmp$Generation), max(df_tmp$Generation), length.out = grid.lines)
+  #y.pred <- seq(min(as.numeric(df_tmp$ne_gen)),
+  #              max(as.numeric(df_tmp$ne_gen)), length.out = grid.lines)
+  #xy <- expand.grid( x = x.pred, y = y.pred)
+  # z.pred <- matrix(predict(fit, newdata = xy), 
+  #                nrow = grid.lines, ncol = grid.lines)
   
   scatter3D(x = df_tmp$Generation, y = df_tmp$ne_gen, z = df_tmp$mean.het.adm,
             bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_nu],
             theta = 210, phi = 20, type = "s",cex = 0.2, cex.lab = 0.6, cex.axis = 0.5,
-            xlab = "Gen", ylab = "Ne", zlab = "Stat",
-            surf = list(x = x.pred, y = y.pred, z = z.pred,facets = NA))
+            xlab = "Gen", ylab = "Ne", zlab = "Stat")
 }
-
+#surf = list(x = x.pred, y = y.pred, z = z.pred,facets = NA)
 ```
 
 ```{r}
@@ -579,7 +584,7 @@ for (nu in seq_nu_bis) {
     setwd(dir_nu)
     
     df_tmp = data.frame.increase(seq_ne_ini, seq_combi)
-    col_nu = as.integer(rep(nu, nrow(df_tmp)))
+    col_nu = as.character(rep(nu, nrow(df_tmp)))
     col_cpt = rep(cpt, nrow(df_tmp))
     col_n0 = rep(NA, nrow(df_tmp))
     col_nf = rep(NA, nrow(df_tmp))
@@ -650,12 +655,16 @@ for (nu in seq_nu_bis) {
 
 ```{r}
 df_nu_reduce_gen_100 = df_nu_reduce[which(df_nu_reduce$Generation == 100),]
-
+df_nu_reduce$log_mean = log(df_nu_reduce$mean.het.adm)
 scatter3D(x = df_nu_reduce$Generation, y = df_nu_reduce$nf,
-          z = df_nu_reduce$mean.het.adm,
-          ticktype = "detailed",bty = "b2",pch = 16,
-          theta = 210, phi = 20, type = "s", cex.lab = 0.6, cex.axis = 0.5,
-          xlab = "generation", ylab = "Nf", zlab = "stat")
+          z = df_nu_reduce$mean.het.adm, colvar = as.numeric(df_nu_reduce$nu),
+          col = c("#1B9E77", "#D95F02", "#7570B3"),
+          colkey = list(at = c(0.1, 0.25, 0.4),
+                        addlines = TRUE, length = 1, width = 0.5,
+                        labels = levels(as.factor(df_nu_reduce$nu))),
+          ticktype = "detailed",bty = "g",pch = 16,
+          theta = 0, phi = 20, type = "s", cex = 0.5, cex.lab = 0.6, cex.axis = 0.5,
+          xlab = "generation", ylab = "Nf", zlab = "stat", clab = "U")
 
   # scatter3D(x = df_tmp$Generation, y = vec_tot, z = df_tmp$mean.het.adm,
   #           bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_nu],
@@ -688,22 +697,23 @@ for (alpha in seq_alpha) {
     for (bottle in seq_bottle) {
       change_dir = str_c("alpha", alpha, "/Nu", nu, "/bottle",bottle,"/")
       setwd(change_dir)
+      
+      mat_tmp = data.frame.increase(seq_ne0, seq_combi)
+      col_alpha = rep(alpha, nrow(mat_tmp))
+      col_nu = rep(nu, nrow(mat_tmp))
+      col_bottle = rep(bottle, nrow(mat_tmp))
+      col_cpt = rep(cpt, nrow(mat_tmp))
+      col_bott_u = as.numeric(rep(bottle, nrow(mat_tmp)))/as.numeric(rep(nu, nrow(mat_tmp)))
+      col_bott_u = ceiling(col_bott_u/10)*10
+      col_alpha_u = as.numeric(rep(nu, nrow(mat_tmp)))/as.numeric(rep(alpha, nrow(mat_tmp)))
+      col_alpha_u = ceiling(col_alpha_u/0.001)*0.001
+      mat_tmp = data.frame(mat_tmp, alpha = col_alpha,
+                           U = col_nu, time_botl = col_bottle, cpt = col_cpt,
+                           bott_u = col_bott_u, alpha_u = col_alpha_u)
+      
       if (alpha==seq_alpha[1] & nu==seq_nu_red[1] & bottle==seq_bottle[1]) {
-        mat_bottle = data.frame.increase(seq_ne0, seq_combi)
-        col_alpha = rep(alpha, nrow(mat_bottle))
-        col_nu = rep(nu, nrow(mat_bottle))
-        col_bottle = rep(bottle, nrow(mat_bottle))
-        col_cpt = rep(cpt, nrow(mat_bottle))
-        mat_bottle = data.frame(mat_bottle, alpha = col_alpha,
-                                U = col_nu, time_botl = col_bottle, cpt = col_cpt)
+        mat_bottle = mat_tmp
       }else{
-        mat_tmp = data.frame.increase(seq_ne0, seq_combi)
-        col_alpha = rep(alpha, nrow(mat_tmp))
-        col_nu = rep(nu, nrow(mat_tmp))
-        col_bottle = rep(bottle, nrow(mat_tmp))
-        col_cpt = rep(cpt, nrow(mat_tmp))
-        mat_tmp = data.frame(mat_tmp, alpha = col_alpha,
-                             U = col_nu, time_botl = col_bottle, cpt = col_cpt)
         mat_bottle = rbind(mat_bottle, mat_tmp)
       }
       cpt = cpt + 1
@@ -716,12 +726,20 @@ mat_bottle$alpha = as.factor(mat_bottle$alpha)
 mat_bottle$U = as.factor(mat_bottle$U)
 mat_bottle$time_botl = as.factor(mat_bottle$time_botl)
 mat_bottle$cpt = as.factor(mat_bottle$cpt)
+mat_bottle$bott_u = as.factor(mat_bottle$bott_u)
+mat_bottle$alpha_u = as.factor(mat_bottle$alpha_u)
 
 mat_bottle_time_50 = mat_bottle[which(mat_bottle$time_botl == 50),]
 mat_bottle_time_20 = mat_bottle[which(mat_bottle$time_botl == 20),]
 mat_bottle_time_80 = mat_bottle[which(mat_bottle$time_botl == 80),]
 
 ```
+
+```{r}
+summary(mat_bottle$alpha_u)
+```
+
+
 
 ```{r}
 
@@ -760,11 +778,35 @@ print(p)
 
 ```
 ```{r}
+p = plot_stat_gen(mat_bottle_time_20, mat_bottle_time_20$Generation, 
+                  mat_bottle_time_20$perc100.adm.angles, mat_bottle_time_20$cpt,
+                  mat_bottle_time_20$alpha, size_point = 0,
+                  "Stat en fonction des générations\nbottleneck 20 N0 1000 Nf 1000",TRUE,
+                  legd = TRUE, line_t = mat_bottle_time_20$U)
+p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
+  geom_vline(xintercept = 21, size = 0.4, color = "orange")+
+  labs(color = "alpha", linetype = "U")
+
+
+print(p)
+
+p = plot_stat_gen(mat_bottle_time_50, mat_bottle_time_50$Generation, 
+                  mat_bottle_time_50$perc100.adm.angles, mat_bottle_time_50$cpt,
+                  mat_bottle_time_50$alpha, size_point = 0,
+                  "Stat en fonction des générations\nbottleneck 50 N0 1000 Nf 1000",TRUE,
+                  legd = TRUE, line_t = mat_bottle_time_50$U)
+p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
+  geom_vline(xintercept = 51, size = 0.4, color = "orange")+
+  labs(color = "alpha", linetype = "U")
+
+
+print(p)
+
 p = plot_stat_gen(mat_bottle_time_80, mat_bottle_time_80$Generation, 
-              mat_bottle_time_80$mean.het.adm, mat_bottle_time_80$cpt,
-              mat_bottle_time_80$alpha, size_point = 0,
-              "Stat en fonction des générations\nbottleneck 80 N0 1000 Nf 1000",TRUE,
-              legd = TRUE, line_t = mat_bottle_time_80$U)
+                  mat_bottle_time_80$mean.adm.props, mat_bottle_time_80$cpt,
+                  mat_bottle_time_80$alpha, size_point = 0,
+                  "Stat en fonction des générations\nbottleneck 80 N0 1000 Nf 1000",TRUE,
+                  legd = TRUE, line_t = mat_bottle_time_80$U)
 p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
   geom_vline(xintercept = 81, size = 0.4, color = "orange")+
   labs(color = "alpha", linetype = "U")
@@ -775,6 +817,45 @@ print(p)
 ```
 
 ```{r}
+mini_mat_bottle = rbind(mat_bottle_time_20, mat_bottle_time_50, mat_bottle_time_80)
+
+p = plot_stat_gen(mat_bottle, mat_bottle$Generation, 
+              mat_bottle$mean.het.adm, mat_bottle$cpt,
+              mat_bottle$bott_u, line_t = mat_bottle$alpha,
+              "Stat en fonction des générations\n selon différents bottleneck",TRUE,
+              legd = TRUE)
+p = p+  theme(legend.position="bottom", legend.box = "horizontal")
+print(p)
+
+p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+                mini_mat_bottle$mean.het.adm, mini_mat_bottle$cpt,
+                mini_mat_bottle$bott_u, line_t = mini_mat_bottle$alpha,
+                "Stat en fonction des générations\n selon différents bottleneck",TRUE,
+                legd = TRUE)
+p = p + labs(color = "tpsbott/U", linetype = "alpha")
+print(p)
+
+```
+
+
+```{r}
+vec_line = c()
+vec_line[which(mini_mat_bottle$time_botl == 20)] = "dotted"
+vec_line[which(mini_mat_bottle$time_botl == 50)] = "longdash"
+vec_line[which(mini_mat_bottle$time_botl == 80)] = "solid"
+
+p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+                mini_mat_bottle$mean.het.adm, mini_mat_bottle$cpt,
+                mini_mat_bottle$alpha_u, line_t = mini_mat_bottle$time_botl,
+                "Stat en fonction des générations\n selon différents bottleneck",TRUE,
+                legd = TRUE)
+p = p + labs(color = "alpha/U", linetype = "tpsbott") + scale_linetype_manual(values=c("dotted", "longdash", "solid")) + geom_vline(xintercept = 21, size = 0.4, color = "orange", linetype = "dotted")+geom_vline(xintercept = 51, size = 0.4, color = "orange", linetype = "dotted")+geom_vline(xintercept = 81, size = 0.4, color = "orange", linetype = "dotted")
+print(p)
+```
+
+
+
+```{r}
 
 vec_tmp = c()
 vec_tmp[which(mat_bottle$alpha == 0.1)] = 2
@@ -782,13 +863,167 @@ vec_tmp[which(mat_bottle$alpha == 0.5)] = 3
 vec_tmp[which(mat_bottle$alpha == 0.9)] = 4
 
 scatter3D(x = mat_bottle$Generation, y = as.numeric(as.character(mat_bottle$time_botl)),
-          z = mat_bottle$mean.het.adm, col = vec_tmp,
+          z = mat_bottle$mean.het.adm, colvar = as.numeric(vec_tmp),
           ticktype = "detailed",bty = "b2",pch = 16,
-          theta = 360, phi = 0, type = "l",cex = 0.2, cex.lab = 0.6, cex.axis = 0.5,
-          xlab = "generation", ylab = "bottle", zlab = "stat")
+          theta = 85, phi = 0, type = "s",cex = 0.3, cex.lab = 0.6, cex.axis = 0.5,
+          xlab = "generation", ylab = "bottle", zlab = "stat",
+          col = c("#1B9E77", "#D95F02", "#7570B3"),
+          colkey = list(at = c(2.3, 3, 3.7),
+                        addlines = TRUE, length = 1, width = 0.5,
+                        labels = c("0.1", "0.5", "0.9")),
+          clab = "alpha")
 
 
 
+```
+
+```{r}
+# mat_bottle_time_80$mean.adm.props
+# mat_bottle_time_80$var.adm.props
+# mat_bottle_time_80$perc50.adm.props
+# 
+# veca = c(
+# mat_bottle_time_80$perc10.adm.props[1],
+# mat_bottle_time_80$perc20.adm.props[1],
+# mat_bottle_time_80$perc30.adm.props[1],
+# mat_bottle_time_80$perc40.adm.props[1],
+# mat_bottle_time_80$perc50.adm.props[1],
+# mat_bottle_time_80$perc60.adm.props[1],
+# mat_bottle_time_80$perc70.adm.props[1],
+# mat_bottle_time_80$perc80.adm.props[1],
+# mat_bottle_time_80$perc90.adm.props[1])
+# mat_bottle_time_80$skew.adm.props[1]
+# mat_bottle_time_80$mode.adm.props[1]
+# 
+# courbea = get.norm.par(p = seq(0.1, 0.9, 0.1), (veca))
+# courbea
+#fit.perc(p = seq(0.1, 0.9, 0.1), (a))
+
+```
+
+
+```{r}
+
+
+# new_mat_bottle = data.frame(mat_bottle_time_80, mean_norm = rep(NA, nrow(mat_bottle_time_80)),
+#                             sd_norm = rep(NA, nrow(mat_bottle_time_80)))
+# 
+# for (line in c(seq(1, nrow(new_mat_bottle), 100), seq(11, nrow(new_mat_bottle), 10) ) ){
+#   vec_props = c(new_mat_bottle$perc10.adm.props[line],
+#                 new_mat_bottle$perc20.adm.props[line],
+#                 new_mat_bottle$perc30.adm.props[line],
+#                 new_mat_bottle$perc40.adm.props[line],
+#                 new_mat_bottle$perc50.adm.props[line],
+#                 new_mat_bottle$perc60.adm.props[line],
+#                 new_mat_bottle$perc70.adm.props[line],
+#                 new_mat_bottle$perc80.adm.props[line],
+#                 new_mat_bottle$perc90.adm.props[line])
+#   courbe_props = invisible(get.norm.par(p = seq(0.1, 0.9, 0.1), (vec_props)))
+#   
+#   if (!is.na(courbe_props) ){
+#       cat("\014")
+#       dev.off()
+#   }
+# 
+#   #cat("\014")
+#   new_mat_bottle$mean_norm[line] = courbe_props[1]
+#   new_mat_bottle$sd_norm[line] = courbe_props[2]
+# }
+
+
+```
+
+
+```{r}
+# setwd("../../../Images/")
+# 
+# nb_simu = nrow(new_mat_bottle)/101
+# 
+# png(file="example%03d.png", width=600, heigh=400)
+# 
+# for (gen in seq(10,101, 10) ) {
+#   new_mat_tmp = new_mat_bottle[which(new_mat_bottle$Generation == gen),]
+#   for (alpha in seq_alpha) {
+#     new_mat_tmp = new_mat_tmp[which(new_mat_tmp$alpha == alpha),]
+#     for (u in seq_nu_bis) {
+#       new_mat_tmp = new_mat_tmp[which(new_mat_tmp$U == u),]
+#       if (alpha == seq_alpha[1] && u == seq_nu_bis[1]) {
+#         plot(function(x) dnorm(x,new_mat_tmp$mean_norm,new_mat_tmp$sd_norm),
+#              0, 1.2,xlab="x",ylab="",main = gen, col ="red")
+#       }else{
+#         if (!identical(new_mat_tmp$mean_norm, numeric(0)) |
+#             !identical(new_mat_tmp$sd_norm, numeric(0))) {
+#           curve(function(x) dnorm(x,new_mat_tmp$mean_norm,new_mat_tmp$sd_norm),
+#                 col="red",from=0,to=1.2)
+#         }
+#         
+#       }
+#     }
+#   }
+# }
+# 
+# dev.off()
+# 
+# system("convert -delay 50 *.png loi_norm.gif")
+# 
+# file.remove(list.files(pattern=".png"))
+
+```
+
+
+```{r}
+#fit.perc(p = seq(0.1, 0.9, 0.1), (a))
+```
+
+
+```{r}
+
+setwd("../../../Images/")
+
+mat_bottle_time_80_u_0.01 = mat_bottle_time_80[which(mat_bottle_time_80$U == 0.01),]
+nb_simu = nrow(mat_bottle_time_80_u_0.01) / 101
+
+png(file="example%03d.png", width=600, heigh=400)
+
+for (line in c(seq(1,10,1), seq(11,101,10)) ){
+  for (alpha in seq_alpha) {
+    mat_tmp_bott = mat_bottle_time_80_u_0.01[which(mat_bottle_time_80_u_0.01$alpha == alpha),]
+    vec_x = seq(0,100,10)
+    vec_y = c(mat_tmp_bott$perc0.adm.props[line],
+              mat_tmp_bott$perc10.adm.props[line],
+              mat_tmp_bott$perc20.adm.props[line],
+              mat_tmp_bott$perc30.adm.props[line],
+              mat_tmp_bott$perc40.adm.props[line],
+              mat_tmp_bott$perc50.adm.props[line],
+              mat_tmp_bott$perc60.adm.props[line],
+              mat_tmp_bott$perc70.adm.props[line],
+              mat_tmp_bott$perc80.adm.props[line],
+              mat_tmp_bott$perc90.adm.props[line],
+              mat_tmp_bott$perc100.adm.props[line])
+    if (alpha == seq_alpha[1]) {
+      plot(vec_y, vec_x, type = "b", col = "#A5260A", main = line-1,
+           ylim = c(0,100), xlim =c(-0.5,1.2))
+    }else{
+      lines(vec_y, vec_x, type = "b", col = (as.numeric(as.character(mat_tmp_bott$alpha))*10+3))
+    }
+  }
+}
+
+dev.off()
+
+system("convert -delay 200 *.png courbe_freq.gif")
+
+file.remove(list.files(pattern=".png"))
+
+#plot(vec_test_x, vec_test, type = "b")
+#A5260A
+
+```
+
+
+```{r}
+# plot(vec_x, vec_y, type = "b", col = "#A5260A", main = line-1)
+# lines(vec_x, vec_y, type = "b", col = "blue")
 ```
 
 
