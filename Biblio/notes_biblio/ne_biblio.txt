@@ -49,6 +49,11 @@ Implémentation méthodes calcul Ne via LD utilisée Whole-Genome salmon...
 
 Programme d'approximation de Ne via LD (nb calculs détaillés)
 
+>>> Subspecies hybridization as a potential conservation tool in species reintroductions
+Lilith J. Zecherle, Hazel J. Nichols, Shirli Bar‐David, Richard P. Brown, Helen Hipperson, Gavin J. Horsburgh, Alan R. Templeton
+
+Effet de l'admixture sur la réintroduction d'espèces
+
 >>> https://www.sciencedirect.com/topics/earth-and-planetary-sciences/effective-population-size
 
 >>> Effective population size and patterns of molecular evolution and variation
@@ -67,4 +72,4 @@ Programme d'approximation de Ne via LD (nb calculs détaillés)
 
 >>> Genetic Drift and the Loss of Alleles Versus Heterozygosity, Allendorf
 
->>> Habitat fragmentation causes bottlenecks andinbreeding in the European tree frog (Hyla arborea), Andersen
+>>> Habitat fragmentation causes bottlenecks and inbreeding in the European tree frog (Hyla arborea), Andersen

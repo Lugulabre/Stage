@@ -75,7 +75,7 @@ Fonction de lecture des stats résumées. La fonction est prévue pour lire les 
 data.frame.stat = function(seq_ne, max_gen, max_simu){
 
   #Créer matrice vide qui contiendra les stats
-  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 63)
+  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 64)
   mat_stat = as.data.frame(mat_stat)
   #Compteur pour indiquer les lignes à remplir
   cpt = 0
@@ -97,19 +97,22 @@ data.frame.stat = function(seq_ne, max_gen, max_simu){
         file_stat = read.table(file_path, header = TRUE) #Lecture fichier stat résumées
         #Suppression 1ère colonne, contenant uniquement chiffres pour tri en bash. 
         mat_stat[row_min_simu:row_max_simu,3:63] = file_stat
+        mat_stat[row_min_simu:row_max_simu,64] = rep((cpt-1), max_gen)
       }
     }
   }
   
 
   #Attribution nom colonnes selon appelation stat par MetHis
-  colnames(mat_stat) = c("Ne", "simu", names(file_stat))
+  colnames(mat_stat) = c("Ne", "simu", names(file_stat),"cpt")
   #Passage des Ne en facteur
   mat_stat$Ne = factor(as.factor(mat_stat$Ne), levels = as.character(seq_ne))
   #Passage simulations en entier
   mat_stat$simu = as.integer(mat_stat$simu)
   #Passage générations en entier
   mat_stat$Generation = as.integer(mat_stat$Generation)
+  #Passage compteur en facteur
+  mat_stat$cpt = as.integer(mat_stat$cpt)  
   #Passage stats en double
   for (numcol in 4:ncol(mat_stat)) {
     mat_stat[,numcol] = as.double(mat_stat[,numcol])
@@ -159,7 +162,7 @@ Cette fonction permet d'afficher les lignes de régression ou les lignes reliant
 ```{r}
 #Plot function
 #Affichage d'une stat au cours des générations
-plot_stat_gen = function(df, gen, stat, group_col, color_col, titre, ligne = FALSE, legd = TRUE,
+plot_stat_gen = function(df, gen, stat, group_col = c(), color_col, titre, ligne = TRUE, legd = TRUE,
                          size_point = 0.1, line_t = "solid"){
   p = ggplot(df, aes(x = gen, y = stat,
                      group = group_col, color = color_col)) + ggtitle(titre)
@@ -178,7 +181,7 @@ plot_stat_gen = function(df, gen, stat, group_col, color_col, titre, ligne = FAL
                 panel.grid.minor.y = element_line(size = 0.25,
                                                   linetype = 'solid',
                                                   colour = "#CECECE"))
-  #print(p)
+  
   return(p)
 }
 ```
@@ -205,7 +208,7 @@ plot_without_point = function(df, gen, stat, color_col, titre, legd = TRUE){
 }
 ```
 
-Fonction d'extraction d'une sous-matrice à partir d'une matrice principale en fonction de valeurs choisies^ de Ne.
+Fonction d'extraction d'une sous-matrice à partir d'une matrice principale en fonction de valeurs choisies de Ne.
 
 ```{r}
 extract_sub_mat = function(all_mat, list_ne){
@@ -230,6 +233,7 @@ seq_tot = sort(c(seq_50_1000, seq_1024_16384))
 mat_tot = data.frame.stat(seq_tot, 101, 1)
 mat_50_1000 = extract_sub_mat(mat_tot, c(seq(50,200,10), seq(200,1000,100)))
 mat_1024_16384 = extract_sub_mat(mat_tot, 2**seq(6,14,1))
+mat_64_100_16384 = extract_sub_mat(mat_tot, c(2**seq(6,14,1), 100, 1000) )
 
 #mat_1024_16384_mean = data.frame.mean(mat_1024_16384, 101, seq_1024_16384)
 
@@ -240,36 +244,55 @@ Graphiques obtenus : affichage de l'évolution d'une statistique donnée en fonc
 
 ```{r}
 p_tmp = plot_stat_gen(mat_tot, mat_tot$Generation, 
-                      mat_tot$mean.het.adm, mat_tot$Ne, mat_tot$Ne,
-                      "Stat en fonction des générations\n selon différentes Ne initiales",
+                      mat_tot$mean.het.adm, mat_tot$Ne, mat_tot$Ne,ligne = T,
+                      "Moyenne htz en fonction des générations\n selon différentes Ne initiales",
                       legd = FALSE)
 p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
 p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
 print(p_tmp)
 p_tmp = plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
-                      mat_50_1000$mean.het.adm, mat_50_1000$Ne, mat_50_1000$Ne,
-                      "Stat en fonction des générations\nselon différentes Ne initiales",
+                      mat_50_1000$mean.het.adm, mat_50_1000$Ne, mat_50_1000$Ne,ligne = T,
+                      "Moyenne htz en fonction des générations\nselon différentes Ne initiales",
                       legd = TRUE)
 p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
 p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
 print(p_tmp)
-
-plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
-              mat_1024_16384$mean.het.adm, mat_1024_16384$Ne, mat_1024_16384$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
 ```
+
+```{r}
+write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y){
+  num_col = which(colnames(mat) == name_stat)
+  p = plot_stat_gen(mat, mat$Generation, 
+                mat[,num_col], mat$Ne, mat$Ne,ligne = T,
+                str_c(name_stat, "en fonction des générations\n selon différentes Ne initiales"))
+  png(filename = str_c("../../../Images/", name_file, ".png"), width = 1000, height = 800)
+  print(p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE))
+  dev.off()
+  ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
+}
+```
+
+```{r}
+
+write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_htz_ne_cst", 0.01, 0.062)
+write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
+write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
+
+```
+
+
 
 ```{r}
 plot_stat_gen(mat_tot, mat_tot$Generation, 
               mat_tot$Fst.s1.adm, mat_tot$Ne,mat_tot$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales",
+              "Fst s1 adm en fonction des générations\n selon différentes Ne initiales",
               legd = FALSE)
 plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
               mat_50_1000$Fst.s1.adm, mat_50_1000$Ne,mat_50_1000$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
+              "Fst s1 adm en fonction des générations\n selon différentes Ne initiales")
 plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
-              mat_1024_16384$Fst.s1.adm, mat_1024_16384$Ne,mat_1024_16384$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
+              mat_1024_16384$Fst.s1.adm, mat_1024_16384$Ne,mat_1024_16384$Ne,ligne = T,
+              "Fst s1 adm en fonction des générations\n selon différentes Ne initiales")
 ```
 
 
@@ -385,15 +408,14 @@ mat_pop_nu$Nu = as.factor(mat_pop_nu$Nu)
 
 ```
 
-
 ```{r}
 plot_without_point(mat_pop_nu, mat_pop_nu$Generation, 
                    mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
-                   "Stat en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
+                   "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
                    legd = FALSE)
 plot_without_point(mat_pop_nu, mat_pop_nu$Generation, 
                    mat_pop_nu$mean.het.adm, mat_pop_nu$Nu,
-                   "Stat en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
+                   "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
                    legd = TRUE)
 # plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation,
 #              mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
@@ -432,9 +454,9 @@ for (rg_list in 1:length(list_df_nu)) {
   list_ne = as.integer(unlist(str_split(list_ne, "-")))
   list_ne0 = list_ne[seq(1, length(list_ne), 2)]
   list_nef = list_ne[seq(2, length(list_ne), 2)]
-  mat_tmp = list_df_nu[[rg_list]][which(list_df_nu[[rg_list]]$Generation == 100),]
+  mat_tmp_u = list_df_nu[[rg_list]][which(list_df_nu[[rg_list]]$Generation == 100),]
   
-  scatter3D(x = list_ne0, y = list_nef, z = mat_tmp$mean.het.adm,
+  scatter3D(x = list_ne0, y = list_nef, z = mat_tmp_u$mean.het.adm,
             bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
             theta = 120, phi = 0, type = "s", cex.lab = 0.6, cex.axis = 0.5,
             xlab = "Ne0", ylab = "Nef", zlab = "Stat")
@@ -445,28 +467,43 @@ for (rg_list in 1:length(list_df_nu)) {
 ```
 
 ```{r}
-grid.lines = 50
-fit <- loess(mat_tmp$mean.het.adm ~ list_nef + list_ne0)
-x.pred <- seq(min(list_ne0), max(list_ne0), length.out = grid.lines)
-y.pred <- seq(min(list_nef), max(list_nef), length.out = grid.lines)
-xy <- expand.grid( x = x.pred, y = y.pred)
-z.pred <- matrix(predict(fit, newdata = xy), 
-                 nrow = grid.lines, ncol = grid.lines)
-
-fitpoints = predict(fit)
-scatter3D(x = list_ne0, y = list_nef, z = mat_tmp$mean.het.adm,
-          bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
-          theta = 150, phi = 0, type = "s",cex = 0.5, cex.lab = 0.6, cex.axis = 0.5,
-          xlab = "Ne0", ylab = "Nef", zlab = "Stat",
-          surf = list(x = x.pred, y = y.pred, z = z.pred,
-                      facets = NA))
+# grid.lines = 50
+# fit <- loess(mat_tmp_u$mean.het.adm ~ list_nef + list_ne0)
+# x.pred <- seq(min(list_ne0), max(list_ne0), length.out = grid.lines)
+# y.pred <- seq(min(list_nef), max(list_nef), length.out = grid.lines)
+# xy <- expand.grid( x = x.pred, y = y.pred)
+# z.pred <- matrix(predict(fit, newdata = xy), 
+#                  nrow = grid.lines, ncol = grid.lines)
+# 
+# fitpoints = predict(fit)
+# scatter3D(x = list_ne0, y = list_nef, z = mat_tmp_u$mean.het.adm,
+#           bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
+#           theta = 150, phi = 0, type = "s",cex = 0.5, cex.lab = 0.6, cex.axis = 0.5,
+#           xlab = "Ne0", ylab = "Nef", zlab = "Stat",
+#           surf = list(x = x.pred, y = y.pred, z = z.pred,
+#                       facets = NA))
 
 ```
+
 ```{r}
-print(wireframe(mat_tmp$mean.het.adm ~ list_ne0 * list_nef, data = mat_tmp,
-                screen = list(z = 40, x = -60)))
-```
+for (rg_list in 1:length(list_df_nu)) {
+  
+  list_ne = list_df_nu[[rg_list]]$Ne[which(list_df_nu[[rg_list]]$Generation == 100)]
+  list_ne = as.integer(unlist(str_split(list_ne, "-")))
+  list_ne0 = list_ne[seq(1, length(list_ne), 2)]
+  list_nef = list_ne[seq(2, length(list_ne), 2)]
+  mat_tmp_u = list_df_nu[[rg_list]][which(list_df_nu[[rg_list]]$Generation == 100),]
+  
+  print(wireframe(mat_tmp_u$mean.het.adm ~ list_ne0 * list_nef, data = mat_tmp_u,
+                  drape = TRUE, zlab = "Htz", xlab = "Ne0", ylab = "Nef",
+                  screen = list(z = 40, x = -60),
+                  scales = list(z.ticks=5, arrows=F, col="black", font=1, tck=0.8),
+                  main = seq_nu[rg_list]))
+  
+}
 
+
+```
 
 Calcul matrice pour connaître Ne à chaque génération. 
 ```{r}
@@ -571,12 +608,12 @@ scatter3D(x = mat_pop_nu$Generation, y = mat_pop_nu$ne_gen,
 setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
 seq_nu_bis = sprintf("%.2f", c(0.01, 0.25, 0.49))
 seq_ne_ini = c(100)
-seq_ne_fin = seq(1000, 10000, 1000)
+seq_ne_fin = c(200, 400, seq(1000, 10000, 1000))
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
 
+
 df_nu_reduce = data.frame()
-cpt = 1
 
 for (nu in seq_nu_bis) {
   if(dir.exists(str_c("Nu", nu ))){
@@ -585,16 +622,14 @@ for (nu in seq_nu_bis) {
     
     df_tmp = data.frame.increase(seq_ne_ini, seq_combi)
     col_nu = as.character(rep(nu, nrow(df_tmp)))
-    col_cpt = rep(cpt, nrow(df_tmp))
     col_n0 = rep(NA, nrow(df_tmp))
     col_nf = rep(NA, nrow(df_tmp))
-    cpt = cpt + 1
     
     if (nu == seq_nu_bis[1]) {
-      df_nu_reduce = data.frame(df_tmp, nu = col_nu, cpt = col_cpt,
+      df_nu_reduce = data.frame(df_tmp, nu = col_nu,
                                 n0 = col_n0, nf = col_nf)
     }else{
-      df_tmp = data.frame(df_tmp, nu = col_nu, cpt = col_cpt,
+      df_tmp = data.frame(df_tmp, nu = col_nu,
                           n0 = col_n0, nf = col_nf)
       df_nu_reduce = rbind(df_nu_reduce, df_tmp)
     }
@@ -673,6 +708,56 @@ scatter3D(x = df_nu_reduce$Generation, y = df_nu_reduce$nf,
 
 ```
 
+```{r}
+
+seq_ne_ini3 = seq(100,100,0)
+seq_multi3 = c(2,4,10,100)
+seq_ne_fin3 = seq_multi3*seq_ne_ini3
+seq_combi3 = as.data.frame(outer(seq_ne_ini3, seq_ne_fin3, FUN="paste", sep="-"))
+seq_combi3 = as.data.frame.vector(unlist(seq_combi3))[[1]]
+
+for (rg in c(1:length(seq_combi3))) {
+  if (rg == 1) {
+    mat_pop_nu3 = df_nu_reduce[which(df_nu_reduce$Ne == seq_combi3[rg]),]
+  }else{
+    tmp = df_nu_reduce[which(df_nu_reduce$Ne == seq_combi3[rg]),]
+    mat_pop_nu3 = rbind(mat_pop_nu3, tmp)
+  }
+}
+
+```
+
+```{r}
+write_increase_plot = function(name_stat, mat, name_file, min_y, max_y){
+  num_col = which(colnames(mat) == name_stat)
+  p = plot_stat_gen(df = mat, gen = mat$Generation, 
+                    stat = mat[,num_col], group_col = c(),
+                    color_col = mat$Ne, line_t = mat$nu,
+                    titre = str_c(name_stat," en fonction des générations\n selon différentes croissances de populations"),
+                    legd = TRUE)
+  
+  p = improve_plot_bottle(p =p, vec_abline = c(), lab_col = "ne0-nef",
+                       lab_line = "U", vec_linetype = c("dotted", "longdash", "solid"))
+
+  png(filename = str_c("../../../Images/", name_file,".png"), width = 1000, height = 800)
+  p = p+ylim(min_y, max_y)
+  print(p)
+  dev.off()
+  ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
+}
+
+```
+
+
+```{r}
+write_increase_plot("mean.het.adm", mat_pop_nu3, "moyenne_heterozygotie/moy_htz_pop_inc_nu_var",0.01,0.062)
+
+write_increase_plot("Fst.s1.adm", mat_pop_nu3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
+
+write_increase_plot("mean.F.adm", mat_pop_nu3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
+
+```
+
 
 
 ## Bottleneck
@@ -690,7 +775,6 @@ seq_nef = c(1000)
 
 seq_combi = as.data.frame(outer(seq_ne0, seq_nef, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
-cpt = 1
 
 for (alpha in seq_alpha) {
   for (nu in seq_nu_red) {
@@ -702,13 +786,12 @@ for (alpha in seq_alpha) {
       col_alpha = rep(alpha, nrow(mat_tmp))
       col_nu = rep(nu, nrow(mat_tmp))
       col_bottle = rep(bottle, nrow(mat_tmp))
-      col_cpt = rep(cpt, nrow(mat_tmp))
       col_bott_u = as.numeric(rep(bottle, nrow(mat_tmp)))/as.numeric(rep(nu, nrow(mat_tmp)))
-      col_bott_u = ceiling(col_bott_u/10)*10
+      col_bott_u = ceiling(col_bott_u/1)*1
       col_alpha_u = as.numeric(rep(nu, nrow(mat_tmp)))/as.numeric(rep(alpha, nrow(mat_tmp)))
       col_alpha_u = ceiling(col_alpha_u/0.001)*0.001
       mat_tmp = data.frame(mat_tmp, alpha = col_alpha,
-                           U = col_nu, time_botl = col_bottle, cpt = col_cpt,
+                           U = col_nu, time_botl = col_bottle,
                            bott_u = col_bott_u, alpha_u = col_alpha_u)
       
       if (alpha==seq_alpha[1] & nu==seq_nu_red[1] & bottle==seq_bottle[1]) {
@@ -716,7 +799,6 @@ for (alpha in seq_alpha) {
       }else{
         mat_bottle = rbind(mat_bottle, mat_tmp)
       }
-      cpt = cpt + 1
       setwd("../../../")
     }
   }
@@ -735,87 +817,73 @@ mat_bottle_time_80 = mat_bottle[which(mat_bottle$time_botl == 80),]
 
 ```
 
+```{r}
+improve_plot_bottle = function(p, vec_abline, lab_col, lab_line, vec_linetype){
+  for (rg_abl in 1:length(vec_abline)) {
+    p = p + geom_vline(xintercept = vec_abline[rg_abl], size = 0.4, color = "orange", linetype = "solid")
+  }
+  p = p + labs(color = lab_col, linetype = lab_line) + scale_linetype_manual(values=vec_linetype)
+  return(p)
+}
+```
+
 
 ```{r}
+boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott){
+  for (bott in vec_bott) {
+    new_mat = mat[which(mat$time_botl == bott),]
+    new_vec = vec_stat[which(mat$time_botl == bott)]
+    
+    p = plot_stat_gen(new_mat, new_mat$Generation, 
+                      new_vec, c(),
+                      new_mat$alpha, size_point = 0,
+                      str_c(name_stat, " en fonction des générations\nbottleneck ", bott, " N0 1000 Nf 1000"),
+                      TRUE,legd = TRUE, line_t = new_mat$U)
+    
+    p = improve_plot_bottle(p = p, vec_abline = c(1,bott+1), lab_col = "alpha",
+                            lab_line = "U", vec_linetype = c("solid", "longdash", "dotted"))
+    
+    print(p)
+  }
+}
 
+```
+
+
+
+```{r}
 plot_without_point(mat_bottle, mat_bottle$Generation, 
               mat_bottle$mean.het.adm, mat_bottle$alpha,
               "Stat en fonction des générations\n selon différents bottleneck",
               legd = TRUE)
 
-p = plot_stat_gen(mat_bottle_time_20, mat_bottle_time_20$Generation, 
-              mat_bottle_time_20$mean.het.adm, mat_bottle_time_20$alpha,
-              mat_bottle_time_20$alpha,
-              "Stat en fonction des générations\n selon différents bottleneck",FALSE,
-              legd = TRUE)
-p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
-  geom_vline(xintercept = 21, size = 0.4, color = "orange")
-print(p)
-
-p = plot_stat_gen(mat_bottle_time_50, mat_bottle_time_50$Generation, 
-              mat_bottle_time_50$mean.het.adm, mat_bottle_time_50$alpha,
-              mat_bottle_time_50$alpha,
-              "Stat en fonction des générations\n selon différents bottleneck",FALSE,
-              legd = TRUE)
-p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
-  geom_vline(xintercept = 51, size = 0.4, color = "orange")
-print(p)
-
-p = plot_stat_gen(mat_bottle_time_80, mat_bottle_time_80$Generation, 
-              mat_bottle_time_80$mean.het.adm, mat_bottle_time_80$alpha,
-              mat_bottle_time_80$alpha,
-              "Stat en fonction des générations\n selon différents bottleneck",FALSE,
-              legd = TRUE)
-p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
-  geom_vline(xintercept = 81, size = 0.4, color = "orange")
-print(p)
-
-
 ```
+Moyenne de l'hétérozygotie
+
 ```{r}
-p = plot_stat_gen(mat_bottle_time_20, mat_bottle_time_20$Generation, 
-                  mat_bottle_time_20$perc100.adm.angles, mat_bottle_time_20$cpt,
-                  mat_bottle_time_20$alpha, size_point = 0,
-                  "Stat en fonction des générations\nbottleneck 20 N0 1000 Nf 1000",TRUE,
-                  legd = TRUE, line_t = mat_bottle_time_20$U)
-p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
-  geom_vline(xintercept = 21, size = 0.4, color = "orange")+
-  labs(color = "alpha", linetype = "U")
-
-
-print(p)
-
-p = plot_stat_gen(mat_bottle_time_50, mat_bottle_time_50$Generation, 
-                  mat_bottle_time_50$perc100.adm.angles, mat_bottle_time_50$cpt,
-                  mat_bottle_time_50$alpha, size_point = 0,
-                  "Stat en fonction des générations\nbottleneck 50 N0 1000 Nf 1000",TRUE,
-                  legd = TRUE, line_t = mat_bottle_time_50$U)
-p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
-  geom_vline(xintercept = 51, size = 0.4, color = "orange")+
-  labs(color = "alpha", linetype = "U")
-
-
-print(p)
-
-p = plot_stat_gen(mat_bottle_time_80, mat_bottle_time_80$Generation, 
-                  mat_bottle_time_80$mean.adm.props, mat_bottle_time_80$cpt,
-                  mat_bottle_time_80$alpha, size_point = 0,
-                  "Stat en fonction des générations\nbottleneck 80 N0 1000 Nf 1000",TRUE,
-                  legd = TRUE, line_t = mat_bottle_time_80$U)
-p = p+ geom_vline(xintercept = 1, size = 0.4, color = "orange")+
-  geom_vline(xintercept = 81, size = 0.4, color = "orange")+
-  labs(color = "alpha", linetype = "U")
-
-
-print(p)
+boucle_plot_bottle(mat_bottle, mat_bottle$mean.het.adm, "Heterozygotie", c(20,50,80))
 
 ```
+
+Fst
+
+```{r}
+boucle_plot_bottle(mat_bottle, mat_bottle$Fst.s1.adm, "Fst s1 adm", c(20,50,80))
+
+boucle_plot_bottle(mat_bottle, mat_bottle$Fst.s2.adm, "Fst s2 adm", c(20,50,80))
+```
+
+```{r}
+boucle_plot_bottle(mat_bottle, mat_bottle$mean.F.adm, "F mean", c(20,50,80))
+```
+
+
 
 ```{r}
 mini_mat_bottle = rbind(mat_bottle_time_20, mat_bottle_time_50, mat_bottle_time_80)
 
 p = plot_stat_gen(mat_bottle, mat_bottle$Generation, 
-              mat_bottle$mean.het.adm, mat_bottle$cpt,
+              mat_bottle$mean.het.adm, c(),
               mat_bottle$bott_u, line_t = mat_bottle$alpha,
               "Stat en fonction des générations\n selon différents bottleneck",TRUE,
               legd = TRUE)
@@ -823,29 +891,45 @@ p = p+  theme(legend.position="bottom", legend.box = "horizontal")
 print(p)
 
 p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
-                mini_mat_bottle$mean.het.adm, mini_mat_bottle$cpt,
+                mini_mat_bottle$mean.het.adm, c(),
                 mini_mat_bottle$bott_u, line_t = mini_mat_bottle$alpha,
                 "Stat en fonction des générations\n selon différents bottleneck",TRUE,
                 legd = TRUE)
-p = p + labs(color = "tpsbott/U", linetype = "alpha")
-print(p)
+improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "tpsbott/U",
+                    lab_line = "alpha", vec_linetype = c("solid", "longdash", "dotted"))
+
 
 ```
 
 
 ```{r}
-vec_line = c()
-vec_line[which(mini_mat_bottle$time_botl == 20)] = "dotted"
-vec_line[which(mini_mat_bottle$time_botl == 50)] = "longdash"
-vec_line[which(mini_mat_bottle$time_botl == 80)] = "solid"
 
-p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
-                mini_mat_bottle$mean.het.adm, mini_mat_bottle$cpt,
-                mini_mat_bottle$alpha_u, line_t = mini_mat_bottle$time_botl,
-                "Stat en fonction des générations\n selon différents bottleneck",TRUE,
-                legd = TRUE)
-p = p + labs(color = "alpha/U", linetype = "tpsbott") + scale_linetype_manual(values=c("dotted", "longdash", "solid")) + geom_vline(xintercept = 21, size = 0.4, color = "orange", linetype = "dotted")+geom_vline(xintercept = 51, size = 0.4, color = "orange", linetype = "dotted")+geom_vline(xintercept = 81, size = 0.4, color = "orange", linetype = "dotted")
-print(p)
+write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y){
+  num_col = which(colnames(mat) == name_stat)
+  p = plot_stat_gen(mat, mat$Generation, 
+                    mat[,num_col], c(),
+                    mat$alpha_u, line_t = mat$time_botl,
+                    str_c(name_stat, " en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)"),TRUE,
+                    legd = TRUE)
+  p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
+                          lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
+  
+  png(filename = str_c("../../../Images/",name_file,".png"), width = 1000, height = 800)
+  p = p+ylim(min_y, max_y)
+  print(p)
+  dev.off()
+  ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
+}
+```
+
+
+```{r}
+write_bottle_plot("mean.het.adm", mini_mat_bottle, "moyenne_heterozygotie/moy_htz_bottleneck",0.01,0.062)
+
+write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5)
+
+write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)
+
 ```
 
 
@@ -869,30 +953,6 @@ scatter3D(x = mat_bottle$Generation, y = as.numeric(as.character(mat_bottle$time
           clab = "alpha")
 
 
-
-```
-
-```{r}
-# mat_bottle_time_80$mean.adm.props
-# mat_bottle_time_80$var.adm.props
-# mat_bottle_time_80$perc50.adm.props
-# 
-# veca = c(
-# mat_bottle_time_80$perc10.adm.props[1],
-# mat_bottle_time_80$perc20.adm.props[1],
-# mat_bottle_time_80$perc30.adm.props[1],
-# mat_bottle_time_80$perc40.adm.props[1],
-# mat_bottle_time_80$perc50.adm.props[1],
-# mat_bottle_time_80$perc60.adm.props[1],
-# mat_bottle_time_80$perc70.adm.props[1],
-# mat_bottle_time_80$perc80.adm.props[1],
-# mat_bottle_time_80$perc90.adm.props[1])
-# mat_bottle_time_80$skew.adm.props[1]
-# mat_bottle_time_80$mode.adm.props[1]
-# 
-# courbea = get.norm.par(p = seq(0.1, 0.9, 0.1), (veca))
-# courbea
-#fit.perc(p = seq(0.1, 0.9, 0.1), (a))
 
 ```
 
@@ -967,7 +1027,7 @@ scatter3D(x = mat_bottle$Generation, y = as.numeric(as.character(mat_bottle$time
 
 
 ```{r}
-#fit.perc(p = seq(0.1, 0.9, 0.1), (a))
+#fit.perc(p = seq(0.1, 0.9, 0.1), (vec_props))
 ```
 
 
@@ -995,30 +1055,36 @@ for (line in c(seq(1,10,1), seq(11,101,10)) ){
               mat_tmp_bott$perc80.adm.props[line],
               mat_tmp_bott$perc90.adm.props[line],
               mat_tmp_bott$perc100.adm.props[line])
+    
     if (alpha == seq_alpha[1]) {
-      plot(vec_y, vec_x, type = "b", col = "#A5260A", main = line-1,
-           ylim = c(0,100), xlim =c(-0.5,1.2))
+      hist(vec_y, breaks = vec_y, main = line-1, col = "#A5260A", xlim = c(-0.2,1.2))
+      # box_tmp = data.frame(perc = vec_x, val = vec_y, alpha = rep(alpha, length(vec_x)))
+      # plot(vec_y, vec_x, type = "b", col = "#A5260A", main = line-1,
+      #      ylim = c(0,100), xlim =c(-0.5,1.2))
     }else{
-      lines(vec_y, vec_x, type = "b", col = (as.numeric(as.character(mat_tmp_bott$alpha))*10+3))
+      hist(vec_y, breaks = vec_y, add = TRUE, col = (as.numeric(as.character(mat_tmp_bott$alpha))*10+2))
+      # box_col = data.frame(perc = vec_x, val = vec_y, alpha = rep(alpha, length(vec_x)))
+      # box_tmp = rbind(box_tmp, box_col)
+      # lines(vec_y, vec_x, type = "b", col = (as.numeric(as.character(mat_tmp_bott$alpha))*10+3))
     }
   }
+  # boxplot(val~alpha, data = box_tmp, main = line-1, col = c("#FF866A", "#77B5FE","#87E990"))
+  legend("topleft", title="Alpha",names(summary(as.factor(box_tmp$alpha))),
+         fill = c("#A5260A", 7,11), cex=0.8)
+  # p_box <- ggplot(box_tmp, aes(x = as.factor(alpha), y = val, group=alpha, color = as.factor(alpha))) + 
+  #   geom_boxplot() + labs(title = line-1)
+  # print(p_box)FALSE
 }
 
 dev.off()
 
-system("convert -delay 200 *.png courbe_freq.gif")
+system("convert -delay 120 *.png hist_bottle.gif")
 
 file.remove(list.files(pattern=".png"))
 
 #plot(vec_test_x, vec_test, type = "b")
-#A5260A
 
 ```
 
-
-```{r}
-# plot(vec_x, vec_y, type = "b", col = "#A5260A", main = line-1)
-# lines(vec_x, vec_y, type = "b", col = "blue")
-```
 
 
