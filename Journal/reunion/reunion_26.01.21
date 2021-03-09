@@ -140,7 +140,7 @@ II. Modèle avec même S1, mais Ne croissance exponentielle au cours des génér
     Paramètres : No, Ng et Nu entre 0 et 1/2 (courbure fonction)
     No entre 10 et 100, Ng entre 10 et 10 000
     (Si Ng - No < -1, pas intéressant)
-    Emnboîtement des modèles-> combinaison de paramètres est la même que sous un autre scénario
+    Emboîtement des modèles-> combinaison de paramètres est la même que sous un autre scénario
 
 III. Construire liste de paramètres quand bottleneck
      Autres options / développement pour admix tools

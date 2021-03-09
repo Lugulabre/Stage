@@ -1,11 +1,11 @@
 ---
-title: "test_stat_gen_par_gen"
+title: "Représentation des stats calculées par MetHis"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/old_methis_pop_size_diff/")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/old_methis_pop_size_diff/")
 ```
 
 ## Librairies utilisées
@@ -13,13 +13,80 @@ knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/ol
 ```{r}
 library(stringr)
 library(ggplot2)
+require(MASS)
 ```
+
+## Vérification des priors utilisés
+
+Fonction
+```{r}
+
+#Data frame prior
+data.frame.prior = function(seq_ne, max_gen, max_simu){
+
+  #Créer matrice vide qui contiendra les stats
+  mat_prior = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 5)
+  #Attribution nom colonnes selon appelation stat par MetHis
+  colnames(mat_prior) = c("Ne", "gen", "simu", "s1", "s2")  
+  mat_prior = as.data.frame(mat_prior)
+  #Compteur pour indiquer les lignes à remplir
+  cpt = 0
+  
+  for (ne in seq_ne) {
+    dir_ne = str_c("Ne", toString(ne), "/") #Répertoire de taille effective
+    row_min = cpt*max_gen*max_simu+1
+    row_max = (cpt+1)*max_gen*max_simu
+    mat_prior[row_min:row_max,1] = toString(ne)
+    cpt = cpt+1
+    
+    for (nb_gen in 1:max_gen) {
+      dir_gen = str_c("gen", toString(nb_gen), "/")
+      row_min_gen = (nb_gen-1)*max_simu+1 + row_min
+      row_max_gen = nb_gen*max_simu + row_min
+      mat_prior[row_min_gen:row_max_gen,2] = nb_gen
+      
+      for (nb_simu in 1:max_simu) {
+        mat_prior[row_min_gen+nb_simu-1,3] = nb_simu
+        dir_simu = str_c("simu_", toString(nb_simu), "/")
+        file_path = str_c(dir_ne, dir_gen, dir_simu, "simu_", nb_simu, ".txt")
+        df_tmp = read.table(file_path, header = TRUE)
+        mat_prior[row_min_gen+nb_simu-1,4:5] = df_tmp[1,5:6]
+        
+      }
+    }
+  }
+  
+
+  #Passage des Ne en facteur
+  mat_prior$Ne = factor(as.factor(mat_prior$Ne), levels = as.character(seq_ne))
+  #Passage générations en entier
+  mat_prior$gen = as.integer(mat_prior$gen)
+  #Passage simuulations en entier
+  mat_prior$simu = as.integer(mat_prior$simu)  
+
+  return(mat_prior)
+}
+
+```
+
+Application
+```{r}
+seq_64_8192 = 2**seq(6,13,1)
+mat_prior_64_8192 = data.frame.prior(seq_64_8192, 100, 100)
+summary(mat_prior_64_8192$s1[which(mat_prior_64_8192$Ne == "8192")])
+```
+
 
 ## Résumé des lectures de stat
 
 ```{bash}
 
 #Script bash pour réduire le nombre d'ouvertures de fichier en R.
+#Attention !!! Script à utiliser s'il y a de nouvelles simulations
+#et doit être modifié si de nouveaux sous-répertoires sont ajoutés
+#2 lignes à ajouter dans ce cas : "cd $path_to_directory" et "set_resum_stat"
+#Ne pas utiliser si répertoire cloné du github
+
 set_resum_stat()
 {
   list_Ne=$(ls -d Ne*)
@@ -27,7 +94,6 @@ set_resum_stat()
   for Ne in $list_Ne; do
       cd $Ne
       list_gen=$(ls -d gen*)
-  
       for gen in $list_gen; do
           cd $gen
           cat simu_*/final_sumstats.txt > tmp.txt
@@ -35,16 +101,14 @@ set_resum_stat()
           rm tmp.txt
           cd ../
       done
-  
-      #echo $Ne
       cd ../
   done
 }
 
 set_resum_stat
 
-cd ../old_methis_pop_increase
-set_resum_stat
+#cd ../old_methis_pop_increase
+#set_resum_stat
 
 ```
 
@@ -108,10 +172,14 @@ data.frame.stat = function(seq_ne, max_gen){
 ```{r}
 #Plot function
 #Affichage d'une stat au cours des générations
-plot_stat_gen = function(df, gen, stat, Ne, titre){
+plot_stat_gen = function(df, gen, stat, Ne, titre, ligne = FALSE){
   p = ggplot(df, aes(x = gen, y = stat, color = Ne)) + ggtitle(titre)
-  #smooth de la courbe pour obtenir régression et tempérer variabilité due au TCL
-  p = p + geom_point(size = 1)+ geom_smooth()
+  if (ligne) {
+    p = p + geom_point(size = 1)+ geom_line()
+  }else{
+    #smooth de la courbe pour obtenir régression et tempérer variabilité due au TCL
+    p = p + geom_point(size = 1)+ geom_smooth()
+  }
   print(p)
 }
 ```
@@ -132,7 +200,7 @@ extract_sub_mat = function(all_mat, list_ne){
 Calcul des matrices de stats
 ```{r}
 seq_64_8192 = 2**seq(6,13,1)
-seq_60_100 = 10*seq(6,10,1)
+seq_60_100 = 10*seq(5,10,1)
 seq_tot = sort(c(seq_60_100, seq_64_8192))
 
 mat_tot = data.frame.stat(seq_tot, 100)
@@ -142,15 +210,18 @@ mat_64_8192 = extract_sub_mat(mat_tot, seq_64_8192)
 
 Graphiques obtenus
 ```{r}
-plot_stat_gen(mat_tot, mat_tot$gen, 
-              mat_tot$mean.het.adm, mat_tot$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
-plot_stat_gen(mat_60_100, mat_60_100$gen, 
-              mat_60_100$mean.het.adm, mat_60_100$Ne,
+plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
+              mat_64_8192$Fst.s1.adm, mat_64_8192$Ne,
               "Stat en fonction des générations\n selon différentes Ne initiales")
 plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
-              mat_64_8192$mean.het.adm, mat_64_8192$Ne,
+              mat_64_8192$f3, mat_64_8192$Ne,
               "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
+              mat_64_8192$mean.adm.angles, mat_64_8192$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
+              mat_64_8192$mean.adm.props, mat_64_8192$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales", TRUE)
 ```
 
 ## Populations croissantes avec des N0 variant entre 30 et 110, et des Ng variant entre 100 et 8100.
