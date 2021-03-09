@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/new_methis_pop_size_diff/")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp/")
 ```
 
 ## Librairies utilisées
@@ -23,7 +23,6 @@ Fonction
 
 #Data frame prior
 data.frame.prior = function(seq_ne, max_simu){
-
   #Créer matrice vide qui contiendra les stats
   mat_prior = matrix(data = NA, nrow = length(seq_ne)*max_simu, ncol = 4)
   #Attribution nom colonnes selon appelation stat par MetHis
@@ -64,7 +63,7 @@ Application
 seq_64_8192 = 2**seq(6,13,1)
 seq_60_100 = 10*seq(5,10,1)
 seq_tot = sort(c(seq_60_100, seq_64_8192))
-mat_prior_tot = data.frame.prior(seq_tot, 100)
+mat_prior_tot = data.frame.prior(seq_tot, 1)
 summary(mat_prior_tot$s1)
 ```
 
@@ -79,29 +78,29 @@ summary(mat_prior_tot$s1)
 #2 lignes à ajouter dans ce cas : "cd $path_to_directory" et "set_resum_stat"
 #Ne pas utiliser si répertoire cloné du github
 
-set_resum_stat()
-{
-  list_Ne=$(ls -d Ne*)
-  
-  for Ne in $list_Ne; do
-      cd $Ne
-      list_simu=$(ls -d simu_*)
-      for simu in $list_simu; do
-        cd $simu
-        rm final_sumstats.txt
-        for (( num = 0; num < 101; num++ )); do
-          #echo "final_sumstats$num.txt"
-          cat "final_sumstats$num.txt" >> tmp.txt
-        done
-        nl tmp.txt | sort --key 2 --unique | sort --key 1 --numeric-sort > final_sumstats.txt
-        rm tmp.txt
-        cd ../
-      done
-      cd ../
-  done
-}
+#set_resum_stat()
+#{
+#  list_Ne=$(ls -d Ne*)
 
-set_resum_stat
+#  for Ne in $list_Ne; do
+#      cd $Ne
+#      list_simu=$(ls -d simu_*)
+#      for simu in $list_simu; do
+#        cd $simu
+#        #rm final_sumstats.txt
+#        for (( num = 0; num < 101; num++ )); do
+#          #echo "final_sumstats$num.txt"
+#          cat "final_sumstats$num.txt" >> tmp.txt
+#        done
+#        nl tmp.txt | sort --key 2 --unique | sort --key 1 --numeric-sort > final_sumstats.txt
+#        rm tmp.txt
+#        cd ../
+#      done
+#      cd ../
+#  done
+#}
+
+#set_resum_stat
 
 #cd ../new_methis_pop_increase
 #set_resum_stat
@@ -205,15 +204,18 @@ data.frame.mean = function(df_stat, max_gen, seq_ne){
 ```{r}
 #Plot function
 #Affichage d'une stat au cours des générations
-plot_stat_gen = function(df, gen, stat, Ne, titre, ligne = FALSE){
-  p = ggplot(df, aes(x = gen, y = stat, color = Ne)) + ggtitle(titre)
+plot_stat_gen = function(df, gen, stat, color_col, titre, ligne = FALSE, legd = TRUE){
+  p = ggplot(df, aes(x = gen, y = stat, color = color_col)) + ggtitle(titre)
+  
   if (ligne) {
-    p = p + geom_point(size = 1)+ geom_line()
+    p = p + geom_point(size = 0.1, show.legend = legd)+ geom_line(show.legend = legd)
   }else{
     #smooth de la courbe pour obtenir régression et tempérer variabilité due au TCL
-    p = p + geom_point(size = 1)+ geom_smooth()
+    p = p + geom_point(size = 0.1, show.legend = legd)+ geom_smooth(show.legend = legd)
   }
+  
   print(p)
+  return(p)
 }
 ```
 
@@ -233,27 +235,35 @@ extract_sub_mat = function(all_mat, list_ne){
 
 Calcul des matrices de stats
 ```{r}
-seq_64_8192 = 2**seq(6,13,1)
-seq_60_100 = 10*seq(5,10,1)
+seq_64_8192 = 2**seq(10,14,1)
+seq_60_100 = 10*seq(5,100,1)
 seq_tot = sort(c(seq_60_100, seq_64_8192))
 
-mat_tot = data.frame.stat(seq_tot, 101, 100)
+mat_tot = data.frame.stat(seq_tot, 101, 1)
 mat_60_100 = extract_sub_mat(mat_tot, seq_60_100)
 mat_64_8192 = extract_sub_mat(mat_tot, seq_64_8192)
 
-mat_tot_mean = data.frame.mean(mat_tot, 101, seq_tot)
+#mat_tot_mean = data.frame.mean(mat_tot, 101, seq_tot)
 
 ```
 
 
 Graphiques obtenus
 ```{r}
-plot_stat_gen(mat_tot_mean, mat_tot_mean$gen, 
-              mat_tot_mean$Fst.s1.adm, mat_tot_mean$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
+p = plot_stat_gen(mat_tot, mat_tot$gen, 
+              mat_tot$mean.het.adm, mat_tot$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+p = p + geom_hline(yintercept = mat_tot$mean.het.s1[1],
+                           color = "red")
+p = p + geom_hline(yintercept = mat_tot$mean.het.s2[1],
+                           color = "black")
+print(p)
 plot_stat_gen(mat_tot, mat_tot$gen, 
               mat_tot$Fst.s1.adm, mat_tot$Ne,
-              "Stat en fonction des générations\n selon différentes Ne initiales")
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+
 #plot_stat_gen(mat_64_8192, mat_64_8192$gen, 
 #              mat_64_8192$f3, mat_64_8192$Ne,
 #              "Stat en fonction des générations\n selon différentes Ne initiales")
