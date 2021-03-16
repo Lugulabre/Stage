@@ -23,6 +23,7 @@ Fonction
 
 #Data frame prior
 data.frame.prior = function(seq_ne, max_simu){
+
   #Créer matrice vide qui contiendra les stats
   mat_prior = matrix(data = NA, nrow = length(seq_ne)*max_simu, ncol = 4)
   #Attribution nom colonnes selon appelation stat par MetHis
