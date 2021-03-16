@@ -37,7 +37,7 @@ Fonction de lecture des stats résumées. La fonction est prévue pour lire les 
 data.frame.stat = function(seq_ne, max_gen, max_simu){
 
   #Créer matrice vide qui contiendra les stats
-  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 64)
+  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 63)
   mat_stat = as.data.frame(mat_stat)
   #Compteur pour indiquer les lignes à remplir
   cpt = 0
@@ -59,7 +59,6 @@ data.frame.stat = function(seq_ne, max_gen, max_simu){
         file_stat = read.table(file_path, header = TRUE) #Lecture fichier stat résumées
         #Suppression 1ère colonne, contenant uniquement chiffres pour tri en bash. 
         mat_stat[row_min_simu:row_max_simu,3:63] = file_stat
-        mat_stat[row_min_simu:row_max_simu,64] = rep((cpt-1), max_gen)
         # delta0 = mat_stat[row_min_simu,32]
         # print(delta0)
         # mat_stat[row_min_simu:row_max_simu,65] = (delta0 - mat_stat[row_min_simu:row_max_simu,32])
@@ -70,15 +69,13 @@ data.frame.stat = function(seq_ne, max_gen, max_simu){
   
 
   #Attribution nom colonnes selon appelation stat par MetHis
-  colnames(mat_stat) = c("Ne", "simu", names(file_stat),"cpt")#, "delta.adm.props")
+  colnames(mat_stat) = c("Ne", "simu", names(file_stat))#,"cpt")#, "delta.adm.props")
   #Passage des Ne en facteur
   mat_stat$Ne = factor(as.factor(mat_stat$Ne), levels = as.character(seq_ne))
   #Passage simulations en entier
   mat_stat$simu = as.integer(mat_stat$simu)
   #Passage générations en entier
   mat_stat$Generation = as.integer(mat_stat$Generation)
-  #Passage compteur en facteur
-  mat_stat$cpt = as.integer(mat_stat$cpt)  
   #Passage stats en double
   for (numcol in 4:ncol(mat_stat)) {
     mat_stat[,numcol] = as.double(mat_stat[,numcol])
@@ -124,8 +121,20 @@ data.frame.mean = function(df_stat, max_gen, seq_ne){
 
 ```
 
+Fonction d'extraction d'une sous-matrice à partir d'une matrice principale en fonction de valeurs choisies de Ne devant être présentes dans la matrice initiale.
+
+```{r}
+extract_sub_mat = function(all_mat, list_ne){
+  all_rows = c()
+  for (ne in as.character(list_ne)) {
+    all_rows = append(all_rows, which(all_mat[,1] == ne))
+  }
+  return(all_mat[all_rows,])
+}
+```
+
 Fonction d'affichage des graphiques en 2D, avec un background blanc et les lignes horizontales de quadrillage affichées.
-Cette fonction permet d'afficher les lignes de régression ou les lignes reliant les points.
+Cette fonction permet d'afficher les lignes reliant les points ou les lignes de régression. Il est possible de passer en paramètres la variable selon laquelle les points seront colorés, les groupes selon lesquels les points sont reliés, l'affichage ou non de la légende (l'affichage se fait par défaut), la taille des points et le type de ligne utilisé.
 
 ```{r}
 #Plot function
@@ -154,7 +163,7 @@ plot_stat_gen = function(df, gen, stat, group_col = c(), color_col, titre, ligne
 }
 ```
 
-Cette fonction d'affichage de graphique reprend la précédente, mais sans affficher les points.
+Cette fonction d'affichage de graphique reprend la précédente, en affichant uniquement les courbes de régression sans les points.
 
 ```{r}
 #Plot function
@@ -176,6 +185,10 @@ plot_without_point = function(df, gen, stat, color_col, titre, legd = TRUE){
 }
 ```
 
+Cette fonction permet de rajouter à un plot existant :
+- des lignes verticales (pour les goulots d'étranglement par exemple)
+- un titre aux légendes de couleurs et de types de ligne
+- de modifier les types de lignes utilisés
 
 ```{r}
 improve_plot_bottle = function(p, vec_abline, lab_col, lab_line, vec_linetype){
@@ -187,17 +200,53 @@ improve_plot_bottle = function(p, vec_abline, lab_col, lab_line, vec_linetype){
 }
 ```
 
-Fonction d'extraction d'une sous-matrice à partir d'une matrice principale en fonction de valeurs choisies de Ne.
+Fonction pour une représentation graphique à l'aide d'un gif, pour suivre l'évolution de la distribution des proportions d'admixture dans la population.
 
 ```{r}
-extract_sub_mat = function(all_mat, list_ne){
-  all_rows = c()
-  for (ne in as.character(list_ne)) {
-    all_rows = append(all_rows, which(all_mat[,1] == ne))
+
+hist.gif.props.adm = function(mat, select_stat, select_seq, title,
+                              seq_gen = c(seq(1,10,1), seq(11,101,10)),
+                              vec_col = c("#A5260A", "#F6DC12", "#87E990", "#FFE4C4",
+                                          "#E67E30", "#79F8F8", "#A10684", "#8B6C42")){
+  
+  png(file="example%03d.png", width=600, heigh=400)
+  for (line in seq_gen) {
+    cpt_col = 1
+    for (var in select_seq) {
+      rg_select = which(colnames(mat) == select_stat)
+      mat_tmp = mat[which(mat[,rg_select] == var),]
+      vec_y = c(mat_tmp$perc0.adm.props[line],
+                mat_tmp$perc10.adm.props[line],
+                mat_tmp$perc20.adm.props[line],
+                mat_tmp$perc30.adm.props[line],
+                mat_tmp$perc40.adm.props[line],
+                mat_tmp$perc50.adm.props[line],
+                mat_tmp$perc60.adm.props[line],
+                mat_tmp$perc70.adm.props[line],
+                mat_tmp$perc80.adm.props[line],
+                mat_tmp$perc90.adm.props[line],
+                mat_tmp$perc100.adm.props[line])
+
+      if (var == select_seq[1]) {
+        hist(vec_y, breaks = vec_y, main = line-1, col = vec_col[cpt_col], xlim = c(-0.2,1.2))
+        cpt_col = cpt_col+1
+      }else{
+        hist(vec_y, breaks = vec_y, add = TRUE, col = vec_col[cpt_col])
+        cpt_col = cpt_col+1
+      }
+    }
+    legend("topleft", title="Alpha",legend = select_seq,
+           fill = vec_col[1:cpt_col], cex=0.8) 
   }
-  return(all_mat[all_rows,])
+
+  dev.off()
+  system(str_c("convert -delay 120 *.png ",title,".gif"))
+  file.remove(list.files(pattern=".png"))
+
 }
+
 ```
+
 
 ###Enregistrement des fonctions
 ```{r}
@@ -207,26 +256,29 @@ print(difftime(Sys.time(), time.ini))
 
 ## Population constante de tailles initiales différentes
 
-Calcul des matrices de stats
+Calcul des matrices de stats pour de populations constantes de tailles initiales différentes.
 
 ```{r}
 seq_1024_16384 = 2**seq(10,14,1)
 seq_50_1000 = seq(50,1000,1)
 seq_tot = sort(c(seq_50_1000, seq_1024_16384))
 
-mat_tot = data.frame.stat(seq_tot, 101, 1)
+# mat tot cstt
+mat_tot = data.frame.stat(seq_tot, 101, 1) 
+# Ne de 50 à 200 par pas de 10 puis de 200 à 1000 par pas de 100 (mat1 cstt)
 mat_50_1000 = extract_sub_mat(mat_tot, c(seq(50,200,10), seq(200,1000,100)))
+# Ne de 1024 à 16384 avec un pas de x2 (mat2 cstt)
 mat_1024_16384 = extract_sub_mat(mat_tot, 2**seq(6,14,1))
+# Ne de 64 à 16384 avec un pas de x2 + Ne de 100 et de 1000 (mat3 cstt)
 mat_64_100_16384 = extract_sub_mat(mat_tot, c(2**seq(6,14,1), 100, 1000) )
-
-#mat_1024_16384_mean = data.frame.mean(mat_1024_16384, 101, seq_1024_16384)
 
 ```
 
-
 Graphiques obtenus : affichage de l'évolution d'une statistique donnée en fonction des générations colorée selon la Ne initiale.
 
+#####Hétérozygotie moyenne
 ```{r}
+# Affichage de l'hétérozygotie pour la matrice totale (mat tot cstt)
 p_tmp = plot_stat_gen(mat_tot, mat_tot$Generation, 
                       mat_tot$mean.het.adm, mat_tot$Ne, mat_tot$Ne,ligne = T,
                       "Moyenne He en fonction des générations\n selon différentes Ne initiales",
@@ -234,6 +286,8 @@ p_tmp = plot_stat_gen(mat_tot, mat_tot$Generation,
 p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
 p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
 print(p_tmp)
+
+# Affichage de l'hétérozygotie pour mat1 cstt
 p_tmp = plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
                       mat_50_1000$mean.het.adm, mat_50_1000$Ne, mat_50_1000$Ne,ligne = T,
                       "Moyenne He en fonction des générations\nselon différentes Ne initiales",
@@ -243,28 +297,7 @@ p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black
 print(p_tmp)
 ```
 
-```{r}
-write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y){
-  num_col = which(colnames(mat) == name_stat)
-  p = plot_stat_gen(mat, mat$Generation, 
-                mat[,num_col], mat$Ne, mat$Ne,ligne = T,
-                str_c(name_stat, " en fonction des générations\n selon différentes Ne initiales"))
-  png(filename = str_c("../../../Images/", name_file, ".png"), width = 1000, height = 800)
-  print(p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE))
-  dev.off()
-  ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
-}
-```
-
-```{r}
-
-write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.062)
-write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
-write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
-
-```
-
-
+#####Fst s1 adm
 
 ```{r}
 plot_stat_gen(mat_tot, mat_tot$Generation, 
@@ -279,6 +312,41 @@ plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation,
               "Fst s1 adm en fonction des générations\n selon différentes Ne initiales")
 ```
 
+Fonction d'écriture de plot dans des fichiers, en choisissant la statistique enregistrée.
+
+```{r}
+write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y){
+  num_col = which(colnames(mat) == name_stat)
+  p = plot_stat_gen(mat, mat$Generation, 
+                mat[,num_col], mat$Ne, mat$Ne,ligne = T,
+                str_c(name_stat, " en fonction des générations\n selon différentes Ne initiales"))
+  png(filename = str_c("../../../Images/", name_file, ".png"), width = 1000, height = 800)
+  print(p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE))
+  dev.off()
+  ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
+}
+```
+
+Écriture de différents graphiques pour différentes statistiques choisies. La matrice choisie est la mat3 cstt pour des raisons de lisibilité. Cette matrice permet également d'observer l'évolution des statistiques choisies pour des Ne = 100 et Ne = 1000, valeurs qui seront reprises dans d'autres scénarios ultérieurement.^
+
+```{r}
+
+write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.062)
+write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
+write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5)
+write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
+
+```
+
+
+```{r}
+setwd("../../../Images/")
+
+hist.gif.props.adm(mat = mat_64_100_16384, select_stat = "Ne", select_seq = c(64,100,256,2048),
+                   title = "adm.props/hist_cstt")
+```
+
+
 ###Populations à Ne constants
 ```{r}
 print(difftime(Sys.time(), time.ini))
@@ -292,6 +360,27 @@ Celles-ci sont enregistrées dans des répertoires de la forme "Ne100-XXX/Ne100-
 Fonction de lecture des stats résumées. La fonction est prévue pour lire les fichiers de stats résumées dans des répertoires de la forme "NeXXX/simu_XXX" (avec XXX remplacés par les valeurs de Ne et de simulations). Elle renvoie les résultats sous forme de data frame en ajoutant aux statistiques résumées les colonnes correspondant à l'effectif efficace et la simulation.
 
 ```{r}
+data.frame.ne.gen = function(seq_ne){
+  for (ne in seq_ne) {
+    if (dir.exists(str_c("Ne", ne))) {
+      dir_ne = str_c("Ne", ne, "/simu_1/")
+      setwd(dir_ne)
+      file_tmp = read.table("simu_1.par", header = TRUE)
+      
+      if (ne == seq_ne[1]) {
+        mat_ne_inc = as.data.frame(file_tmp[,2])
+      }else{
+        mat_ne_inc = cbind(mat_ne_inc, file_tmp[,2])
+      }
+      setwd("../../")
+    }
+  }
+  return(mat_ne_inc)
+}
+```
+
+
+```{r}
 data.frame.increase = function(seq_ne_ini, seq_combi){
   mat_inc = c()
   for (ne_ini in seq_ne_ini) {
@@ -301,17 +390,39 @@ data.frame.increase = function(seq_ne_ini, seq_combi){
       motif_detect = str_c("^",ne_ini,"-")
       vec_ne_tmp = seq_combi[which(str_detect(seq_combi, motif_detect))]
       mat_tmp = data.frame.stat(seq_ne = vec_ne_tmp, max_gen = 101, max_simu = 1)
+      mat_ne = data.frame.ne.gen(seq_ne = vec_ne_tmp)
+      # print(mat_ne)
+      vec_tmp = as.integer(unlist(str_split(mat_tmp$Ne, "-")))
+      mat_tmp$ne_gen = unlist(mat_ne, use.names = F)
+      # print(length(vec_tmp))
+      mat_tmp$n0 = vec_tmp[seq(1,length(vec_tmp),2)]
+      mat_tmp$nf = vec_tmp[seq(2,length(vec_tmp),2)]
       if (ne_ini == seq_ne_ini[1]) {
         mat_inc = mat_tmp
       }else{
         mat_inc = rbind(mat_inc, mat_tmp)
       }
+      
       setwd("../")
       #print(dim(mat_pop_inc))
     }
   }
   return(na.omit(mat_inc))
 }
+
+# mat_pop_nu = data.frame(mat_pop_nu,
+#                         ne_gen = unlist(mat_ne_inc , use.names = F),
+#                         n0 = rep(NA, nrow(mat_pop_nu)),
+#                         nf = rep(NA, nrow(mat_pop_nu)) )
+# 
+# for (i in 1:nrow(mat_pop_nu)) {
+#   vec_tmp = as.integer(unlist(str_split(mat_pop_nu$Ne, "-")))
+#   mat_pop_nu$n0[i] = vec_tmp[1]
+#   mat_pop_nu$nf[i] = vec_tmp[2]
+# }
+# 
+# mat_ne_inc = data.frame()
+# cpt = 1
 
 ```
 
@@ -321,7 +432,7 @@ On extrait ensuite les stats pour lesquelles on a un nef de 10000.
 ```{r}
 setwd("../new_methis_pop_increase_50000_snp/")
 seq_ne_ini = seq(50,100,2)
-seq_ne_fin = seq(100, 10000, 100)
+seq_ne_fin = c(seq(100, 10000, 200), 10000)
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
 
@@ -360,58 +471,66 @@ plot_stat_gen(mat_end_10000, mat_end_10000$Generation,
               legd = TRUE)
 ```
 
-###Populations croissantes à Nu aléatoire dans la loi uniforme [0,0.5]
+###Populations croissantes à U aléatoire dans la loi uniforme [0,0.5]
 ```{r}
 print(difftime(Sys.time(), time.ini))
 ```
 
 
 
-## Variation Nu
+## Variation U
+
+Le U déterminant l'inflexion de la courbe de croissance est ici connu et fixé avant la simulation.
+
+```{r}
+data.frame.increase.nu = function(seq_ne_ini, seq_combi, seq_nu){
+  for (nu in seq_nu) {
+    if(dir.exists(str_c("Nu", nu ))){
+      dir_nu = str_c("Nu", nu, "/")
+      setwd(dir_nu)
+      
+      mat_tmp = data.frame.increase(seq_ne_ini, seq_combi)
+      
+      if (nu == seq_nu[1]) {
+        mat_pop = data.frame(mat_tmp, U = nu)
+      }else{
+        mat_tmp = data.frame(mat_tmp, U = nu)
+        mat_pop = rbind(mat_pop, mat_tmp)
+      }
+      setwd("../")
+    }
+  }
+  mat_pop$U = as.factor(mat_pop$U)
+  
+  return(mat_pop)
+
+}
+```
+
 
 ```{r}
 setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+
+#Détermination des paramètres initiaux
 seq_nu = sprintf("%.2f", seq(0.05, 0.45, 0.05))
 seq_ne_ini = seq(50,100,10)
 seq_ne_fin = seq(100, 10000, 200)
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
 
-list_df_nu = list()
-cpt = 1
 
-for (nu in seq_nu) {
-  if(dir.exists(str_c("Nu", nu ))){
-    dir_nu = str_c("Nu", nu, "/")
-    setwd(dir_nu)
-    list_df_nu[[cpt]] = data.frame.increase(seq_ne_ini, seq_combi)
-    cpt = cpt+1
-    setwd("../")
-  }
-}
+mat_pop_nu = data.frame.increase.nu(seq_ne_ini = seq_ne_ini, seq_combi = seq_combi, seq_nu = seq_nu)
 
-for (combi_lst in 1:length(list_df_nu)) {
-  if (combi_lst == 1) {
-    mat_pop_nu = list_df_nu[[combi_lst]]
-    mat_pop_nu = data.frame(mat_pop_nu, Nu = seq_nu[combi_lst])
-  }else{
-    mat_tmp = list_df_nu[[combi_lst]]
-    mat_tmp = data.frame(mat_tmp, Nu = seq_nu[combi_lst])
-    mat_pop_nu = rbind(mat_pop_nu, mat_tmp)
-  }
-}
-
-mat_pop_nu$Nu = as.factor(mat_pop_nu$Nu)
 
 ```
 
 ```{r}
 plot_without_point(mat_pop_nu, mat_pop_nu$Generation, 
                    mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
-                   "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
+                   "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon U",
                    legd = FALSE)
 plot_without_point(mat_pop_nu, mat_pop_nu$Generation, 
-                   mat_pop_nu$mean.het.adm, mat_pop_nu$Nu,
+                   mat_pop_nu$mean.het.adm, mat_pop_nu$U,
                    "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
                    legd = TRUE)
 # plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation,
@@ -425,138 +544,52 @@ plot_without_point(mat_pop_nu, mat_pop_nu$Generation,
 
 ```
 
+Affichage de l'hétérozygotie pour les différentes valeurs de Nu avec N0 entre 50 et 100 (pas de 10) et Nf entre 100 et 10 000 (pas de 200).
+
 ```{r}
 
-for (rg_list in 1:length(list_df_nu)) {
-  p_tmp = plot_stat_gen(list_df_nu[[rg_list]], list_df_nu[[rg_list]]$Generation, 
-                        list_df_nu[[rg_list]]$mean.het.adm, list_df_nu[[rg_list]]$Ne,
-                        list_df_nu[[rg_list]]$Ne,
-                        str_c("Nu = ",seq_nu[rg_list]), TRUE,legd = FALSE)
-  p_tmp = p_tmp+geom_hline(yintercept = list_df_nu[[rg_list]]$mean.het.s1[1],
+for (nu in seq_nu) {
+  
+  mat_pop_nu_tmp = mat_pop_nu[which(mat_pop_nu$U == nu),]
+  
+  p_tmp = plot_stat_gen(mat_pop_nu_tmp, mat_pop_nu_tmp$Generation,
+                        mat_pop_nu_tmp$mean.het.adm, mat_pop_nu_tmp$Ne,
+                        mat_pop_nu_tmp$Ne,
+                        str_c("U = ",nu), TRUE, legd = FALSE)
+  p_tmp = p_tmp+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s1[1],
                            color = "red")
-  p_tmp = p_tmp+geom_hline(yintercept = list_df_nu[[rg_list]]$mean.het.s2[1],
+  p_tmp = p_tmp+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s2[1],
                            color = "black")
   print(p_tmp)
 
 }
+remove(mat_pop_nu_tmp)
 
 ```
 
 
-```{r}
-
-# for (rg_list in 1:length(list_df_nu)) {
-#   
-#   list_ne = list_df_nu[[rg_list]]$Ne[which(list_df_nu[[rg_list]]$Generation == 100)]
-#   list_ne = as.integer(unlist(str_split(list_ne, "-")))
-#   list_ne0 = list_ne[seq(1, length(list_ne), 2)]
-#   list_nef = list_ne[seq(2, length(list_ne), 2)]
-#   mat_tmp_u = list_df_nu[[rg_list]][which(list_df_nu[[rg_list]]$Generation == 100),]
-#   
-#   scatter3D(x = list_ne0, y = list_nef, z = mat_tmp_u$mean.het.adm,
-#             bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
-#             theta = 120, phi = 0, type = "s", cex.lab = 0.6, cex.axis = 0.5,
-#             xlab = "Ne0", ylab = "Nef", zlab = "Stat")
-# 
-# }
-
-
-```
+Affichage en surface de l'hétérozygotie à la génération 100 en fonction de Ne0 et Nef selon différents U.
 
 ```{r}
-# grid.lines = 50
-# fit <- loess(mat_tmp_u$mean.het.adm ~ list_nef + list_ne0)
-# x.pred <- seq(min(list_ne0), max(list_ne0), length.out = grid.lines)
-# y.pred <- seq(min(list_nef), max(list_nef), length.out = grid.lines)
-# xy <- expand.grid( x = x.pred, y = y.pred)
-# z.pred <- matrix(predict(fit, newdata = xy), 
-#                  nrow = grid.lines, ncol = grid.lines)
-# 
-# fitpoints = predict(fit)
-# scatter3D(x = list_ne0, y = list_nef, z = mat_tmp_u$mean.het.adm,
-#           bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_list],
-#           theta = 150, phi = 0, type = "s",cex = 0.5, cex.lab = 0.6, cex.axis = 0.5,
-#           xlab = "Ne0", ylab = "Nef", zlab = "Stat",
-#           surf = list(x = x.pred, y = y.pred, z = z.pred,
-#                       facets = NA))
-
-```
-
-```{r}
-for (rg_list in 1:length(list_df_nu)) {
+for (nu in seq_nu) {
   
-  list_ne = list_df_nu[[rg_list]]$Ne[which(list_df_nu[[rg_list]]$Generation == 100)]
+  mat_pop_nu_tmp = mat_pop_nu[which(mat_pop_nu$U == nu),]
+  
+  list_ne = mat_pop_nu_tmp$Ne[which(mat_pop_nu_tmp$Generation == 100)]
   list_ne = as.integer(unlist(str_split(list_ne, "-")))
   list_ne0 = list_ne[seq(1, length(list_ne), 2)]
   list_nef = list_ne[seq(2, length(list_ne), 2)]
-  mat_tmp_u = list_df_nu[[rg_list]][which(list_df_nu[[rg_list]]$Generation == 100),]
+  mat_pop_nu_tmp = mat_pop_nu_tmp[which(mat_pop_nu_tmp$Generation == 100),]
   
-  print(wireframe(mat_tmp_u$mean.het.adm ~ list_ne0 * list_nef, data = mat_tmp_u,
+  print(wireframe(mat_pop_nu_tmp$mean.het.adm ~ list_ne0 * list_nef, data = mat_pop_nu_tmp,
                   drape = TRUE, zlab = "He", xlab = "Ne0", ylab = "Nef",
                   screen = list(z = 40, x = -60),
                   scales = list(z.ticks=5, arrows=F, col="black", font=1, tck=0.8),
-                  main = seq_nu[rg_list]))
+                  main = str_c("He moyenne à la génération 100 en fonction de Ne0 et Nef\n U = ", nu)  ))
   
 }
 
-
-```
-
-Calcul matrice pour connaître Ne à chaque génération. 
-```{r}
-setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
-
-mat_ne_inc = data.frame()
-cpt = 1
-
-for (nu in seq_nu) {
-  if(dir.exists(str_c("Nu", nu ))){
-    dir_nu = str_c("Nu", nu, "/")
-    setwd(dir_nu)
-    for (ne_ini in seq_ne_ini) {
-      if (dir.exists(str_c("Ne", ne_ini, "-XXX/"))) {
-        dir_ne = str_c("Ne", ne_ini, "-XXX/")
-        setwd(dir_ne)
-        seq_combi = as.data.frame(outer(ne_ini, seq_ne_fin,
-                                        FUN="paste", sep="-"))
-        seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
-        for (combi in seq_combi) {
-          if (dir.exists(str_c("Ne", combi))) {
-            dir_ne_bis = str_c("Ne", combi, "/simu_1/")
-            setwd(dir_ne_bis)
-            cpt = cpt + 1
-            file_tmp = read.table("simu_1.par", header = TRUE)
-            if (nu == seq_nu[1] && ne_ini==seq_ne_ini[1] && combi == seq_combi[1]) {
-              mat_ne_inc = as.data.frame(file_tmp[,2])
-            }else{
-              
-              mat_ne_inc = cbind(mat_ne_inc, file_tmp[,2])
-            }
-            
-            setwd("../../")
-          }
-        }
-        setwd("../")
-      }
-    }
-    setwd("../")
-
-  }
-}
-```
-
-
-```{r}
-mat_pop_nu = data.frame(mat_pop_nu,
-                        ne_gen = unlist(mat_ne_inc , use.names = F),
-                        n0 = rep(NA, nrow(mat_pop_nu)),
-                        nf = rep(NA, nrow(mat_pop_nu)) )
-
-for (i in 1:nrow(mat_pop_nu)) {
-  vec_tmp = as.integer(unlist(str_split(mat_pop_nu$Ne[i], "-")))
-  mat_pop_nu$n0[i] = vec_tmp[1]
-  mat_pop_nu$nf[i] = vec_tmp[2]
-}
+remove(mat_pop_nu_tmp)
 
 ```
 
@@ -565,19 +598,10 @@ for (i in 1:nrow(mat_pop_nu)) {
 
 for (rg_nu in seq_nu) {
   #rg_nu
-  df_tmp = mat_pop_nu[which(mat_pop_nu$Nu == rg_nu),]
-  
-  #grid.lines = 30
-  #fit <- loess(df_tmp$mean.het.adm ~ df_tmp$Generation + as.numeric(df_tmp$ne_gen))
-  #x.pred <- seq(min(df_tmp$Generation), max(df_tmp$Generation), length.out = grid.lines)
-  #y.pred <- seq(min(as.numeric(df_tmp$ne_gen)),
-  #              max(as.numeric(df_tmp$ne_gen)), length.out = grid.lines)
-  #xy <- expand.grid( x = x.pred, y = y.pred)
-  # z.pred <- matrix(predict(fit, newdata = xy), 
-  #                nrow = grid.lines, ncol = grid.lines)
+  df_tmp = mat_pop_nu[which(mat_pop_nu$U == rg_nu),]
   
   scatter3D(x = df_tmp$Generation, y = df_tmp$ne_gen, z = df_tmp$mean.het.adm,
-            bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_nu],
+            bty = "b2", pch = 16, ticktype = "detailed", main = rg_nu,
             theta = 210, phi = 20, type = "s",cex = 0.2, cex.lab = 0.6, cex.axis = 0.5,
             xlab = "Gen", ylab = "Ne", zlab = "Stat")
   # print(wireframe(mean.het.adm ~ Generation * ne_gen,
@@ -587,19 +611,15 @@ for (rg_nu in seq_nu) {
   #                 scales = list(z.ticks=5, arrows=F, col="black", font=1, tck=0.8),
   #                 main = rg_nu))
 }
-#surf = list(x = x.pred, y = y.pred, z = z.pred,facets = NA)
-```
 
-```{r}
-seq_extract = c("0.05", "0.25", "0.45")
-df_extract = mat_pop_nu[which(mat_pop_nu$Nu == seq_extract),]
+rm(df_tmp)
 
 ```
 
 ```{r}
 
 scatter3D(x = mat_pop_nu$Generation, y = mat_pop_nu$ne_gen,
-          z = as.numeric(as.character(mat_pop_nu$Nu)),
+          z = as.numeric(as.character(mat_pop_nu$U)),
           bty = "b2", pch = 16, ticktype = "detailed",
           theta = 210, phi = 50, type = "s", cex.lab = 0.6, cex.axis = 0.5,
           xlab = "Gen", ylab = "Ne", zlab = "Nu")
@@ -615,91 +635,20 @@ seq_ne_fin = c(200, 400, seq(1000, 10000, 1000))
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
 
-
-df_nu_reduce = data.frame()
-
-for (nu in seq_nu_bis) {
-  if(dir.exists(str_c("Nu", nu ))){
-    dir_nu = str_c("Nu", nu, "/")
-    setwd(dir_nu)
-    
-    df_tmp = data.frame.increase(seq_ne_ini, seq_combi)
-    col_nu = as.character(rep(nu, nrow(df_tmp)))
-    col_n0 = rep(NA, nrow(df_tmp))
-    col_nf = rep(NA, nrow(df_tmp))
-    
-    if (nu == seq_nu_bis[1]) {
-      df_nu_reduce = data.frame(df_tmp, nu = col_nu,
-                                n0 = col_n0, nf = col_nf)
-    }else{
-      df_tmp = data.frame(df_tmp, nu = col_nu,
-                          n0 = col_n0, nf = col_nf)
-      df_nu_reduce = rbind(df_nu_reduce, df_tmp)
-    }
-    setwd("../")
-  }
-}
-
-for (i in 1:nrow(df_nu_reduce)) {
-  vec_tmp = as.integer(unlist(str_split(df_nu_reduce$Ne[i], "-")))
-  df_nu_reduce$n0[i] = vec_tmp[1]
-  df_nu_reduce$nf[i] = vec_tmp[2]
-}
-
-```
-
-```{r}
-ne_gen = data.frame()
-cpt = 1
-
-for (nu in seq_nu_bis) {
-  if(dir.exists(str_c("Nu", nu ))){
-    dir_nu = str_c("Nu", nu, "/")
-    setwd(dir_nu)
-    for (ne_ini in seq_ne_ini) {
-      if (dir.exists(str_c("Ne", ne_ini, "-XXX/"))) {
-        dir_ne = str_c("Ne", ne_ini, "-XXX/")
-        setwd(dir_ne)
-        seq_combi = as.data.frame(outer(ne_ini, seq_ne_fin,
-                                        FUN="paste", sep="-"))
-        seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
-        for (combi in seq_combi) {
-          if (dir.exists(str_c("Ne", combi))) {
-            dir_ne_bis = str_c("Ne", combi, "/simu_1/")
-            setwd(dir_ne_bis)
-            cpt = cpt + 1
-            file_tmp = read.table("simu_1.par", header = TRUE)
-            if (nu == seq_nu_bis[1] && ne_ini==seq_ne_ini[1] && combi == seq_combi[1]) {
-              ne_gen = as.data.frame(file_tmp[,2])
-            }else{
-              ne_gen = rbind(ne_gen, file_tmp[,2])
-            }
-            
-            setwd("../../")
-          }
-        }
-        setwd("../")
-      }
-    }
-    setwd("../")
-
-  }
-}
-
-
+mat_pop_nu_reduce = data.frame.increase.nu(seq_ne_ini, seq_combi, seq_nu_bis)
 
 ```
 
 
 ```{r}
-df_nu_reduce_gen_100 = df_nu_reduce[which(df_nu_reduce$Generation == 100),]
-df_nu_reduce$log_mean = log(df_nu_reduce$mean.het.adm)
-scatter3D(x = df_nu_reduce$Generation, y = df_nu_reduce$nf,
-          z = df_nu_reduce$mean.het.adm, colvar = as.numeric(df_nu_reduce$nu),
+mat_pop_nu_reduce_gen_100 = mat_pop_nu_reduce[which(mat_pop_nu_reduce$Generation == 100),]
+mat_pop_nu_reduce$log_mean = log(mat_pop_nu_reduce$mean.het.adm)
+scatter3D(x = mat_pop_nu_reduce$Generation, y = mat_pop_nu_reduce$nf,
+          z = mat_pop_nu_reduce$mean.het.adm, colvar = as.numeric(mat_pop_nu_reduce$U),
           col = c("#1B9E77", "#D95F02", "#7570B3"),
-          colkey = list(at = c(0.1, 0.25, 0.4),
+          colkey = list(at = c(1.3, 2, 2.7),
                         addlines = TRUE, length = 1, width = 0.5,
-                        labels = levels(as.factor(df_nu_reduce$nu))),
+                        labels = levels(as.factor(mat_pop_nu_reduce$U))),
           ticktype = "detailed",bty = "g",pch = 16,
           theta = 115, phi = 0, type = "s", cex = 0.5, cex.lab = 0.6, cex.axis = 0.5,
           xlab = "generation", ylab = "Nf", zlab = "stat", clab = "U")
@@ -712,6 +661,7 @@ scatter3D(x = df_nu_reduce$Generation, y = df_nu_reduce$nf,
 ```
 
 ```{r}
+setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
 
 seq_ne_ini3 = seq(100,100,0)
 seq_multi3 = c(2,4,10,100)
@@ -719,14 +669,7 @@ seq_ne_fin3 = seq_multi3*seq_ne_ini3
 seq_combi3 = as.data.frame(outer(seq_ne_ini3, seq_ne_fin3, FUN="paste", sep="-"))
 seq_combi3 = as.data.frame.vector(unlist(seq_combi3))[[1]]
 
-for (rg in c(1:length(seq_combi3))) {
-  if (rg == 1) {
-    mat_pop_nu3 = df_nu_reduce[which(df_nu_reduce$Ne == seq_combi3[rg]),]
-  }else{
-    tmp = df_nu_reduce[which(df_nu_reduce$Ne == seq_combi3[rg]),]
-    mat_pop_nu3 = rbind(mat_pop_nu3, tmp)
-  }
-}
+mat_pop_nu_reduce_3 = data.frame.increase.nu(seq_ne_ini3, seq_combi3, seq_nu_bis)
 
 ```
 
@@ -735,7 +678,7 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y){
   num_col = which(colnames(mat) == name_stat)
   p = plot_stat_gen(df = mat, gen = mat$Generation, 
                     stat = mat[,num_col], group_col = c(),
-                    color_col = mat$Ne, line_t = mat$nu,
+                    color_col = mat$Ne, line_t = mat$U,
                     titre = str_c(name_stat," en fonction des générations\n selon différentes croissances de populations"),
                     legd = TRUE)
   
@@ -753,13 +696,22 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y){
 
 
 ```{r}
-write_increase_plot("mean.het.adm", mat_pop_nu3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.062)
-
-write_increase_plot("Fst.s1.adm", mat_pop_nu3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
-
-write_increase_plot("mean.F.adm", mat_pop_nu3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
+write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.062)
+write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
+write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5)
+write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
 
 ```
+
+```{r}
+setwd("../../../Images/")
+
+mat_pop_nu_reduce_100_10000 = mat_pop_nu_reduce_3[which(mat_pop_nu_reduce_3$Ne == "100-10000"),]
+
+hist.gif.props.adm(mat = mat_pop_nu_reduce_100_10000, select_stat = "U", select_seq = seq_nu_bis,
+                   title = "adm.props/hist_inc")
+```
+
 
 ###Populations croissantes avec Nu variable et fixé
 ```{r}
@@ -791,11 +743,9 @@ data.frame.bottleneck = function(lst_ne0, lst_nef, lst_alpha, lst_nu, lst_bottle
             col_bott_u = ceiling(col_bott_u/1)*1
             col_alpha_u = as.numeric(rep(nu, nrow(mat_tmp)))/as.numeric(rep(alpha, nrow(mat_tmp)))
             col_alpha_u = ceiling(col_alpha_u/0.001)*0.001
-            col_cpt = rep(cpt, nrow(mat_tmp))
             mat_tmp = data.frame(mat_tmp, alpha = col_alpha,
                                  U = col_nu, time_botl = col_bottle,
                                  bott_u = col_bott_u, alpha_u = col_alpha_u)
-            mat_tmp$cpt = col_cpt
             cpt = cpt+1
           }
           # print(dim(mat_tmp))
@@ -813,7 +763,6 @@ data.frame.bottleneck = function(lst_ne0, lst_nef, lst_alpha, lst_nu, lst_bottle
     mat_bot$alpha = as.factor(mat_bot$alpha)
     mat_bot$U = as.factor(mat_bot$U)
     mat_bot$time_botl = as.factor(mat_bot$time_botl)
-    mat_bot$cpt = as.factor(mat_bot$cpt)
     mat_bot$bott_u = as.factor(mat_bot$bott_u)
     mat_bot$alpha_u = as.factor(mat_bot$alpha_u)
   }
@@ -829,12 +778,6 @@ data.frame.bottleneck = function(lst_ne0, lst_nef, lst_alpha, lst_nu, lst_bottle
 ```{r}
 setwd("../new_methis_bottleneck_50000_snp/")
 
-# seq_alpha = c(0.1, 0.5, 0.9)
-# seq_nu_red = c(0.01, 0.25, 0.49)
-# seq_bottle = seq(10, 90, 10)
-# seq_ne0 = c(1000)
-# seq_nef = c(1000)
-
 mat_bottle = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000), 
                                    lst_alpha = c(0.1, 0.5, 0.9),
                                    lst_nu = c(0.01, 0.25, 0.49),
@@ -849,7 +792,7 @@ mat_bottle_time_80 = mat_bottle[which(mat_bottle$time_botl == 80),]
 
 
 ```{r}
-boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott){
+boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott,size_pop = 1000){
   for (bott in vec_bott) {
     new_mat = mat[which(mat$time_botl == bott),]
     new_vec = vec_stat[which(mat$time_botl == bott)]
@@ -857,7 +800,8 @@ boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott){
     p = plot_stat_gen(new_mat, new_mat$Generation, 
                       new_vec, c(),
                       new_mat$alpha, size_point = 0,
-                      str_c(name_stat, " en fonction des générations\nbottleneck ", bott, " N0 1000 Nf 1000"),
+                      str_c(name_stat, " en fonction des générations\nbottleneck ",
+                            bott, " N0 ",size_pop," Nf ",size_pop),
                       TRUE,legd = TRUE, line_t = new_mat$U)
     
     p = improve_plot_bottle(p = p, vec_abline = c(1,bott+1), lab_col = "alpha",
@@ -984,9 +928,8 @@ print(p)
 
 ```{r}
 write_bottle_plot("mean.het.adm", mini_mat_bottle, "moyenne_heterozygotie/moy_He_bottleneck",0.01,0.062)
-
 write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5)
-
+write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5)
 write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)
 
 ```
@@ -1003,13 +946,14 @@ vec_tmp[which(mat_bottle$alpha == 0.9)] = 4
 scatter3D(x = mat_bottle$Generation, y = as.numeric(as.character(mat_bottle$time_botl)),
           z = mat_bottle$mean.het.adm, colvar = as.numeric(vec_tmp),
           ticktype = "detailed",bty = "b2",pch = 16,
-          theta = 65, phi = 0, type = "s",cex = 0.3, cex.lab = 0.6, cex.axis = 0.5,
-          xlab = "generation", ylab = "bottle", zlab = "stat",
+          theta = 70, phi = 0, type = "s",cex = 0.3, cex.lab = 0.6, cex.axis = 0.5,
+          xlab = "generation", ylab = "bottleneck", zlab = "He moyen",
           col = c("#1B9E77", "#D95F02", "#7570B3"),
           colkey = list(at = c(2.3, 3, 3.7),
                         addlines = TRUE, length = 1, width = 0.5,
                         labels = c("0.1", "0.5", "0.9")),
-          clab = "alpha")
+          clab = "alpha",
+          main = "He moyenne en fonction des générations et\n du temps de bottleneck")
 
 
 
@@ -1022,47 +966,48 @@ setwd("../../../Images/")
 
 seq_alpha = c(0.1, 0.5, 0.9)
 mat_bottle_time_80_u_0.01 = mat_bottle_time_80[which(mat_bottle_time_80$U == 0.01),]
-nb_simu = nrow(mat_bottle_time_80_u_0.01) / 101
 
-png(file="example%03d.png", width=600, heigh=400)
-#c(seq(1,10,1), seq(11,101,10))
-for (line in  c(seq(1,10,1), seq(11,101,10))){
-  for (alpha in seq_alpha) {
-    mat_tmp_bott = mat_bottle_time_80_u_0.01[which(mat_bottle_time_80_u_0.01$alpha == alpha),]
-    vec_x = seq(0,100,10)
-    vec_y = c(mat_tmp_bott$perc0.adm.props[line],
-              mat_tmp_bott$perc10.adm.props[line],
-              mat_tmp_bott$perc20.adm.props[line],
-              mat_tmp_bott$perc30.adm.props[line],
-              mat_tmp_bott$perc40.adm.props[line],
-              mat_tmp_bott$perc50.adm.props[line],
-              mat_tmp_bott$perc60.adm.props[line],
-              mat_tmp_bott$perc70.adm.props[line],
-              mat_tmp_bott$perc80.adm.props[line],
-              mat_tmp_bott$perc90.adm.props[line],
-              mat_tmp_bott$perc100.adm.props[line])
-    
-    if (alpha == seq_alpha[1]) {
-      hist(vec_y, breaks = vec_y, main = line-1, col = "#A5260A", xlim = c(-0.2,1.2))
-    }else{
-      hist(vec_y, breaks = vec_y, add = TRUE, col = (as.numeric(as.character(mat_tmp_bott$alpha))*10+2))
-    }
-  }
-  legend("topleft", title="Alpha",names(summary(as.factor(mat_tmp_bott$alpha))),
-         fill = c("#A5260A", 7,11), cex=0.8)
-
-}
-
-dev.off()
-
-system("convert -delay 120 *.png hist_bottle1.gif")
-
-file.remove(list.files(pattern=".png"))
-
+hist.gif.props.adm(mat = mat_bottle_time_80_u_0.01, select_stat = "alpha", select_seq = seq_alpha,
+                   title = "adm.props/hist_bottle")
 
 ```
 
 ####Evolution de la proportion d'admixture dans la population
+
+```{r}
+mat_bottle_time_80_u_0.01$delta.mean.adm.props = NA
+mat_bottle_time_80_u_0.01$delta.var.adm.props = NA
+
+var.adm = function(s1, gen){
+  return( (s1*(1-s1))/(2**gen) )
+}
+
+for (i in 1:nrow(mat_bottle_time_80_u_0.01)) {
+  if (mat_bottle_time_80_u_0.01$Generation[i] == 0) {
+    ref_adm = mat_bottle_time_80_u_0.01$mean.adm.props[i]
+    mat_bottle_time_80_u_0.01$delta.mean.adm.props[i] = 0
+    mat_bottle_time_80_u_0.01$delta.var.adm.props[i] = 0
+  }else{
+    mat_bottle_time_80_u_0.01$delta.mean.adm.props[i] = mat_bottle_time_80_u_0.01$mean.adm.props[i] - ref_adm
+    ref_var = var.adm(s1 = ref_adm, gen = mat_bottle_time_80_u_0.01$Generation[i])
+    mat_bottle_time_80_u_0.01$delta.var.adm.props[i] = mat_bottle_time_80_u_0.01$var.adm.props[i] - ref_var
+  }
+}
+
+
+# plot(mat_bottle_time_80_u_0.01$delta.mean.adm.props~mat_bottle_time_80_u_0.01$Generation, type = "l")
+# plot(mat_bottle_time_80_u_0.01$delta.var.adm.props~mat_bottle_time_80_u_0.01$Generation, type = "l")
+
+
+plot_stat_gen(mat_bottle_time_80_u_0.01, mat_bottle_time_80_u_0.01$Generation, 
+              mat_bottle_time_80_u_0.01$delta.mean.adm.props,
+              mat_bottle_time_80_u_0.01$alpha, mat_bottle_time_80_u_0.01$alpha,ligne = T,
+                      "Moyenne He en fonction des générations\n selon différentes Ne initiales",
+                      legd = FALSE)
+
+
+```
+
 
 ```{r}
 # vec_test_tot = c()
@@ -1114,7 +1059,7 @@ mat_bottle_time_80_10.000 = mat_bottle_10.000[which(mat_bottle_10.000$time_botl 
 Moyenne de l'hétérozygotie
 
 ```{r}
-boucle_plot_bottle(mat_bottle_10.000, mat_bottle_10.000$mean.het.adm, "Heterozygotie", c(20,50,80))
+boucle_plot_bottle(mat_bottle_10.000, mat_bottle_10.000$mean.het.adm, "Heterozygotie", c(20,50,80),10000)
 
 ```
 
@@ -1124,7 +1069,7 @@ mini_mat_bottle_10.000 = rbind(mat_bottle_time_20_10.000, mat_bottle_time_50_10.
 p = plot_stat_gen(mini_mat_bottle_10.000, mini_mat_bottle_10.000$Generation, 
                   mini_mat_bottle_10.000$mean.het.adm, c(),
                   mini_mat_bottle_10.000$alpha_u, line_t = mini_mat_bottle_10.000$time_botl,
-                  "Moyenne He en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",TRUE,
+                  "Moyenne He en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 10000)",TRUE,
                   legd = TRUE)
 p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
                         lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
@@ -1160,7 +1105,7 @@ options( "scipen"=0)
 ```
 
 ```{r}
-boucle_plot_bottle(mat_bottle_100.000, mat_bottle_100.000$mean.het.adm, "Heterozygotie", c(20,50,80))
+boucle_plot_bottle(mat_bottle_100.000, mat_bottle_100.000$mean.het.adm, "Heterozygotie", c(20,50,80),"100 000")
 
 ```
 
@@ -1168,5 +1113,31 @@ boucle_plot_bottle(mat_bottle_100.000, mat_bottle_100.000$mean.het.adm, "Heteroz
 ###Bottleneck 100 000
 ```{r}
 print(difftime(Sys.time(), time.ini))
+```
+
+
+
+
+```{r}
+# mat_cstt_tmp = extract_sub_mat(mat_64_100_16384, c(64, 128, 256, 1024, 2048))
+# mat_cstt_tmp$ne_gen = unlist(mat_ne_inc , use.names = F)
+# 
+# p = ggplot(mat_cstt_tmp,aes(x = Generation, y = ne_gen, group = Ne, color = Ne))
+# p = p + geom_line(show.legend = TRUE) + ggtitle("Évolution du Ne au cours des générations")
+# p = p+labs(color = "Ne")+ylab("Ne")+theme_classic()
+# print(p)
+```
+
+```{r}
+# 
+# mat_bott_tmp = mat_bottle_time_80
+# mat_bott_tmp$ne_gen = unlist(mat_ne_inc , use.names = F)
+# # 
+# # mat_bott_tmp$ne_gen
+# p = ggplot(mat_bott_tmp,aes(x = Generation, y = ne_gen, group = U, color = U))
+# p = p + geom_line(show.legend = TRUE) + ggtitle("Évolution du Ne au cours des générations")
+# p = p+labs(color = "U")+ylab("Ne")+theme_classic()
+# print(p)
+# 
 ```
 
