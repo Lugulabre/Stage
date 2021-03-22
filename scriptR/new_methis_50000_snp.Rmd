@@ -37,7 +37,7 @@ Fonction de lecture des stats résumées. La fonction est prévue pour lire les 
 data.frame.stat = function(seq_ne, max_gen, max_simu){
 
   #Créer matrice vide qui contiendra les stats
-  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 63)
+  mat_stat = matrix(data = NA, nrow = length(seq_ne)*max_gen*max_simu, ncol = 64)
   mat_stat = as.data.frame(mat_stat)
   #Compteur pour indiquer les lignes à remplir
   cpt = 0
@@ -59,9 +59,10 @@ data.frame.stat = function(seq_ne, max_gen, max_simu){
         file_stat = read.table(file_path, header = TRUE) #Lecture fichier stat résumées
         #Suppression 1ère colonne, contenant uniquement chiffres pour tri en bash. 
         mat_stat[row_min_simu:row_max_simu,3:63] = file_stat
-        # delta0 = mat_stat[row_min_simu,32]
-        # print(delta0)
-        # mat_stat[row_min_simu:row_max_simu,65] = (delta0 - mat_stat[row_min_simu:row_max_simu,32])
+        #Ajout de la contribution s1,0 initiale pour pouvoir calculer les delta de proportion d'admixture ultérieurement
+        file_path_s1.0 = str_c(dir_ne, dir_simu, str_c("simu_",nb_simu,".txt") )
+        file_stat_s1.0 = read.table(file_path_s1.0, header = TRUE)
+        mat_stat[row_min_simu:row_max_simu,64] = file_stat_s1.0$s1.0[1]
       }
       #print(dim(mat_stat))
     }
@@ -69,7 +70,7 @@ data.frame.stat = function(seq_ne, max_gen, max_simu){
   
 
   #Attribution nom colonnes selon appelation stat par MetHis
-  colnames(mat_stat) = c("Ne", "simu", names(file_stat))#,"cpt")#, "delta.adm.props")
+  colnames(mat_stat) = c("Ne", "simu", names(file_stat), "s1.0")#,"cpt")#, "delta.adm.props")
   #Passage des Ne en facteur
   mat_stat$Ne = factor(as.factor(mat_stat$Ne), levels = as.character(seq_ne))
   #Passage simulations en entier
@@ -86,6 +87,27 @@ data.frame.stat = function(seq_ne, max_gen, max_simu){
   return(mat_stat)
 }
   
+```
+
+Calcul du delta des moyennes de proportion d'admixture par rapport à la moyenne attendue
+
+```{r}
+var.adm = function(s1, gen){
+  return( (s1*(1-s1))/(2**gen) )
+}
+
+delta.adm.props = function(mat){
+  mat$delta.mean.adm.props = NA
+  mat$delta.var.adm.props = NA
+  for (i in 1:nrow(mat)) {
+    ref_adm = mat$s1.0[i]
+    mat$delta.mean.adm.props[i] = mat$mean.adm.props[i] - ref_adm
+    ref_var = var.adm(s1 = ref_adm, gen = mat$Generation[i])
+    mat$delta.var.adm.props[i] = mat$var.adm.props[i] - ref_var
+  }
+  return(mat)
+}
+
 ```
 
 Dans le cas où l'on travaille sur de très nombreuses simulations correspondant à un effectif efficace, cette fonction permet de calculer les statistiques moyennées pour les valeurs de Ne étudiées.
@@ -204,7 +226,7 @@ Fonction pour une représentation graphique à l'aide d'un gif, pour suivre l'é
 
 ```{r}
 
-hist.gif.props.adm = function(mat, select_stat, select_seq, title,
+hist.gif.props.adm = function(mat, select_stat, select_seq, title, title_leg,
                               seq_gen = c(seq(1,10,1), seq(11,101,10)),
                               vec_col = c("#A5260A", "#F6DC12", "#87E990", "#FFE4C4",
                                           "#E67E30", "#79F8F8", "#A10684", "#8B6C42")){
@@ -235,7 +257,7 @@ hist.gif.props.adm = function(mat, select_stat, select_seq, title,
         cpt_col = cpt_col+1
       }
     }
-    legend("topleft", title="Alpha",legend = select_seq,
+    legend("topleft", title=title_leg,legend = select_seq,
            fill = vec_col[1:cpt_col], cex=0.8) 
   }
 
@@ -279,22 +301,22 @@ Graphiques obtenus : affichage de l'évolution d'une statistique donnée en fonc
 #####Hétérozygotie moyenne
 ```{r}
 # Affichage de l'hétérozygotie pour la matrice totale (mat tot cstt)
-p_tmp = plot_stat_gen(mat_tot, mat_tot$Generation, 
-                      mat_tot$mean.het.adm, mat_tot$Ne, mat_tot$Ne,ligne = T,
-                      "Moyenne He en fonction des générations\n selon différentes Ne initiales",
-                      legd = FALSE)
-p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
-p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
-print(p_tmp)
+p = plot_stat_gen(mat_tot, mat_tot$Generation, 
+                  mat_tot$mean.het.adm, mat_tot$Ne, mat_tot$Ne,ligne = T,
+                  "Moyenne He en fonction des générations\n selon différentes Ne initiales",
+                  legd = FALSE)
+p = p+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
+p = p+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
+print(p)
 
 # Affichage de l'hétérozygotie pour mat1 cstt
-p_tmp = plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
+p = plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
                       mat_50_1000$mean.het.adm, mat_50_1000$Ne, mat_50_1000$Ne,ligne = T,
                       "Moyenne He en fonction des générations\nselon différentes Ne initiales",
                       legd = TRUE)
-p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
-p_tmp = p_tmp+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
-print(p_tmp)
+p = p+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
+p = p+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
+print(p)
 ```
 
 #####Fst s1 adm
@@ -320,11 +342,17 @@ write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y){
   p = plot_stat_gen(mat, mat$Generation, 
                 mat[,num_col], mat$Ne, mat$Ne,ligne = T,
                 str_c(name_stat, " en fonction des générations\n selon différentes Ne initiales"))
+  p = p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE)
   png(filename = str_c("../../../Images/", name_file, ".png"), width = 1000, height = 800)
-  print(p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE))
+  print(p)
   dev.off()
   ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
 }
+```
+
+Ajout delta mean et var des proportions d'admixture pour les effectifs efficaces constants.
+```{r}
+mat_64_100_16384 = delta.adm.props(mat_64_100_16384)
 ```
 
 Écriture de différents graphiques pour différentes statistiques choisies. La matrice choisie est la mat3 cstt pour des raisons de lisibilité. Cette matrice permet également d'observer l'évolution des statistiques choisies pour des Ne = 100 et Ne = 1000, valeurs qui seront reprises dans d'autres scénarios ultérieurement.^
@@ -335,6 +363,8 @@ write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_
 write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
 write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5)
 write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
+write_cstt_plot("delta.mean.adm.props", mat_64_100_16384, "delta_mean_adm/delta_mean_ne_cstt", -0.25, 0.25)
+write_cstt_plot("delta.var.adm.props", mat_64_100_16384, "delta_var_adm/delta_var_ne_cstt", -0.2, 0.05)
 
 ```
 
@@ -343,7 +373,7 @@ write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03
 setwd("../../../Images/")
 
 hist.gif.props.adm(mat = mat_64_100_16384, select_stat = "Ne", select_seq = c(64,100,256,2048),
-                   title = "adm.props/hist_cstt")
+                   title = "adm.props/hist_cstt", title_leg = "Ne")
 ```
 
 
@@ -552,15 +582,15 @@ for (nu in seq_nu) {
   
   mat_pop_nu_tmp = mat_pop_nu[which(mat_pop_nu$U == nu),]
   
-  p_tmp = plot_stat_gen(mat_pop_nu_tmp, mat_pop_nu_tmp$Generation,
+  p = plot_stat_gen(mat_pop_nu_tmp, mat_pop_nu_tmp$Generation,
                         mat_pop_nu_tmp$mean.het.adm, mat_pop_nu_tmp$Ne,
                         mat_pop_nu_tmp$Ne,
                         str_c("U = ",nu), TRUE, legd = FALSE)
-  p_tmp = p_tmp+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s1[1],
+  p = p+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s1[1],
                            color = "red")
-  p_tmp = p_tmp+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s2[1],
+  p = p+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s2[1],
                            color = "black")
-  print(p_tmp)
+  print(p)
 
 }
 remove(mat_pop_nu_tmp)
@@ -684,9 +714,8 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y){
   
   p = improve_plot_bottle(p =p, vec_abline = c(), lab_col = "ne0-nef",
                        lab_line = "U", vec_linetype = c("dotted", "longdash", "solid"))
-
+  p = p + ylim(min_y, max_y)
   png(filename = str_c("../../../Images/", name_file,".png"), width = 1000, height = 800)
-  p = p+ylim(min_y, max_y)
   print(p)
   dev.off()
   ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
@@ -695,11 +724,18 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y){
 ```
 
 
+Ajout delta mean et var des proportions d'admixture pour les populations croissantes.
+```{r}
+mat_pop_nu_reduce_3 = delta.adm.props(mat_pop_nu_reduce_3)
+```
+
 ```{r}
 write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.062)
 write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
 write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5)
 write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
+write_increase_plot("delta.mean.adm.props", mat_pop_nu_reduce_3, "delta_mean_adm/delta_mean_pop_inc_nu_va", -0.25, 0.25)
+write_increase_plot("delta.var.adm.props", mat_pop_nu_reduce_3, "delta_var_adm/delta_var_pop_inc_nu_va", -0.2, 0.05)
 
 ```
 
@@ -709,7 +745,7 @@ setwd("../../../Images/")
 mat_pop_nu_reduce_100_10000 = mat_pop_nu_reduce_3[which(mat_pop_nu_reduce_3$Ne == "100-10000"),]
 
 hist.gif.props.adm(mat = mat_pop_nu_reduce_100_10000, select_stat = "U", select_seq = seq_nu_bis,
-                   title = "adm.props/hist_inc")
+                   title = "adm.props/hist_inc", title_leg = "U")
 ```
 
 
@@ -739,10 +775,12 @@ data.frame.bottleneck = function(lst_ne0, lst_nef, lst_alpha, lst_nu, lst_bottle
             col_alpha = rep(alpha, nrow(mat_tmp))
             col_nu = rep(nu, nrow(mat_tmp))
             col_bottle = rep(bottle, nrow(mat_tmp))
-            col_bott_u = as.numeric(rep(bottle, nrow(mat_tmp)))/as.numeric(rep(nu, nrow(mat_tmp)))
-            col_bott_u = ceiling(col_bott_u/1)*1
-            col_alpha_u = as.numeric(rep(nu, nrow(mat_tmp)))/as.numeric(rep(alpha, nrow(mat_tmp)))
-            col_alpha_u = ceiling(col_alpha_u/0.001)*0.001
+            col_bott_u = rep(str_c(bottle, "/", nu), nrow(mat_tmp))
+            # col_bott_u = as.numeric(rep(bottle, nrow(mat_tmp)))/as.numeric(rep(nu, nrow(mat_tmp)))
+            # col_bott_u = ceiling(col_bott_u/1)*1
+            col_alpha_u = rep(str_c(nu, "/", alpha), nrow(mat_tmp))
+            # col_alpha_u = as.numeric(rep(nu, nrow(mat_tmp)))/as.numeric(rep(alpha, nrow(mat_tmp)))
+            # col_alpha_u = ceiling(col_alpha_u/0.001)*0.001
             mat_tmp = data.frame(mat_tmp, alpha = col_alpha,
                                  U = col_nu, time_botl = col_bottle,
                                  bott_u = col_bott_u, alpha_u = col_alpha_u)
@@ -877,9 +915,8 @@ write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y){
                     legd = TRUE)
   p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
                           lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
-
-  png(filename = str_c("../../../Images/",name_file,".png"), width = 1000, height = 800)
   p = p+ylim(min_y, max_y)
+  png(filename = str_c("../../../Images/",name_file,".png"), width = 1000, height = 800)
   print(p)
   dev.off()
   ggsave(filename =  str_c("../../../Images/", name_file, ".eps"), plot = p)
@@ -925,12 +962,19 @@ print(p)
 # print(p)
 ```
 
+Ajout delta mean et var des proportions d'admixture pour les effectifs efficaces constants.
+```{r}
+mini_mat_bottle = delta.adm.props(mini_mat_bottle)
+```
+
 
 ```{r}
 write_bottle_plot("mean.het.adm", mini_mat_bottle, "moyenne_heterozygotie/moy_He_bottleneck",0.01,0.062)
 write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5)
 write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5)
 write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)
+write_bottle_plot("delta.mean.adm.props", mini_mat_bottle, "delta_mean_adm/delta_mean_bottleneck", -0.25, 0.25)
+write_bottle_plot("delta.var.adm.props", mini_mat_bottle, "delta_var_adm/delta_var_bottleneck", -0.2, 0.05)
 
 ```
 
@@ -955,7 +999,7 @@ scatter3D(x = mat_bottle$Generation, y = as.numeric(as.character(mat_bottle$time
           clab = "alpha",
           main = "He moyenne en fonction des générations et\n du temps de bottleneck")
 
-
+remove(vec_tmp)
 
 ```
 
@@ -968,7 +1012,7 @@ seq_alpha = c(0.1, 0.5, 0.9)
 mat_bottle_time_80_u_0.01 = mat_bottle_time_80[which(mat_bottle_time_80$U == 0.01),]
 
 hist.gif.props.adm(mat = mat_bottle_time_80_u_0.01, select_stat = "alpha", select_seq = seq_alpha,
-                   title = "adm.props/hist_bottle")
+                   title = "adm.props/hist_bottle", title_leg = "alpha")
 
 ```
 
@@ -993,8 +1037,10 @@ for (i in 1:nrow(mat_bottle_time_80_u_0.01)) {
     mat_bottle_time_80_u_0.01$delta.var.adm.props[i] = mat_bottle_time_80_u_0.01$var.adm.props[i] - ref_var
   }
 }
+```
 
 
+```{r}
 # plot(mat_bottle_time_80_u_0.01$delta.mean.adm.props~mat_bottle_time_80_u_0.01$Generation, type = "l")
 # plot(mat_bottle_time_80_u_0.01$delta.var.adm.props~mat_bottle_time_80_u_0.01$Generation, type = "l")
 
@@ -1002,8 +1048,14 @@ for (i in 1:nrow(mat_bottle_time_80_u_0.01)) {
 plot_stat_gen(mat_bottle_time_80_u_0.01, mat_bottle_time_80_u_0.01$Generation, 
               mat_bottle_time_80_u_0.01$delta.mean.adm.props,
               mat_bottle_time_80_u_0.01$alpha, mat_bottle_time_80_u_0.01$alpha,ligne = T,
-                      "Moyenne He en fonction des générations\n selon différentes Ne initiales",
-                      legd = FALSE)
+              "Delta mean adm props en fonction des générations\n bottleneck = 80, U = 0.01",
+              legd = TRUE)
+
+plot_stat_gen(mat_bottle_time_80_u_0.01, mat_bottle_time_80_u_0.01$Generation, 
+              mat_bottle_time_80_u_0.01$delta.var.adm.props,
+              mat_bottle_time_80_u_0.01$alpha, mat_bottle_time_80_u_0.01$alpha,ligne = T,
+              "Delta var adm props en fonction des générations\n bottleneck = 80, U = 0.01",
+              legd = TRUE)
 
 
 ```
@@ -1116,28 +1168,4 @@ print(difftime(Sys.time(), time.ini))
 ```
 
 
-
-
-```{r}
-# mat_cstt_tmp = extract_sub_mat(mat_64_100_16384, c(64, 128, 256, 1024, 2048))
-# mat_cstt_tmp$ne_gen = unlist(mat_ne_inc , use.names = F)
-# 
-# p = ggplot(mat_cstt_tmp,aes(x = Generation, y = ne_gen, group = Ne, color = Ne))
-# p = p + geom_line(show.legend = TRUE) + ggtitle("Évolution du Ne au cours des générations")
-# p = p+labs(color = "Ne")+ylab("Ne")+theme_classic()
-# print(p)
-```
-
-```{r}
-# 
-# mat_bott_tmp = mat_bottle_time_80
-# mat_bott_tmp$ne_gen = unlist(mat_ne_inc , use.names = F)
-# # 
-# # mat_bott_tmp$ne_gen
-# p = ggplot(mat_bott_tmp,aes(x = Generation, y = ne_gen, group = U, color = U))
-# p = p + geom_line(show.legend = TRUE) + ggtitle("Évolution du Ne au cours des générations")
-# p = p+labs(color = "U")+ylab("Ne")+theme_classic()
-# print(p)
-# 
-```
 
