@@ -928,8 +928,8 @@ write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y){
 p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
                   mini_mat_bottle$mean.het.adm, c(),
                   mini_mat_bottle$alpha_u, line_t = mini_mat_bottle$time_botl,
-                  "Moyenne He en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",TRUE,
-                  legd = TRUE)
+                  "Moyenne He en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",
+                  TRUE, legd = TRUE)
 p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
                         lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
 print(p)
@@ -937,17 +937,17 @@ print(p)
 p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
                   mini_mat_bottle$Fst.s1.adm, c(),
                   mini_mat_bottle$alpha_u, line_t = mini_mat_bottle$time_botl,
-                  "Fst s1 adm en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",TRUE,
-                  legd = TRUE)
+                  "Fst s1 adm en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",
+                  TRUE, legd = TRUE)
 p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
                         lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
 print(p)
 
 p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
-                  mini_mat_bottle$mean.adm.props, c(),
+                  mini_mat_bottle$mean.F.adm, c(),
                   mini_mat_bottle$alpha_u, line_t = mini_mat_bottle$time_botl,
-                  "Moyenne F en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",TRUE,
-                  legd = TRUE)
+                  "Moyenne F en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",
+                  TRUE, legd = TRUE)
 p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
                         lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
 print(p)
@@ -975,6 +975,8 @@ write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck
 write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)
 write_bottle_plot("delta.mean.adm.props", mini_mat_bottle, "delta_mean_adm/delta_mean_bottleneck", -0.25, 0.25)
 write_bottle_plot("delta.var.adm.props", mini_mat_bottle, "delta_var_adm/delta_var_bottleneck", -0.2, 0.05)
+mini_mat_bottle$log.delta.var = log2(abs(mini_mat_bottle$delta.var.adm.props))
+write_bottle_plot("log.delta.var", mini_mat_bottle, "delta_var_adm/log_delta_var_bottleneck", -15, 0)
 
 ```
 
@@ -1166,6 +1168,8 @@ boucle_plot_bottle(mat_bottle_100.000, mat_bottle_100.000$mean.het.adm, "Heteroz
 ```{r}
 print(difftime(Sys.time(), time.ini))
 ```
+
+
 
 
 

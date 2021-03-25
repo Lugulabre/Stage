@@ -117,3 +117,8 @@ Biblio sur bottleneck
 15/02/21
 A FAIRE :
 Rajouter les hétérozygoties initiales sur les graphes
+
+25/03/21
+Commence à arriver à la fin du scénario d'admixture avec pulse simple (nb : un pulse d'admixture de s1 et s2 à la génération 0, puis 100 générations)
+Retravail sur les courbes de proportions d'admixture (moyenne et variance) en multipliant le nombre de simulations pour un nombre de scénarios restreint
+Mise en place de la présentation, à retravailler (notamment sur le fonctionnement de MetHis, approfondir)
