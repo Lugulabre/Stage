@@ -417,8 +417,8 @@ p = plot_stat_gen(mat_50_1000, mat_50_1000$Generation,
                       mat_50_1000$mean.het.adm, mat_50_1000$Ne, mat_50_1000$Ne,ligne = T,
                       "Moyenne He en fonction des générations\nselon différentes Ne initiales",
                       legd = TRUE)
-p = p+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
-p = p+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
+p = p+geom_hline(yintercept = 0.062, color = "red")
+p = p+geom_hline(yintercept = 0.049, color = "black")
 print(p)
 ```
 
@@ -1282,12 +1282,16 @@ p = plot_stat_gen(mat_cstt_multi_mean, mat_cstt_multi_mean$Generation,
                   mat_cstt_multi_mean$Ne,ligne = T,
                   "Delta mean adm props en fonction de s1.0\n selon différentes Ne initiales",
                   legd = TRUE)
+p = p + guides(linetype = FALSE)
+p = p + labs(color = "Ne")
 print(p)
+ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_mean", ".eps"), plot = p)
 p = p+geom_errorbar(aes(ymin = delta.mean.adm.props - mat_cstt_multi_var$delta.mean.adm.props,
                         ymax = delta.mean.adm.props + mat_cstt_multi_var$delta.mean.adm.props),
                     width=0.6)
 print(p)
-
+ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_mean_IC95", ".eps"),
+       plot = p)
 p = plot_stat_gen(mat_cstt_multi_100, mat_cstt_multi_100$s1.0,
                   mat_cstt_multi_100$delta.mean.adm.props, mat_cstt_multi_100$Ne,
                   mat_cstt_multi_100$Ne,ligne = T,
@@ -1296,7 +1300,7 @@ p = plot_stat_gen(mat_cstt_multi_100, mat_cstt_multi_100$s1.0,
 p = p +geom_line(linetype = "dotted")
 p = p + xlab("s1.0") + ylab("delta mean adm props")
 print(p)
-
+ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_var", ".eps"), plot = p)
 ```
 
 
@@ -1348,12 +1352,15 @@ p = plot_stat_gen(df = mat_inc_multi_mean, gen = mat_inc_multi_mean$Generation,
                   line_t = mat_inc_multi_mean$Ne,ligne = T,
                   titre = "Delta mean adm props en fonction des générations",
                   legd = TRUE)
+
+p = p + labs(color = "U", linetype = "Ne0-Nef")
 print(p)
+ggsave(filename =  str_c("../../../Images/100_simu/ne_inc_mean", ".eps"), plot = p)
 p = p+geom_errorbar(aes(ymin = delta.mean.adm.props - mat_inc_multi_var$delta.mean.adm.props,
                         ymax = delta.mean.adm.props + mat_inc_multi_var$delta.mean.adm.props),
                     width=0.6)
 print(p)
-
+ggsave(filename =  str_c("../../../Images/100_simu/ne_inc_mean_IC95", ".eps"), plot = p)
 p = plot_stat_gen(df = mat_inc_multi_100, gen = mat_inc_multi_100$s1.0, 
                   stat = mat_inc_multi_100$delta.mean.adm.props,
                   color_col = mat_inc_multi_100$U,
@@ -1409,12 +1416,14 @@ p = plot_stat_gen(df = mat_bot_multi_mean, gen = mat_bot_multi_mean$Generation,
                   line_t = mat_bot_multi_mean$alpha,ligne = T,
                   titre = "Delta mean adm props en fonction de s1.0\n selon différentes Ne initiales",
                   legd = TRUE)
+p = p + labs(color = "U", linetype = "alpha")
 print(p)
+ggsave(filename =  str_c("../../../Images/100_simu/ne_bott_mean", ".eps"), plot = p)
 p = p+geom_errorbar(aes(ymin = delta.mean.adm.props - mat_bot_multi_var$delta.mean.adm.props,
                         ymax = delta.mean.adm.props + mat_bot_multi_var$delta.mean.adm.props),
                     width=0.6)
 print(p)
-
+ggsave(filename =  str_c("../../../Images/100_simu/ne_bott_mean_IC95", ".eps"), plot = p)
 p = plot_stat_gen(df = mat_bot_multi_100, gen = mat_bot_multi_100$s1.0, 
                   stat = mat_bot_multi_100$delta.mean.adm.props,
                   color_col = mat_bot_multi_100$time_botl,
