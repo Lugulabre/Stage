@@ -332,7 +332,9 @@ Fonction pour une représentation graphique à l'aide d'un gif, pour suivre l'é
 hist.gif.props.adm = function(mat, select_stat, select_seq, title, title_leg,
                               seq_gen = c(seq(1,10,1), seq(11,101,10)),
                               vec_col = c("#A5260A", "#F6DC12", "#87E990", "#FFE4C4",
-                                          "#E67E30", "#79F8F8", "#A10684", "#8B6C42")){
+                                          "#E67E30", "#79F8F8", "#A10684", "#8B6C42"),
+                              vec_col_mean = c("#F9429E", "#FF7F00", "#00FF00", "#00FFFF",
+                                               "#0F056B", "#884DA7", "#FE1B00", "#01796F")){
   
   png(file="example%03d.png", width=600, heigh=400)
   for (line in seq_gen) {
@@ -353,10 +355,13 @@ hist.gif.props.adm = function(mat, select_stat, select_seq, title, title_leg,
                 mat_tmp$perc100.adm.props[line])
 
       if (var == select_seq[1]) {
-        hist(vec_y, breaks = vec_y, main = line-1, col = vec_col[cpt_col], xlim = c(-0.2,1.2))
+        hist(vec_y, breaks = vec_y, main = line-1, col = vec_col[cpt_col], xlim = c(-0.2,1.2),
+             xlab = "adm props")
+        abline(v = mat_tmp$mean.adm.props[line], col = vec_col_mean[cpt_col])
         cpt_col = cpt_col+1
       }else{
-        hist(vec_y, breaks = vec_y, add = TRUE, col = vec_col[cpt_col])
+        hist(vec_y, breaks = vec_y, add = TRUE, col = vec_col[cpt_col], xlab = "adm props")
+        abline(v = mat_tmp$mean.adm.props[line], col = vec_col_mean[cpt_col])
         cpt_col = cpt_col+1
       }
     }
@@ -385,7 +390,7 @@ Calcul des matrices de stats pour de populations constantes de tailles initiales
 
 ```{r}
 seq_1024_16384 = 2**seq(10,14,1)
-seq_50_1000 = seq(50,1000,1)
+seq_50_1000 = c(seq(50,1000,1), 10000)
 seq_tot = sort(c(seq_50_1000, seq_1024_16384))
 
 # mat tot cstt
@@ -395,7 +400,7 @@ mat_50_1000 = extract_sub_mat(mat_tot, c(seq(50,200,10), seq(200,1000,100)))
 # Ne de 1024 à 16384 avec un pas de x2 (mat2 cstt)
 mat_1024_16384 = extract_sub_mat(mat_tot, 2**seq(6,14,1))
 # Ne de 64 à 16384 avec un pas de x2 + Ne de 100 et de 1000 (mat3 cstt)
-mat_64_100_16384 = extract_sub_mat(mat_tot, c(2**seq(6,14,1), 100, 1000) )
+mat_64_100_16384 = extract_sub_mat(mat_tot, c(2**seq(6,14,1), 100, 1000, 10000) )
 
 ```
 
@@ -475,7 +480,7 @@ write_cstt_plot("delta.var.adm.props", mat_64_100_16384, "delta_var_adm/delta_va
 ```{r}
 setwd("../../../Images/")
 
-hist.gif.props.adm(mat = mat_64_100_16384, select_stat = "Ne", select_seq = c(64,100,256,2048),
+hist.gif.props.adm(mat = mat_64_100_16384, select_stat = "Ne", select_seq = c(100,1000,10000),
                    title = "adm.props/hist_cstt", title_leg = "Ne")
 ```
 
@@ -835,6 +840,7 @@ mat_pop_nu_reduce_100_10000 = mat_pop_nu_reduce_3[which(mat_pop_nu_reduce_3$Ne =
 
 hist.gif.props.adm(mat = mat_pop_nu_reduce_100_10000, select_stat = "U", select_seq = seq_nu_bis,
                    title = "adm.props/hist_inc", title_leg = "U")
+remove(mat_pop_nu_reduce_100_10000)
 ```
 
 
@@ -1099,12 +1105,14 @@ remove(vec_tmp)
 
 setwd("../../../Images/")
 
-seq_alpha = c(0.1, 0.5, 0.9)
+mat_bottle_time_80_alpha_0.1 = mat_bottle_time_80[which(mat_bottle_time_80$alpha == 0.1),]
 mat_bottle_time_80_u_0.01 = mat_bottle_time_80[which(mat_bottle_time_80$U == 0.01),]
 
-hist.gif.props.adm(mat = mat_bottle_time_80_u_0.01, select_stat = "alpha", select_seq = seq_alpha,
-                   title = "adm.props/hist_bottle", title_leg = "alpha")
+hist.gif.props.adm(mat = mat_bottle_time_80_alpha_0.1, select_stat = "U",
+                   select_seq = c(0.01, 0.25, 0.49),
+                   title = "adm.props/hist_bottle", title_leg = "U")
 
+remove(mat_bottle_time_80_alpha_0.1)
 ```
 
 #### Evolution de la proportion d'admixture dans la population
@@ -1276,20 +1284,26 @@ write_cstt_plot("delta.var.adm.props", mat_cstt_multi_mean,
 p = plot_stat_gen(mat_cstt_multi_mean, mat_cstt_multi_mean$Generation, 
                   mat_cstt_multi_mean$delta.mean.adm.props, mat_cstt_multi_mean$Ne,
                   mat_cstt_multi_mean$Ne,ligne = T,
-                  "Delta mean adm props en fonction de s1.0\n selon différentes Ne initiales",
+                  "Delta mean adm props en fonction des générations",
                   legd = TRUE)
-p = p + ylim(-0.12, 0.01)
+p = p + ylim(-0.1, 0)
 p = p + guides(linetype = FALSE)
 p = p + labs(color = "Ne")
 print(p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_mean", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_mean", ".png"), plot = p)
+
+####################
+
+p = p + ylim(-0.12, 0)
 p = p+geom_errorbar(aes(ymin = delta.mean.adm.props - mat_cstt_multi_var$delta.mean.adm.props,
                         ymax = delta.mean.adm.props + mat_cstt_multi_var$delta.mean.adm.props),
                     width=0.6)
 print(p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_mean_IC95", ".eps"),plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_mean_IC95", ".png"),plot = p)
+
+####################
 
 p = ggplot(mat_cstt_multi_100, aes(x = s1.0, y = delta.mean.adm.props, color = Ne))
 p = p+geom_point()
@@ -1303,8 +1317,10 @@ p = p + theme(panel.grid.major.y = element_line(size = 0.5,
                                                 linetype = 'solid',
                                                 colour = "#CECECE"))
 print(p)
-ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_var", ".eps"), plot = p)
-ggsave(filename =  str_c("../../../Images/100_simu/ne_cstt_var", ".png"), plot = p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_100/ne_cstt_delta_s10", ".eps"), plot = p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_100/ne_cstt_delta_s10", ".png"), plot = p)
+
+####################
 
 p = ggplot(mat_cstt_multi_gen0, aes(x = s1.0, y = delta.mean.adm.props, color = Ne))
 p = p+geom_point()
@@ -1318,6 +1334,25 @@ p = p + theme(panel.grid.major.y = element_line(size = 0.5,
                                                 linetype = 'solid',
                                                 colour = "#CECECE"))
 print(p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_0/ne_cstt_delta_s10", ".eps"), plot = p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_0/ne_cstt_delta_s10", ".png"), plot = p)
+
+####################
+
+p = ggplot(mat_cstt_multi_gen0, aes(x = s1.0, y = mean.adm.props, color = Ne))
+p = p+geom_point()
+p = p + xlab("s1.0") + ylab("mean adm props")
+p = p + scale_fill_OkabeIto()
+p = p + theme_classic()
+p = p + theme(panel.grid.major.y = element_line(size = 0.5,
+                                                linetype = 'solid',
+                                                colour = "#BABABA"),
+              panel.grid.minor.y = element_line(size = 0.25,
+                                                linetype = 'solid',
+                                                colour = "#CECECE"))
+print(p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_0/ne_cstt_mean_adm_s10", ".eps"), plot = p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_0/ne_cstt_mean_adm_s10", ".png"), plot = p)
 
 ```
 
@@ -1345,6 +1380,8 @@ print(p)
 ggsave(filename =  str_c("../../../Images/100_simu_gen_0/He_gen0", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu_gen_0/He_gen0", ".png"), plot = p)
 
+####################
+
 p = ggplot(mat_cstt_multi_gen0, aes(x = s1.0, y = Fst.s1.adm, color = Ne))
 p = p+ggtitle("Fst s1-adm en fonction de s1,0 à la génération 0")
 p = p+geom_point()
@@ -1360,6 +1397,8 @@ p = p + theme(panel.grid.major.y = element_line(size = 0.5,
 print(p)
 ggsave(filename =  str_c("../../../Images/100_simu_gen_0/Fst_s1_adm_gen0", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu_gen_0/Fst_s1_adm_gen0", ".png"), plot = p)
+
+####################
 
 p = ggplot(mat_cstt_multi_gen0, aes(x = s1.0, y = mean.F.adm, color = Ne))
 p = p+geom_point()
@@ -1428,10 +1467,14 @@ p = plot_stat_gen(df = mat_inc_multi_mean, gen = mat_inc_multi_mean$Generation,
                   legd = TRUE)
 
 p = p + labs(color = "U", linetype = "Ne0-Nef")
-p = p + ylim(-0.13, 0.01)
+p = p + ylim(-0.1, 0)
 print(p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_inc_mean", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_inc_mean", ".png"), plot = p)
+
+####################
+
+p = p + ylim(-0.12, 0)
 p = p+geom_errorbar(aes(ymin = delta.mean.adm.props - mat_inc_multi_var$delta.mean.adm.props,
                         ymax = delta.mean.adm.props + mat_inc_multi_var$delta.mean.adm.props),
                     width=0.6)
@@ -1439,19 +1482,11 @@ print(p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_inc_mean_IC95", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_inc_mean_IC95", ".png"), plot = p)
 
-# p = plot_stat_gen(df = mat_inc_multi_100, gen = mat_inc_multi_100$s1.0, 
-#                   stat = mat_inc_multi_100$delta.mean.adm.props,
-#                   color_col = mat_inc_multi_100$U,
-#                   line_t = mat_inc_multi_100$Ne,ligne = T,
-#                   titre = "Delta mean adm props en fonction de s1.0\n selon différentes Ne initiales",
-#                   legd = TRUE, size_point = 2)
-# p = p +geom_line(linetype = "dotted")
-# p = p + xlab("s1.0") + ylab("delta mean adm props")
-# print(p)
+####################
 
 p = ggplot(mat_inc_multi_100, aes(x = s1.0, y = delta.mean.adm.props, color = U))
 p = p+geom_point()
-p = p+ggtitle("F moyen en fonction de s1,0 à la génération 100")
+p = p+ggtitle("delta mean adm props en fonction de s1,0 à la génération 100")
 p = p + xlab("s1.0") + ylab("delta mean adm props")
 p = p + scale_fill_OkabeIto()
 p = p + theme_classic()
@@ -1462,6 +1497,8 @@ p = p + theme(panel.grid.major.y = element_line(size = 0.5,
                                                 linetype = 'solid',
                                                 colour = "#CECECE"))
 print(p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_100/ne_inc_delta_s10", ".eps"), plot = p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_100/ne_inc_delta_s10", ".png"), plot = p)
 
 ```
 
@@ -1506,28 +1543,41 @@ p = plot_stat_gen(df = mat_bot_multi_mean, gen = mat_bot_multi_mean$Generation,
                   stat = mat_bot_multi_mean$delta.mean.adm.props, 
                   color_col = mat_bot_multi_mean$U,
                   line_t = mat_bot_multi_mean$alpha,ligne = T,
-                  titre = "Delta mean adm props en fonction de s1.0\n selon différentes Ne initiales",
+                  titre = "Delta mean adm props en fonction des générations",
                   legd = TRUE)
 p = p + labs(color = "U", linetype = "alpha")
-p = p + ylim(-0.13, 0.01)
+p = p + ylim(-0.1, 0)
 print(p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_bott_mean", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_bott_mean", ".png"), plot = p)
+
+####################
+
+p = p + ylim(-0.12, 0.02)
 p = p+geom_errorbar(aes(ymin = delta.mean.adm.props - mat_bot_multi_var$delta.mean.adm.props,
                         ymax = delta.mean.adm.props + mat_bot_multi_var$delta.mean.adm.props),
                     width=0.6)
 print(p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_bott_mean_IC95", ".eps"), plot = p)
 ggsave(filename =  str_c("../../../Images/100_simu/ne_bott_mean_IC95", ".png"), plot = p)
-p = plot_stat_gen(df = mat_bot_multi_100, gen = mat_bot_multi_100$s1.0, 
-                  stat = mat_bot_multi_100$delta.mean.adm.props,
-                  color_col = mat_bot_multi_100$time_botl,
-                  line_t = mat_bot_multi_100$U,ligne = T,
-                  titre = "Delta mean adm props en fonction de s1.0\n selon différentes Ne initiales",
-                  legd = TRUE, size_point = 2)
-p = p +geom_line(linetype = "dotted")
+
+####################
+
+p = ggplot(mat_bot_multi_100, aes(x = s1.0, y = delta.mean.adm.props, color = U))
+p = p+geom_point()
+p = p+ggtitle("delta mean adm props en fonction de s1,0 à la génération 100")
 p = p + xlab("s1.0") + ylab("delta mean adm props")
+p = p + scale_fill_OkabeIto()
+p = p + theme_classic()
+p = p + theme(panel.grid.major.y = element_line(size = 0.5,
+                                                linetype = 'solid',
+                                                colour = "#BABABA"),
+              panel.grid.minor.y = element_line(size = 0.25,
+                                                linetype = 'solid',
+                                                colour = "#CECECE"))
 print(p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_100/ne_bot_delta_s10", ".eps"), plot = p)
+ggsave(filename =  str_c("../../../Images/100_simu_gen_100/ne_bot_delta_s10", ".png"), plot = p)
 ```
 
 
@@ -1535,6 +1585,38 @@ print(p)
 ### Multi simulations
 ```{r}
 print(difftime(Sys.time(), time.ini))
+```
+
+```{r}
+setwd("../ns_modif/new_methis_pop_size_diff_ns_50/")
+
+mat_cstt_ns_50 = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 1)
+mat_cstt_ns_50 = delta.adm.props(mat_cstt_ns_50)
+
+setwd("../new_methis_pop_size_diff_ns_75/")
+
+mat_cstt_ns_75 = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 1)
+mat_cstt_ns_75 = delta.adm.props(mat_cstt_ns_75)
+
+```
+```{r}
+p = plot_stat_gen(mat_cstt_ns_50, mat_cstt_ns_50$Generation, 
+                  mat_cstt_ns_50$delta.mean.adm.props, mat_cstt_ns_50$Ne,
+                  mat_cstt_ns_50$Ne,ligne = T,
+                  "Delta mean adm props en fonction des générations",
+                  legd = TRUE)
+p = p + guides(linetype = FALSE)
+p = p + labs(color = "Ne")
+print(p)
+
+p = plot_stat_gen(mat_cstt_ns_75, mat_cstt_ns_75$Generation, 
+                  mat_cstt_ns_75$delta.mean.adm.props, mat_cstt_ns_75$Ne,
+                  mat_cstt_ns_75$Ne,ligne = T,
+                  "Delta mean adm props en fonction des générations",
+                  legd = TRUE)
+p = p + guides(linetype = FALSE)
+p = p + labs(color = "Ne")
+print(p)
 ```
 
 
