@@ -1,0 +1,794 @@
+---
+title: "Représentation des stats calculées par MetHis (50 000 SNP) pour des scénarios d'admixture simple"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp")
+# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
+
+```
+
+## Indicateur de temps
+```{r}
+time.ini = Sys.time()
+```
+
+Chargement des libraries et fonctions
+```{r}
+source("../../../scriptR/functions.R")
+```
+
+### Enregistrement des fonctions
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+## Population constante de tailles initiales différentes
+
+Calcul des matrices de stats pour de populations constantes de tailles initiales différentes.
+
+```{r}
+seq_1024_16384 = 2**seq(10,14,1)
+seq_50_1000 = c(seq(50,1000,1), 10000)
+seq_tot = sort(c(seq_50_1000, seq_1024_16384))
+
+# mat tot cstt
+mat_tot = data.frame.stat(seq_tot, 101, 1) 
+# Ne de 50 à 200 par pas de 10 puis de 200 à 1000 par pas de 100 (mat1 cstt)
+mat_50_1000 = extract_sub_mat(mat_tot, c(seq(50,200,10), seq(200,1000,100)))
+# Ne de 1024 à 16384 avec un pas de x2 (mat2 cstt)
+mat_1024_16384 = extract_sub_mat(mat_tot, 2**seq(6,14,1))
+# Ne de 64 à 16384 avec un pas de x2 + Ne de 100 et de 1000 (mat3 cstt)
+mat_64_100_16384 = extract_sub_mat(mat_tot, c(2**seq(6,14,1), 100, 1000, 10000) )
+
+```
+
+Graphiques obtenus : affichage de l'évolution d'une statistique donnée en fonction des générations colorée selon la Ne initiale.
+
+##### Hétérozygotie moyenne
+```{r}
+# Affichage de l'hétérozygotie pour la matrice totale (mat tot cstt)
+p = plot_stat_gen(mat_tot, mat_tot$Generation, 
+                  mat_tot$mean.het.adm, mat_tot$Ne, mat_tot$Ne,ligne = T,
+                  "Moyenne He en fonction des générations\n selon différentes Ne initiales",
+                  legd = FALSE)
+p = p+geom_hline(yintercept = mat_50_1000$mean.het.s1[1], color = "red")
+p = p+geom_hline(yintercept = mat_50_1000$mean.het.s2[1], color = "black")
+print(p)
+
+# Affichage de l'hétérozygotie pour mat1 cstt
+p = plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
+                      mat_50_1000$mean.het.adm, mat_50_1000$Ne, mat_50_1000$Ne,ligne = T,
+                      "Moyenne He en fonction des générations\nselon différentes Ne initiales",
+                      legd = TRUE)
+p = p+geom_hline(yintercept = 0.062, color = "red")
+p = p+geom_hline(yintercept = 0.049, color = "black")
+print(p)
+```
+
+##### Fst s1 adm
+
+```{r}
+plot_stat_gen(mat_tot, mat_tot$Generation, 
+              mat_tot$Fst.s1.adm, mat_tot$Ne,mat_tot$Ne,
+              "Fst s1 adm en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+plot_stat_gen(mat_50_1000, mat_50_1000$Generation, 
+              mat_50_1000$Fst.s1.adm, mat_50_1000$Ne,mat_50_1000$Ne,
+              "Fst s1 adm en fonction des générations\n selon différentes Ne initiales")
+plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation, 
+              mat_1024_16384$Fst.s1.adm, mat_1024_16384$Ne,mat_1024_16384$Ne,ligne = T,
+              "Fst s1 adm en fonction des générations\n selon différentes Ne initiales")
+```
+
+
+
+Ajout delta mean et var des proportions d'admixture pour les effectifs efficaces constants.
+```{r}
+mat_64_100_16384 = delta.adm.props(mat_64_100_16384)
+```
+
+Écriture de différents graphiques pour différentes statistiques choisies. La matrice choisie est la mat3 cstt pour des raisons de lisibilité. Cette matrice permet également d'observer l'évolution des statistiques choisies pour des Ne = 100 et Ne = 1000, valeurs qui seront reprises dans d'autres scénarios ultérieurement.^
+
+```{r}
+
+write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.062)
+write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
+write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5)
+write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
+write_cstt_plot("mean.adm.props", mat_64_100_16384, "adm.props/adm_props_ne_cst", 0, 1)
+write_cstt_plot("delta.mean.adm.props", mat_64_100_16384, "delta_mean_adm/delta_mean_ne_cstt", -0.25, 0.25)
+write_cstt_plot("delta.var.adm.props", mat_64_100_16384, "delta_var_adm/delta_var_ne_cstt", -0.2, 0.05)
+write_cstt_plot("f3", mat_64_100_16384, "f3/f3_ne_cstt", -0.3, 2)
+```
+
+
+```{r}
+setwd("../../../Images/")
+
+hist.gif.props.adm(mat = mat_64_100_16384, select_stat = "Ne", select_seq = c(100,1000,10000),
+                   title = "adm.props/hist_cstt", title_leg = "Ne")
+```
+
+
+### Populations à Ne constants
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+## Populations croissantes
+
+Lecture des data frame pour les combinaison de Ne entre ne0 (ne_ini) et nef (ne_fin).
+On extrait ensuite les stats pour lesquelles on a un nef de 10000.
+
+```{r}
+setwd("../new_methis_pop_increase_50000_snp/")
+seq_ne_ini = seq(50,100,2)
+seq_ne_fin = c(seq(100, 10000, 200), 10000)
+seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
+seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
+
+mat_pop_inc = data.frame.increase(seq_ne_ini, seq_combi)
+
+
+mat_end_10000 = extract_sub_mat(mat_pop_inc,
+                                as.data.frame(outer(seq(50,100,4),
+                                                    c("10000"),
+                                                    FUN="paste",
+                                                    sep="-"))[,1])
+
+```
+
+```{r}
+plot_stat_gen(df = mat_pop_inc, gen = mat_pop_inc$Generation,
+              stat = mat_pop_inc$f3, group_col = mat_pop_inc$Ne,color_col = mat_pop_inc$Ne,
+              titre = "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+plot_stat_gen(mat_pop_inc, mat_pop_inc$Generation, 
+              mat_pop_inc$mean.het.adm, mat_pop_inc$Ne,mat_pop_inc$Ne,
+              "Stat en fonction des générations\n selon différentes Ne initiales",
+              legd = FALSE)
+```
+
+
+```{r}
+
+plot_stat_gen(mat_end_10000, mat_end_10000$Generation, 
+              mat_end_10000$mean.het.adm, mat_end_10000$Ne,mat_end_10000$Ne,
+              "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales",
+              legd = TRUE)
+plot_stat_gen(mat_end_10000, mat_end_10000$Generation, 
+              mat_end_10000$f3, mat_end_10000$Ne,mat_end_10000$Ne,
+              "F3 en fonction des générations\n selon différentes Ne initiales",
+              legd = TRUE)
+```
+
+### Populations croissantes à U aléatoire dans la loi uniforme [0,0.5]
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+
+## Variation U
+
+Le U déterminant l'inflexion de la courbe de croissance est ici connu et fixé avant la simulation.
+
+
+```{r}
+setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+
+#Détermination des paramètres initiaux
+seq_nu = sprintf("%.2f", seq(0.05, 0.45, 0.05))
+seq_ne_ini = seq(50,100,10)
+seq_ne_fin = seq(100, 10000, 200)
+seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
+seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
+
+
+mat_pop_nu = data.frame.increase.nu(seq_ne_ini = seq_ne_ini, seq_combi = seq_combi, seq_nu = seq_nu)
+
+
+```
+
+```{r}
+plot_without_point(mat_pop_nu, mat_pop_nu$Generation, 
+                   mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
+                   "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon U",
+                   legd = FALSE)
+plot_without_point(mat_pop_nu, mat_pop_nu$Generation, 
+                   mat_pop_nu$mean.het.adm, mat_pop_nu$U,
+                   "Moyenne hétérozygotie en fonction des générations\n selon différentes Ne initiales\n et couleurs selon nu",
+                   legd = TRUE)
+# plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation,
+#              mat_pop_nu$mean.het.adm, mat_pop_nu$Ne,
+#              "Stat en fonction des générations\n selon différentes Ne initiales",
+#              TRUE, legd = FALSE)
+# plot_stat_gen(mat_pop_nu, mat_pop_nu$Generation,
+#              mat_pop_nu$mean.het.adm, mat_pop_nu$Nu,
+#              "Stat en fonction des générations\n selon différentes Ne initiales",
+#              TRUE, legd = FALSE)
+
+```
+
+Affichage de l'hétérozygotie pour les différentes valeurs de Nu avec N0 entre 50 et 100 (pas de 10) et Nf entre 100 et 10 000 (pas de 200).
+
+```{r}
+
+for (nu in seq_nu) {
+  
+  mat_pop_nu_tmp = mat_pop_nu[which(mat_pop_nu$U == nu),]
+  
+  p = plot_stat_gen(mat_pop_nu_tmp, mat_pop_nu_tmp$Generation,
+                        mat_pop_nu_tmp$mean.het.adm, mat_pop_nu_tmp$Ne,
+                        mat_pop_nu_tmp$Ne,
+                        str_c("U = ",nu), TRUE, legd = FALSE)
+  p = p+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s1[1],
+                           color = "red")
+  p = p+geom_hline(yintercept = mat_pop_nu_tmp$mean.het.s2[1],
+                           color = "black")
+  print(p)
+
+}
+remove(mat_pop_nu_tmp)
+
+```
+
+
+Affichage en surface de l'hétérozygotie à la génération 100 en fonction de Ne0 et Nef selon différents U.
+
+```{r}
+for (nu in seq_nu) {
+  
+  mat_pop_nu_tmp = mat_pop_nu[which(mat_pop_nu$U == nu),]
+  
+  list_ne = mat_pop_nu_tmp$Ne[which(mat_pop_nu_tmp$Generation == 100)]
+  list_ne = as.integer(unlist(str_split(list_ne, "-")))
+  list_ne0 = list_ne[seq(1, length(list_ne), 2)]
+  list_nef = list_ne[seq(2, length(list_ne), 2)]
+  mat_pop_nu_tmp = mat_pop_nu_tmp[which(mat_pop_nu_tmp$Generation == 100),]
+  
+  print(wireframe(mat_pop_nu_tmp$mean.het.adm ~ list_ne0 * list_nef, data = mat_pop_nu_tmp,
+                  drape = TRUE, zlab = "He", xlab = "Ne0", ylab = "Nef",
+                  screen = list(z = 40, x = -60),
+                  scales = list(z.ticks=5, arrows=F, col="black", font=1, tck=0.8),
+                  main = str_c("He moyenne à la génération 100 en fonction de Ne0 et Nef\n U = ", nu)  ))
+  
+}
+
+remove(mat_pop_nu_tmp)
+
+```
+
+
+```{r}
+
+for (rg_nu in seq_nu) {
+
+  df_tmp = mat_pop_nu[which(mat_pop_nu$U == rg_nu),]
+  
+  scatter3D(x = df_tmp$Generation, y = df_tmp$ne_gen, z = df_tmp$mean.het.adm,
+            bty = "b2", pch = 16, ticktype = "detailed", main = rg_nu,
+            theta = 210, phi = 20, type = "s",cex = 0.2, cex.lab = 0.6, cex.axis = 0.5,
+            xlab = "Gen", ylab = "Ne", zlab = "Stat")
+  # print(wireframe(mean.het.adm ~ Generation * ne_gen,
+  #                 data = df_tmp,
+  #                 drape = TRUE, zlab = "Htz", xlab = "generation", ylab = "Ne gen",
+  #                 screen = list(z = 40, x = -60),
+  #                 scales = list(z.ticks=5, arrows=F, col="black", font=1, tck=0.8),
+  #                 main = rg_nu))
+}
+
+rm(df_tmp)
+
+```
+
+```{r}
+
+scatter3D(x = mat_pop_nu$Generation, y = mat_pop_nu$ne_gen,
+          z = as.numeric(as.character(mat_pop_nu$U)),
+          bty = "b2", pch = 16, ticktype = "detailed",
+          theta = 210, phi = 50, type = "s", cex.lab = 0.6, cex.axis = 0.5,
+          xlab = "Gen", ylab = "Ne", zlab = "Nu")
+```
+
+
+```{r}
+
+setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+seq_nu_bis = sprintf("%.2f", c(0.01, 0.25, 0.49))
+seq_ne_ini = c(100)
+seq_ne_fin = c(200, 400, seq(1000, 10000, 1000))
+seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
+seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
+
+mat_pop_nu_reduce = data.frame.increase.nu(seq_ne_ini, seq_combi, seq_nu_bis)
+
+```
+
+
+```{r}
+mat_pop_nu_reduce_gen_100 = mat_pop_nu_reduce[which(mat_pop_nu_reduce$Generation == 100),]
+mat_pop_nu_reduce$log_mean = log(mat_pop_nu_reduce$mean.het.adm)
+scatter3D(x = mat_pop_nu_reduce$Generation, y = mat_pop_nu_reduce$nf,
+          z = mat_pop_nu_reduce$mean.het.adm, colvar = as.numeric(mat_pop_nu_reduce$U),
+          col = c("#1B9E77", "#D95F02", "#7570B3"),
+          colkey = list(at = c(1.3, 2, 2.7),
+                        addlines = TRUE, length = 1, width = 0.5,
+                        labels = levels(as.factor(mat_pop_nu_reduce$U))),
+          ticktype = "detailed",bty = "g",pch = 16,
+          theta = 115, phi = 0, type = "s", cex = 0.5, cex.lab = 0.6, cex.axis = 0.5,
+          xlab = "generation", ylab = "Nf", zlab = "stat", clab = "U")
+
+  # scatter3D(x = df_tmp$Generation, y = vec_tot, z = df_tmp$mean.het.adm,
+  #           bty = "b2", pch = 16, ticktype = "detailed", main = seq_nu[rg_nu],
+  #           theta = 210, phi = 20, type = "s", cex.lab = 0.6, cex.axis = 0.5,
+  #           xlab = "Gen", ylab = "Ne", zlab = "Stat")
+
+```
+
+```{r}
+setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+
+seq_ne_ini3 = seq(100,100,0)
+seq_multi3 = c(2,4,10,100)
+seq_ne_fin3 = seq_multi3*seq_ne_ini3
+seq_combi3 = as.data.frame(outer(seq_ne_ini3, seq_ne_fin3, FUN="paste", sep="-"))
+seq_combi3 = as.data.frame.vector(unlist(seq_combi3))[[1]]
+
+mat_pop_nu_reduce_3 = data.frame.increase.nu(seq_ne_ini3, seq_combi3, seq_nu_bis)
+
+```
+
+Ajout delta mean et var des proportions d'admixture pour les populations croissantes.
+```{r}
+mat_pop_nu_reduce_3 = delta.adm.props(mat_pop_nu_reduce_3)
+```
+
+```{r}
+write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.062)
+write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
+write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5)
+write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
+write_increase_plot("mean.adm.props", mat_pop_nu_reduce_3, "adm.props/adm_props_ne_inc", 0, 1)
+write_increase_plot("delta.mean.adm.props", mat_pop_nu_reduce_3, "delta_mean_adm/delta_mean_pop_inc_nu_va", -0.25, 0.25)
+write_increase_plot("delta.var.adm.props", mat_pop_nu_reduce_3, "delta_var_adm/delta_var_pop_inc_nu_va", -0.2, 0.05)
+write_increase_plot("ne_gen", mat_pop_nu_reduce_3, "Ne/Ne_inc_all", 99, 10000)
+write_increase_plot("f3", mat_pop_nu_reduce_3, "f3/f3_ne_inc", -0.3, 2)
+```
+
+```{r}
+setwd("../../../Images/")
+
+mat_pop_nu_reduce_100_10000 = mat_pop_nu_reduce_3[which(mat_pop_nu_reduce_3$Ne == "100-10000"),]
+
+hist.gif.props.adm(mat = mat_pop_nu_reduce_100_10000, select_stat = "U", select_seq = seq_nu_bis,
+                   title = "adm.props/hist_inc", title_leg = "U")
+remove(mat_pop_nu_reduce_100_10000)
+```
+
+
+### Populations croissantes avec Nu variable et fixé
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+## Bottleneck
+
+### Nu fixé, alpha variable, N0 fixé, Nf fixé
+
+#### N0 = Nf = 1000
+
+```{r}
+setwd("../new_methis_bottleneck_50000_snp/")
+
+mat_bottle = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000),
+                                   lst_alpha = c(0.1, 0.5, 0.9),
+                                   lst_nu = c(0.01, 0.25, 0.49),
+                                   lst_bottle = seq(10, 90, 10))
+
+mat_bottle_time_50 = mat_bottle[which(mat_bottle$time_botl == 50),]
+mat_bottle_time_20 = mat_bottle[which(mat_bottle$time_botl == 20),]
+mat_bottle_time_80 = mat_bottle[which(mat_bottle$time_botl == 80),]
+
+```
+
+
+```{r}
+plot_without_point(mat_bottle, mat_bottle$Generation, 
+              mat_bottle$mean.het.adm, mat_bottle$alpha,
+              "Stat en fonction des générations\n selon différents bottleneck",
+              legd = TRUE)
+
+```
+Moyenne de l'hétérozygotie
+
+```{r}
+boucle_plot_bottle(mat_bottle, mat_bottle$mean.het.adm, "Heterozygotie", c(20,50,80))
+
+```
+
+Fst
+
+```{r}
+boucle_plot_bottle(mat_bottle, mat_bottle$Fst.s1.adm, "Fst s1 adm", c(20,50,80))
+
+boucle_plot_bottle(mat_bottle, mat_bottle$Fst.s2.adm, "Fst s2 adm", c(20,50,80))
+```
+
+```{r}
+boucle_plot_bottle(mat_bottle, mat_bottle$mean.F.adm, "F mean", c(20,50,80))
+```
+
+
+
+```{r}
+mini_mat_bottle = rbind(mat_bottle_time_20, mat_bottle_time_50, mat_bottle_time_80)
+
+p = plot_stat_gen(mat_bottle, mat_bottle$Generation, 
+              mat_bottle$mean.het.adm, c(),
+              mat_bottle$bott_u, line_t = mat_bottle$alpha,
+              "Stat en fonction des générations\n selon différents bottleneck",TRUE,
+              legd = TRUE)
+p = p+  theme(legend.position="bottom", legend.box = "horizontal")
+print(p)
+
+p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+                mini_mat_bottle$mean.het.adm, c(),
+                mini_mat_bottle$bott_u, line_t = mini_mat_bottle$alpha,
+                "Stat en fonction des générations\n selon différents bottleneck",TRUE,
+                legd = TRUE)
+improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "tpsbott/U",
+                    lab_line = "alpha", vec_linetype = c("solid", "longdash", "dotted"))
+
+
+```
+
+
+
+
+```{r}
+p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+                  mini_mat_bottle$mean.het.adm, c(),
+                  mini_mat_bottle$u_alpha, line_t = mini_mat_bottle$time_botl,
+                  "Moyenne He en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",
+                  TRUE, legd = TRUE)
+p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
+                        lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
+print(p)
+
+p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+                  mini_mat_bottle$Fst.s1.adm, c(),
+                  mini_mat_bottle$u_alpha, line_t = mini_mat_bottle$time_botl,
+                  "Fst s1 adm en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",
+                  TRUE, legd = TRUE)
+p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
+                        lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
+print(p)
+
+p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+                  mini_mat_bottle$mean.F.adm, c(),
+                  mini_mat_bottle$u_alpha, line_t = mini_mat_bottle$time_botl,
+                  "Moyenne F en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",
+                  TRUE, legd = TRUE)
+p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
+                        lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
+print(p)
+
+# p = plot_stat_gen(mini_mat_bottle, mini_mat_bottle$Generation, 
+#                   mini_mat_bottle$delta.adm.props, c(),
+#                   mini_mat_bottle$u_alpha, line_t = mini_mat_bottle$time_botl,
+#                   "delta props en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 1000)",TRUE,
+#                   legd = TRUE)
+# p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
+#                         lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
+# print(p)
+```
+
+Ajout delta mean et var des proportions d'admixture pour les effectifs efficaces constants.
+```{r}
+mini_mat_bottle = delta.adm.props(mini_mat_bottle)
+mini_mat_bottle_20 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 20),]
+mini_mat_bottle_50 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 50),]
+mini_mat_bottle_80 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 80),]
+```
+
+
+```{r}
+write_bottle_plot("mean.het.adm", mini_mat_bottle,
+                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.062)
+write_bottle_plot("mean.het.adm", mini_mat_bottle,
+                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.062)
+write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5)
+write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5)
+write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)
+write_bottle_plot("mean.adm.props", mini_mat_bottle, "adm.props/adm_props_ne_bot", 0, 1)
+write_bottle_plot("delta.mean.adm.props", mini_mat_bottle, "delta_mean_adm/delta_mean_bottleneck", -0.25, 0.25)
+write_bottle_plot("delta.var.adm.props", mini_mat_bottle,
+                  "delta_var_adm/delta_var_bottleneck", -0.2, 0.05)
+mini_mat_bottle$log.delta.var = log2(abs(mini_mat_bottle$delta.var.adm.props))
+write_bottle_plot("log.delta.var", mini_mat_bottle,
+                  "delta_var_adm/log_delta_var_bottleneck", -15, 0)
+write_bottle_plot("ne_gen", mini_mat_bottle, "Ne/Ne_bot_all", 100, 1000)
+write_bottle_plot("f3", mini_mat_bottle, "f3/f3_ne_bot", -0.3, 2)
+
+```
+
+```{r}
+###Matrice tb = 20
+
+write_bottle_plot(name_stat = "mean.het.adm", mat = mini_mat_bottle_20,
+                  name_file = "moyenne_heterozygotie/moy_He_bottleneck_20", 
+                  min_y = 0.01, max_y = 0.062, time_bott = c(21),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "Fst.s1.adm", mat = mini_mat_bottle_20,
+                  name_file = "Fsts1adm/fst_s1_adm_bottleneck_20", 
+                  min_y = 0, max_y = 0.5, time_bott = c(21),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "Fst.s2.adm", mat = mini_mat_bottle_20,
+                  name_file = "Fsts2adm/fst_s2_adm_bottleneck_20", 
+                  min_y = 0, max_y = 0.5, time_bott = c(21),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "mean.F.adm", mat = mini_mat_bottle_20,
+                  name_file = "Fadm/f_adm_bottleneck_20", 
+                  min_y = -0.03, max_y = 0.03, time_bott = c(21),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "delta.mean.adm.props", mat = mini_mat_bottle_20,
+                  name_file = "delta_mean_adm/delta_mean_bottleneck_20", 
+                  min_y = -0.25, max_y = 0.25, time_bott = c(21),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "delta.var.adm.props", mat = mini_mat_bottle_20,
+                  name_file = "delta_var_adm/delta_var_bottleneck_20", 
+                  min_y = -0.25, max_y = 0.25, time_bott = c(21),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+
+###Matrice tb = 50
+
+write_bottle_plot(name_stat = "mean.het.adm", mat = mini_mat_bottle_50,
+                  name_file = "moyenne_heterozygotie/moy_He_bottleneck_50", 
+                  min_y = 0.01, max_y = 0.062, time_bott = c(51),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "Fst.s1.adm", mat = mini_mat_bottle_50,
+                  name_file = "Fsts1adm/fst_s1_adm_bottleneck_50", 
+                  min_y = 0, max_y = 0.5, time_bott = c(51),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "Fst.s2.adm", mat = mini_mat_bottle_50,
+                  name_file = "Fsts2adm/fst_s2_adm_bottleneck_50", 
+                  min_y = 0, max_y = 0.5, time_bott = c(51),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "mean.F.adm", mat = mini_mat_bottle_50,
+                  name_file = "Fadm/f_adm_bottleneck_50", 
+                  min_y = -0.03, max_y = 0.03, time_bott = c(51),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "delta.mean.adm.props", mat = mini_mat_bottle_50,
+                  name_file = "delta_mean_adm/delta_mean_bottleneck_50", 
+                  min_y = -0.25, max_y = 0.25, time_bott = c(51),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "delta.var.adm.props", mat = mini_mat_bottle_50,
+                  name_file = "delta_var_adm/delta_var_bottleneck_50", 
+                  min_y = -0.25, max_y = 0.25, time_bott = c(51),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+
+###Matrice tb = 80
+
+write_bottle_plot(name_stat = "mean.het.adm", mat = mini_mat_bottle_80,
+                  name_file = "moyenne_heterozygotie/moy_He_bottleneck_80", 
+                  min_y = 0.01, max_y = 0.062, time_bott = c(81),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "Fst.s1.adm", mat = mini_mat_bottle_80,
+                  name_file = "Fsts1adm/fst_s1_adm_bottleneck_80", 
+                  min_y = 0, max_y = 0.5, time_bott = c(81),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "Fst.s2.adm", mat = mini_mat_bottle_80,
+                  name_file = "Fsts2adm/fst_s2_adm_bottleneck_80", 
+                  min_y = 0, max_y = 0.5, time_bott = c(81),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "mean.F.adm", mat = mini_mat_bottle_80,
+                  name_file = "Fadm/f_adm_bottleneck_80", 
+                  min_y = -0.03, max_y = 0.03, time_bott = c(81),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "delta.mean.adm.props", mat = mini_mat_bottle_80,
+                  name_file = "delta_mean_adm/delta_mean_bottleneck_80", 
+                  min_y = -0.25, max_y = 0.25, time_bott = c(81),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+write_bottle_plot(name_stat = "delta.var.adm.props", mat = mini_mat_bottle_80,
+                  name_file = "delta_var_adm/delta_var_bottleneck_80", 
+                  min_y = -0.25, max_y = 0.25, time_bott = c(81),
+                  name_color = "alpha", name_line = "U",
+                  labcol = "alpha", labline = "U")
+
+```
+
+
+```{r}
+
+vec_tmp = c()
+vec_tmp[which(mat_bottle$alpha == 0.1)] = 2
+vec_tmp[which(mat_bottle$alpha == 0.5)] = 3
+vec_tmp[which(mat_bottle$alpha == 0.9)] = 4
+
+scatter3D(x = mat_bottle$Generation, y = as.numeric(as.character(mat_bottle$time_botl)),
+          z = mat_bottle$mean.het.adm, colvar = as.numeric(vec_tmp),
+          ticktype = "detailed",bty = "b2",pch = 16,
+          theta = 70, phi = 0, type = "s",cex = 0.3, cex.lab = 0.6, cex.axis = 0.5,
+          xlab = "generation", ylab = "bottleneck", zlab = "He moyen",
+          col = c("#1B9E77", "#D95F02", "#7570B3"),
+          colkey = list(at = c(2.3, 3, 3.7),
+                        addlines = TRUE, length = 1, width = 0.5,
+                        labels = c("0.1", "0.5", "0.9")),
+          clab = "alpha",
+          main = "He moyenne en fonction des générations et\n du temps de bottleneck")
+
+remove(vec_tmp)
+
+```
+
+
+```{r}
+
+setwd("../../../Images/")
+
+mat_bottle_time_80_alpha_0.1 = mat_bottle_time_80[which(mat_bottle_time_80$alpha == 0.1),]
+mat_bottle_time_80_u_0.01 = mat_bottle_time_80[which(mat_bottle_time_80$U == 0.01),]
+
+hist.gif.props.adm(mat = mat_bottle_time_80_alpha_0.1, select_stat = "U",
+                   select_seq = c(0.01, 0.25, 0.49),
+                   title = "adm.props/hist_bottle", title_leg = "U")
+
+remove(mat_bottle_time_80_alpha_0.1)
+```
+
+#### Evolution de la proportion d'admixture dans la population
+
+```{r}
+mat_bottle_time_80_u_0.01 = delta.adm.props(mat_bottle_time_80_u_0.01)
+```
+
+
+```{r}
+# plot(mat_bottle_time_80_u_0.01$delta.mean.adm.props~mat_bottle_time_80_u_0.01$Generation, type = "l")
+# plot(mat_bottle_time_80_u_0.01$delta.var.adm.props~mat_bottle_time_80_u_0.01$Generation, type = "l")
+
+
+plot_stat_gen(mat_bottle_time_80_u_0.01, mat_bottle_time_80_u_0.01$Generation, 
+              mat_bottle_time_80_u_0.01$delta.mean.adm.props,
+              mat_bottle_time_80_u_0.01$alpha, mat_bottle_time_80_u_0.01$alpha,ligne = T,
+              "Delta mean adm props en fonction des générations\n bottleneck = 80, U = 0.01",
+              legd = TRUE)
+
+plot_stat_gen(mat_bottle_time_80_u_0.01, mat_bottle_time_80_u_0.01$Generation, 
+              log(mat_bottle_time_80_u_0.01$delta.var.adm.props),
+              mat_bottle_time_80_u_0.01$alpha, mat_bottle_time_80_u_0.01$alpha,ligne = T,
+              "Delta var adm props en fonction des générations\n bottleneck = 80, U = 0.01",
+              legd = TRUE)
+
+
+```
+
+
+```{r}
+# vec_test_tot = c()
+# level = "0.1"
+# for (level in levels(mat_bottle_time_80_u_0.01$alpha)) {
+#   mat_tmp = mat_bottle_time_80_u_0.01[which(mat_bottle_time_80_u_0.01$alpha == level),]
+#   vec_test = c()
+#   for (gen in 1:102) {
+#     vec_test[gen] = (1 - mat_tmp$mean.adm.props[gen])
+#   }
+#   if (level == levels(mat_bottle_time_80_u_0.01$alpha)[1]) {
+#     vec_test_tot = cbind(vec_test, rep(level, length(vec_test)), seq(0,101,1))
+#   }else{
+#     vec_test = cbind(vec_test, rep(level, length(vec_test)), seq(0,101,1))
+#     vec_test_tot = rbind(vec_test_tot, vec_test)
+#   }
+# }
+# vec_test_tot[, 1] = as.double(vec_test_tot[, 1])
+# colnames(vec_test_tot) = c("stat", "simu", "gen")
+# vec_test_tot = as.data.frame(vec_test_tot)
+# p = ggplot(vec_test_tot, aes(x = gen, y = stat,group = simu))
+# 
+# p = p + geom_line()
+# p = p + theme_classic()
+# print(p)
+
+```
+
+
+### Bottleneck 1000
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+#### N0 = Nf = 10.000
+
+```{r}
+setwd("../new_methis_bottleneck_50000_snp/")
+
+mat_bottle_10.000 = data.frame.bottleneck(lst_ne0 = c(10000), lst_nef = c(10000),
+                                           lst_alpha = c(0.01, 0.1, 0.5, 0.9),
+                                           lst_nu = c(0.01, 0.25, 0.49),
+                                           lst_bottle = seq(10,90,10))
+
+mat_bottle_time_50_10.000 = mat_bottle_10.000[which(mat_bottle_10.000$time_botl == 50),]
+mat_bottle_time_20_10.000 = mat_bottle_10.000[which(mat_bottle_10.000$time_botl == 20),]
+mat_bottle_time_80_10.000 = mat_bottle_10.000[which(mat_bottle_10.000$time_botl == 80),]
+```
+Moyenne de l'hétérozygotie
+
+```{r}
+boucle_plot_bottle(mat_bottle_10.000, mat_bottle_10.000$mean.het.adm, "Heterozygotie", c(20,50,80),10000)
+
+```
+
+```{r}
+mini_mat_bottle_10.000 = rbind(mat_bottle_time_20_10.000, mat_bottle_time_50_10.000, mat_bottle_time_80_10.000)
+
+p = plot_stat_gen(mini_mat_bottle_10.000, mini_mat_bottle_10.000$Generation, 
+                  mini_mat_bottle_10.000$mean.het.adm, c(),
+                  mini_mat_bottle_10.000$u_alpha, line_t = mini_mat_bottle_10.000$time_botl,
+                  "Moyenne He en fonction des générations\n selon différents bottleneck\n (Ne0 = Nef = 10000)",TRUE,
+                  legd = TRUE)
+p = improve_plot_bottle(p =p, vec_abline = c(21, 51, 81), lab_col = "U/alpha",
+                        lab_line = "tpsbott", vec_linetype = c("dotted", "longdash", "solid"))
+print(p)
+
+```
+
+### Bottleneck 10000
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+#### N0 = Nf = 100.000
+
+```{r}
+setwd("../new_methis_bottleneck_50000_snp")
+options( "scipen"=100) 
+#/alpha0.1/Nu0.01/bottle10/Ne100000-XXX/Ne100000-100000/simu_1/
+
+mat_bottle_100.000 = data.frame.bottleneck(lst_ne0 = c(100000), lst_nef = c(100000),
+                                           lst_alpha = c(0.001, 0.01, 0.1, 0.5, 0.9),
+                                           lst_nu = c(0.01, 0.25, 0.49),
+                                           lst_bottle = seq(10,90,10))
+#seq(10, 90, 10)
+
+# mat_bottle_time_50_100.000 = mat_bottle_100.000[which(mat_bottle_100.000$time_botl == 50),]
+# mat_bottle_time_20_100.000 = mat_bottle_100.000[which(mat_bottle_100.000$time_botl == 20),]
+# mat_bottle_time_80_100.000 = mat_bottle_100.000[which(mat_bottle_100.000$time_botl == 80),]
+
+options( "scipen"=0) 
+
+```
+
+```{r}
+boucle_plot_bottle(mat_bottle_100.000, mat_bottle_100.000$mean.het.adm, "Heterozygotie", c(20,50,80),"100 000")
+
+```
+
+
+### Bottleneck 100 000
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
