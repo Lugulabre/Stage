@@ -8,3 +8,9 @@
 **/*.RData
 **/input_example.txt
 **/example_dataset/
+**/*.nosex
+**/*.ped
+**/*.bed
+**/*.map
+**/*.vcf
+**/*.fam
