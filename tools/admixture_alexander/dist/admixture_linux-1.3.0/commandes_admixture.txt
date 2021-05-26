@@ -1,0 +1,5 @@
+vcftools --vcf simu_1_g0.vcf --plink --out simu_1_g0
+
+../../../plink/plink --file simu_1_g0 --make-bed --out simu_1_g0
+
+./admixture simu_1_g0.bed 2

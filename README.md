@@ -16,6 +16,7 @@ Script en R permettant de traiter les données des simulations (sript principal 
 Chaque sous-répertoire contient un type de simulation et de scénario simulés selon des paramètres pouvant être modifiés.
 Scénarios simulés : populations constantes de différentes tailles initiales, populations croissantes et bottleneck.
 Les répertoires les plus essentiels sont ceux utilisant 50000 SNP sur les data utilisées.
+(! Les simulations ne sont pas disponibles sur le répertoire github pour des raisons de taille de stockage)
 
 ## tools
-Outils utilisés pour les simulations (nb : MetHis_modif est l'outil MetHis modifié pour être utilisé en séquentiel + modification du U)
+Outils utilisés pour les simulations (nb : MetHis_modif est l'outil MetHis modifié pour être utilisé en séquentiel + modification du U + implémentation du bottleneck)

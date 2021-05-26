@@ -59,7 +59,7 @@ void make_one_simul(param *params, arg *args){
     compute_all_sumstats(params, args, wanted_samples, idx_gen);
       
     if (args->save_data)
-	write_vcf_file(params, args, wanted_samples, idx_gen);
+      write_vcf_file(params, args, wanted_samples, idx_gen);
 
     free_unsigned_matrix(wanted_samples, args->sample_size_s1 + args->sample_size_s2 + args->sample_size_adm);
 
