@@ -19,4 +19,6 @@
 **/*.map
 **/*.bim
 **/*.P
+**/*.eps
 **/new_methis_50000_snp_complex_adm.html
+**/.Rhistory
