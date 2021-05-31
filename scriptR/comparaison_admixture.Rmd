@@ -1,0 +1,315 @@
+---
+title: "Comparaison des taux d'admixture calculés par MetHis avec ceux calculés par ADMIXTURE"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp")
+# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
+
+```
+
+## Indicateur de temps
+```{r}
+time.ini = Sys.time()
+```
+
+Chargement des libraries et fonctions
+```{r}
+source("../../../scriptR/functions.R")
+```
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
+##s1.0 = 0.75
+
+```{r}
+setwd("../test_logiciel_admixture/Ne_cst/s1.0_0.75/gen80")
+
+seq_gen = c(0,2,4,6,8,10,20,50,80)
+lst_met_075 = hist_methis(seq_gen)
+```
+
+```{r}
+# setwd("../../../tools/admixture_alexander/dist/test_adm_075/")
+# 
+# lst_adm_075_k2 = hist_admixture(seq_gen)
+```
+
+
+
+```{r}
+setwd("../../../tools/admixture_alexander/dist/test_adm_075/")
+
+lst_adm_075_k2 = list()
+df_adm_g0 = read.table(str_c("simu_1_g0.2.Q"), header = FALSE)
+lst_adm_075_k2[[1]] = df_adm_g0[1:50,]
+df_adm_g2 = read.table(str_c("simu_1_g2.2.Q"), header = FALSE)
+lst_adm_075_k2[[2]] = df_adm_g2[1:50,]
+df_adm_g4 = read.table(str_c("simu_1_g4.2.Q"), header = FALSE)
+lst_adm_075_k2[[3]] = df_adm_g4[1:50,]
+df_adm_g6 = read.table(str_c("simu_1_g6.2.Q"), header = FALSE)
+lst_adm_075_k2[[4]] = df_adm_g6
+df_adm_g8 = read.table(str_c("simu_1_g8.2.Q"), header = FALSE)
+lst_adm_075_k2[[5]] = df_adm_g8
+df_adm_g10 = read.table(str_c("simu_1_g10.2.Q"), header = FALSE)
+lst_adm_075_k2[[6]] = df_adm_g10
+df_adm_g20 = read.table(str_c("simu_1_g20.2.Q"), header = FALSE)
+lst_adm_075_k2[[7]] = df_adm_g20
+df_adm_g50 = read.table(str_c("simu_1_g50.2.Q"), header = FALSE)
+lst_adm_075_k2[[8]] = df_adm_g50
+df_adm_g80 = read.table(str_c("simu_1_g80.2.Q"), header = FALSE)
+lst_adm_075_k2[[9]] = df_adm_g80
+```
+
+```{r}
+hist_only_admixture(lst_adm_075_k2, c(rep(1,7), 2, 2), seq_gen)
+```
+
+```{r}
+setwd("../../../tools/admixture_alexander/dist/test_adm_075_k3/")
+
+lst_adm_075_k3 = list()
+df_adm_g0 = read.table(str_c("simu_1_g0.3.Q"), header = FALSE)
+lst_adm_075_k3[[1]] = df_adm_g0
+df_adm_g2 = read.table(str_c("simu_1_g2.3.Q"), header = FALSE)
+lst_adm_075_k3[[2]] = df_adm_g2
+df_adm_g4 = read.table(str_c("simu_1_g4.3.Q"), header = FALSE)
+lst_adm_075_k3[[3]] = df_adm_g4
+df_adm_g6 = read.table(str_c("simu_1_g6.3.Q"), header = FALSE)
+lst_adm_075_k3[[4]] = df_adm_g6
+df_adm_g8 = read.table(str_c("simu_1_g8.3.Q"), header = FALSE)
+lst_adm_075_k3[[5]] = df_adm_g8
+df_adm_g10 = read.table(str_c("simu_1_g10.3.Q"), header = FALSE)
+lst_adm_075_k3[[6]] = df_adm_g10
+df_adm_g20 = read.table(str_c("simu_1_g20.3.Q"), header = FALSE)
+lst_adm_075_k3[[7]] = df_adm_g20
+df_adm_g50 = read.table(str_c("simu_1_g50.3.Q"), header = FALSE)
+lst_adm_075_k3[[8]] = df_adm_g50
+df_adm_g80 = read.table(str_c("simu_1_g80.3.Q"), header = FALSE)
+lst_adm_075_k3[[9]] = df_adm_g80
+```
+
+```{r}
+hist_only_admixture(lst_adm_075_k3, c(rep(1,7), 2, 2), seq_gen)
+```
+
+```{r}
+serieA = unlist((lst_met_075[[1]][1,42:52]))
+names(serieA) = c("0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%","90%", "100%")
+serieB = quantile(lst_adm_075_k2[[1]]$V1[1:50], seq(0,1,0.1))
+serieC = quantile(lst_adm_075_k3[[1]]$V1[1:50], seq(0,1,0.1))
+print(serieA)
+print(serieB)
+print(serieC)
+cor.test(serieA, serieB, method = "pearson")
+cor.test(serieA, serieC, method = "pearson")
+```
+
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
+##s1.0 = 0.5
+
+
+```{r}
+setwd("../test_logiciel_admixture/Ne_cst/s1.0_0.5/gen80")
+
+seq_gen = c(0,2,4,6,8,10,20,50,80)
+lst_met_05 = hist_methis(seq_gen)
+```
+
+```{r}
+# setwd("../../../tools/admixture_alexander/dist/test_adm_05/")
+# 
+# lst_adm_05_k2 = hist_admixture(seq_gen)
+
+```
+
+```{r}
+setwd("../../../tools/admixture_alexander/dist/test_adm_05/")
+
+lst_adm_05_k2 = list()
+df_adm_g0 = read.table(str_c("simu_1_g0.2.Q"), header = FALSE)
+lst_adm_05_k2[[1]] = df_adm_g0[1:50,]
+df_adm_g2 = read.table(str_c("simu_1_g2.2.Q"), header = FALSE)
+lst_adm_05_k2[[2]] = df_adm_g2[1:50,]
+df_adm_g4 = read.table(str_c("simu_1_g4.2.Q"), header = FALSE)
+lst_adm_05_k2[[3]] = df_adm_g4[1:50,]
+df_adm_g6 = read.table(str_c("simu_1_g6.2.Q"), header = FALSE)
+lst_adm_05_k2[[4]] = df_adm_g6[1:50,]
+df_adm_g8 = read.table(str_c("simu_1_g8.2.Q"), header = FALSE)
+lst_adm_05_k2[[5]] = df_adm_g8[1:50,]
+df_adm_g10 = read.table(str_c("simu_1_g10.2.Q"), header = FALSE)
+lst_adm_05_k2[[6]] = df_adm_g10
+df_adm_g20 = read.table(str_c("simu_1_g20.2.Q"), header = FALSE)
+lst_adm_05_k2[[7]] = df_adm_g20
+df_adm_g50 = read.table(str_c("simu_1_g50.2.Q"), header = FALSE)
+lst_adm_05_k2[[8]] = df_adm_g50
+df_adm_g80 = read.table(str_c("simu_1_g80.2.Q"), header = FALSE)
+lst_adm_05_k2[[9]] = df_adm_g80
+```
+
+
+```{r}
+hist_only_admixture(lst_adm_05_k2, c(rep(1,7),2,2), seq_gen)
+```
+
+```{r}
+setwd("../../../tools/admixture_alexander/dist/test_adm_05_k3/")
+
+lst_adm_05_k3 = list()
+df_adm_g0 = read.table(str_c("simu_1_g0.3.Q"), header = FALSE)
+lst_adm_05_k3[[1]] = df_adm_g0
+df_adm_g2 = read.table(str_c("simu_1_g2.3.Q"), header = FALSE)
+lst_adm_05_k3[[2]] = df_adm_g2
+df_adm_g4 = read.table(str_c("simu_1_g4.3.Q"), header = FALSE)
+lst_adm_05_k3[[3]] = df_adm_g4
+df_adm_g6 = read.table(str_c("simu_1_g6.3.Q"), header = FALSE)
+lst_adm_05_k3[[4]] = df_adm_g6
+df_adm_g8 = read.table(str_c("simu_1_g8.3.Q"), header = FALSE)
+lst_adm_05_k3[[5]] = df_adm_g8
+df_adm_g10 = read.table(str_c("simu_1_g10.3.Q"), header = FALSE)
+lst_adm_05_k3[[6]] = df_adm_g10
+df_adm_g20 = read.table(str_c("simu_1_g20.3.Q"), header = FALSE)
+lst_adm_05_k3[[7]] = df_adm_g20
+df_adm_g50 = read.table(str_c("simu_1_g50.3.Q"), header = FALSE)
+lst_adm_05_k3[[8]] = df_adm_g50
+df_adm_g80 = read.table(str_c("simu_1_g80.3.Q"), header = FALSE)
+lst_adm_05_k3[[9]] = df_adm_g80
+```
+
+
+```{r}
+hist_only_admixture(lst_adm_05_k3, c(rep(1,9)), seq_gen)
+```
+
+```{r}
+serieA = unlist((lst_met_05[[1]][1,42:52]))
+names(serieA) = c("0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%","90%", "100%")
+serieB = quantile(lst_adm_05_k2[[1]]$V1[1:50], seq(0,1,0.1))
+serieC = quantile(lst_adm_05_k3[[1]]$V1[1:50], seq(0,1,0.1))
+print(serieA)
+print(serieB)
+print(serieC)
+cor.test(serieA, serieB, method = "pearson")
+cor.test(serieA, serieC, method = "pearson")
+```
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
+##s1.0 = 0.1
+
+```{r}
+setwd("../test_logiciel_admixture/Ne_cst/s1.0_0.1/gen80")
+
+seq_gen = c(0,2,4,6,8,10,20,50,80)
+lst_met_01 = hist_methis(seq_gen)
+```
+
+
+```{r}
+# setwd("../../../tools/admixture_alexander/dist/test_adm_01/")
+# 
+# lst_adm = hist_admixture(seq_gen)
+```
+
+```{r}
+setwd("../../../tools/admixture_alexander/dist/test_adm_01/")
+
+lst_adm_01_k2 = list()
+df_adm_g0 = read.table(str_c("simu_1_g0.2.Q"), header = FALSE)
+lst_adm_01_k2[[1]] = df_adm_g0
+df_adm_g2 = read.table(str_c("simu_1_g2.2.Q"), header = FALSE)
+lst_adm_01_k2[[2]] = df_adm_g2
+df_adm_g4 = read.table(str_c("simu_1_g4.2.Q"), header = FALSE)
+lst_adm_01_k2[[3]] = df_adm_g4
+df_adm_g6 = read.table(str_c("simu_1_g6.2.Q"), header = FALSE)
+lst_adm_01_k2[[4]] = df_adm_g6
+df_adm_g8 = read.table(str_c("simu_1_g8.2.Q"), header = FALSE)
+lst_adm_01_k2[[5]] = df_adm_g8
+df_adm_g10 = read.table(str_c("simu_1_g10.2.Q"), header = FALSE)
+lst_adm_01_k2[[6]] = df_adm_g10
+df_adm_g20 = read.table(str_c("simu_1_g20.2.Q"), header = FALSE)
+lst_adm_01_k2[[7]] = df_adm_g20
+df_adm_g50 = read.table(str_c("simu_1_g50.2.Q"), header = FALSE)
+lst_adm_01_k2[[8]] = df_adm_g50
+df_adm_g80 = read.table(str_c("simu_1_g80.2.Q"), header = FALSE)
+lst_adm_01_k2[[9]] = df_adm_g80
+```
+
+```{r}
+hist_only_admixture(lst_adm_01_k2, c(rep(1,6),2,1,1),seq_gen)
+```
+
+
+```{r}
+setwd("../../../tools/admixture_alexander/dist/test_adm_01_k3/")
+
+lst_adm_01_k3 = list()
+df_adm_g0 = read.table(str_c("simu_1_g0.3.Q"), header = FALSE)
+lst_adm_01_k3[[1]] = df_adm_g0
+df_adm_g2 = read.table(str_c("simu_1_g2.3.Q"), header = FALSE)
+lst_adm_01_k3[[2]] = df_adm_g2
+df_adm_g4 = read.table(str_c("simu_1_g4.3.Q"), header = FALSE)
+lst_adm_01_k3[[3]] = df_adm_g4
+df_adm_g6 = read.table(str_c("simu_1_g6.3.Q"), header = FALSE)
+lst_adm_01_k3[[4]] = df_adm_g6
+df_adm_g8 = read.table(str_c("simu_1_g8.3.Q"), header = FALSE)
+lst_adm_01_k3[[5]] = df_adm_g8
+df_adm_g10 = read.table(str_c("simu_1_g10.3.Q"), header = FALSE)
+lst_adm_01_k3[[6]] = df_adm_g10
+df_adm_g20 = read.table(str_c("simu_1_g20.3.Q"), header = FALSE)
+lst_adm_01_k3[[7]] = df_adm_g20
+df_adm_g50 = read.table(str_c("simu_1_g50.3.Q"), header = FALSE)
+lst_adm_01_k3[[8]] = df_adm_g50
+df_adm_g80 = read.table(str_c("simu_1_g80.3.Q"), header = FALSE)
+lst_adm_01_k3[[9]] = df_adm_g80
+```
+
+```{r}
+hist_only_admixture(lst_adm_01_k3, c(rep(1,9)),seq_gen)
+```
+
+```{r}
+scatter3D(lst_adm_075_k3[[3]]$V1, lst_adm_075_k3[[3]]$V2, lst_adm_075_k3[[3]]$V3,
+          theta = 130,phi = 20)
+```
+
+
+```{r}
+serieA = unlist((lst_met_01[[8]][1,42:52]))
+names(serieA) = c("0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%","90%", "100%")
+serieB = quantile(lst_adm_01_k2[[8]]$V1[1:50], seq(0,1,0.1))
+serieC = quantile(lst_adm_01_k3[[1]]$V1[1:50], seq(0,1,0.1))
+print(serieA)
+print(serieB)
+print(serieC)
+cor.test(serieA, serieB)
+cor.test(serieA, serieC, method = "pearson")
+```
+
+faire k=3
+! aux colonnes
+
+corrélation entre résultats admixture et asd
+et regarder comment elle évolue avec le temps

@@ -668,3 +668,161 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
   ggsave(filename =  str_c("../../../Images/",t_file, ".png"), plot = p)
   return(p)
 }
+
+# Fonction d'affichage de graphique pour des admixtures complexes 
+# (admixture récurrente et admixture two pulses)
+
+plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
+                                    name_color = "time_pulse_s1"){
+  for (i in 1:length(lst_mat)) {
+    for (ne in seq_ne) {
+      mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
+      num_col_y = which(colnames(mat_tmp) == name_stat)
+      num_col_x = which(colnames(mat_tmp) == name_x)
+      num_col_color =  which(colnames(mat_tmp) == name_color)
+      
+      p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
+                      stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu),
+                      color_col = mat_tmp[,num_col_color],titre = str_c(name_stat," en fonction de ",name_x,
+                                                                        ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
+      p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
+      p=p+labs(color = name_color) + guides(linetype = FALSE)
+      p=p+ylim(min_y, max_y)
+      if (name_stat == "mean.het.adm") {
+        p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#A91101")
+        p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#EFD242")
+      }
+      
+      vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
+      vec_s2 = mat_tmp$time_pulse_s2[which(mat_tmp$Generation == 0)]
+      for (rg_pulse in c(1:length(vec_s1))) {
+        pos_x_s1 = vec_s1[rg_pulse]
+        pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
+        pos_x_s2 = vec_s2[rg_pulse]
+        pos_y_s2 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s2, num_col_y]
+        p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
+        p = p+geom_point(aes_string(x=pos_x_s2, y=pos_y_s2), colour="green", shape = 19)
+      }
+
+      return(p)
+    }
+  }
+}
+
+
+plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation"){
+  for (i in 1:length(lst_mat)) {
+    for (ne in seq_ne) {
+      mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
+      num_col_y = which(colnames(mat_tmp) == name_stat)
+      num_col_x = which(colnames(mat_tmp) == name_x)
+      
+      p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
+                      stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu),
+                      color_col = pmax(mat_tmp$time_pulse_s1, mat_tmp$time_pulse_s2),
+                      titre = str_c(name_stat," en fonction de ",name_x,
+                                    ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
+      p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
+      p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
+      p=p+ylim(min_y, max_y)
+      return(p)
+      
+    }
+  }
+}
+
+
+plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation"){
+  for (i in 1:length(lst_mat)) {
+    for (ne in seq_ne) {
+      mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
+      num_col_y = which(colnames(mat_tmp) == name_stat)
+      num_col_x = which(colnames(mat_tmp) == name_x)
+      
+      p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
+                      stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu),
+                      color_col = (100 - pmax(mat_tmp$time_pulse_s1, mat_tmp$time_pulse_s2))*10 +
+                        abs(mat_tmp$time_pulse_s1 - mat_tmp$time_pulse_s2),
+                      titre = str_c(name_stat," en fonction de ",name_x,
+                                    ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
+      p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
+      p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
+      p=p+ylim(min_y, max_y)
+      return(p)
+      
+    }
+  }
+}
+
+# Affichage des histogrammes pour comparer MetHis et ADMIXTURE
+
+hist_one_line = function(df, color = "#F6DC12", color2 = "#F9429E"){
+  vec_y = c(df$perc0.adm.props,
+            df$perc10.adm.props,
+            df$perc20.adm.props,
+            df$perc30.adm.props,
+            df$perc40.adm.props,
+            df$perc50.adm.props,
+            df$perc60.adm.props,
+            df$perc70.adm.props,
+            df$perc80.adm.props,
+            df$perc90.adm.props,
+            df$perc100.adm.props)
+  
+  hist(vec_y, breaks = vec_y, main=df$Generation, col = color, xlim = c(-0.1, 1.1))
+  abline(v = df$mean.adm.props, col = color2, lty = 2, lwd=3)
+  
+}
+
+
+hist_methis = function(seq_gen){
+  df_methis = data.frame.stat(seq_ne = c(100), max_gen = 81, max_simu = 1)
+  
+  lst_met_gen = list()
+  cpt = 1
+  for (gen in seq_gen) {
+    lst_met_gen[[cpt]] = df_methis[which(df_methis$Generation == gen),]
+    cpt = cpt+1
+  }
+  
+  for (i in 1:length(lst_met_gen)) {
+    hist_one_line(lst_met_gen[[i]])
+  }
+  return(lst_met_gen)
+}
+
+
+hist_admixture = function(seq_gen){
+  lst_adm_gen = list()
+  cpt=1
+  for (gen in seq_gen) {
+    lst_adm_gen[[cpt]] = read.table(str_c("simu_1_g",gen,".2.Q"), header = FALSE)
+    if (gen > 19) {
+      lst_adm_gen[[cpt]] = lst_adm_gen[[cpt]][50:100,]
+    }else{
+      lst_adm_gen[[cpt]] = lst_adm_gen[[cpt]][1:50,]
+    }
+    cpt=cpt+1
+  }
+  for (i in c(1:length(lst_adm_gen))) {
+    hist(lst_adm_gen[[i]]$V1, col = "#F6DC12", xlim = c(-0.1, 1.1))
+    abline(v = mean(lst_adm_gen[[i]]$V1), col = "#F9429E", lty = 2, lwd=3)
+  }
+  return(lst_adm_gen)
+}
+
+
+hist_only_admixture = function(lst, vec_col, seq_gen){
+  if (length(lst) != length(vec_col) & length(lst) != length(seq_gen)) {
+    print("Length list =/= length vector columns")
+    return()
+  }
+  
+  for (i in c(1:length(lst))) {
+    hist(lst[[i]][,vec_col[i]], col = "#F6DC12", xlim = c(-0.1, 1.1), main = seq_gen[i])
+    abline(v = mean(lst[[i]][,vec_col[i]]), col = "#F9429E", lty = 2, lwd=3)
+  }
+}
+
+
+
