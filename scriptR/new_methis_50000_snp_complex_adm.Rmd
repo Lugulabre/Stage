@@ -219,96 +219,6 @@ for (val_s10 in vec_val_s10) {
 
 
 ```{r}
-plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
-                                    name_color = "time_pulse_s1"){
-  for (i in 1:length(lst_mat)) {
-    for (ne in seq_ne) {
-      mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
-      num_col_y = which(colnames(mat_tmp) == name_stat)
-      num_col_x = which(colnames(mat_tmp) == name_x)
-      num_col_color =  which(colnames(mat_tmp) == name_color)
-
-      p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
-                      stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu),
-                      color_col = mat_tmp[,num_col_color],titre = str_c(name_stat," en fonction de ",name_x,
-                                                                      ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
-      p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-      p=p+labs(color = name_color) + guides(linetype = FALSE)
-      p=p+ylim(min_y, max_y)
-      if (name_stat == "mean.het.adm") {
-        p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#A91101")
-        p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#EFD242")
-      }
-
-      vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
-      vec_s2 = mat_tmp$time_pulse_s2[which(mat_tmp$Generation == 0)]
-      for (rg_pulse in c(1:length(vec_s1))) {
-        pos_x_s1 = vec_s1[rg_pulse]
-        pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
-        pos_x_s2 = vec_s2[rg_pulse]
-        pos_y_s2 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s2, num_col_y]
-        p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
-        p = p+geom_point(aes_string(x=pos_x_s2, y=pos_y_s2), colour="green", shape = 19)
-      }
-
-      print(p)
-
-    }
-  }
-}
-```
-
-
-```{r}
-plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation"){
-  for (i in 1:length(lst_mat)) {
-    for (ne in seq_ne) {
-      mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
-      num_col_y = which(colnames(mat_tmp) == name_stat)
-      num_col_x = which(colnames(mat_tmp) == name_x)
-
-      p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
-                      stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu),
-                      color_col = pmax(mat_tmp$time_pulse_s1, mat_tmp$time_pulse_s2),
-                      titre = str_c(name_stat," en fonction de ",name_x,
-                                                                      ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
-      p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-      p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
-      p=p+ylim(min_y, max_y)
-      print(p)
-
-    }
-  }
-}
-```
-
-
-```{r}
-plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation"){
-  for (i in 1:length(lst_mat)) {
-    for (ne in seq_ne) {
-      mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
-      num_col_y = which(colnames(mat_tmp) == name_stat)
-      num_col_x = which(colnames(mat_tmp) == name_x)
-
-      p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
-                      stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu),
-                      color_col = (100 - pmax(mat_tmp$time_pulse_s1, mat_tmp$time_pulse_s2))*10 +
-                        abs(mat_tmp$time_pulse_s1 - mat_tmp$time_pulse_s2),
-                      titre = str_c(name_stat," en fonction de ",name_x,
-                                                                      ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
-      p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-      p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
-      p=p+ylim(min_y, max_y)
-      print(p)
-
-    }
-  }
-}
-```
-
-
-```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
                          min_y = 0.02, max_y = 0.063)
@@ -445,7 +355,7 @@ plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
 ```{r}
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
-                         name_stat = "f3", min_y = -0.01, max_y = 1)
+                         name_stat = "f3", min_y = -0.1, max_y = 1.1)
 ```
 
 ```{r}

@@ -2,7 +2,9 @@
 .#*
 **/.DS_Store
 **/simu_*/
-**/Simulations/
+**/Ne*/
+**/Nu*/
+**/alpha*/
 **/data_50k.arp
 **/new_methis*/
 **/*.RData
