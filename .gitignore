@@ -16,5 +16,7 @@
 **/*.map
 **/*.vcf
 **/*.fam
+**/*.map
+**/*.bim
+**/*.P
 **/new_methis_50000_snp_complex_adm.html
-**/dist/test*/
