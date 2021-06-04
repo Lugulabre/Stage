@@ -313,3 +313,9 @@ faire k=3
 
 corrélation entre résultats admixture et asd
 et regarder comment elle évolue avec le temps
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+

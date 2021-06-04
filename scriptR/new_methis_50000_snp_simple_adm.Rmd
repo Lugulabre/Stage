@@ -95,7 +95,7 @@ mat_64_100_16384 = delta.adm.props(mat_64_100_16384)
 
 ```{r}
 
-write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.062)
+write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.063)
 write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
 write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5)
 write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
@@ -350,7 +350,7 @@ mat_pop_nu_reduce_3 = delta.adm.props(mat_pop_nu_reduce_3)
 ```
 
 ```{r}
-write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.062)
+write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.063)
 write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
 write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5)
 write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
@@ -500,9 +500,7 @@ mini_mat_bottle_80 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 80),]
 
 ```{r}
 write_bottle_plot("mean.het.adm", mini_mat_bottle,
-                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.062)
-write_bottle_plot("mean.het.adm", mini_mat_bottle,
-                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.062)
+                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.063)
 write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5)
 write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5)
 write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)

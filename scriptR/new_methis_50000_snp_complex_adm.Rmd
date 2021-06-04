@@ -222,9 +222,10 @@ for (val_s10 in vec_val_s10) {
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
                          min_y = 0.02, max_y = 0.063)
-# plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
-#                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
-#                          min_y = 0.02, max_y = 0.063, name_color = "time_pulse_s2")
+
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
+                         min_y = 0.02, max_y = 0.063, name_color = "time_pulse_s2")
 ```
 
 
@@ -244,13 +245,21 @@ plot_adm_ponctuel_ne_cst_minus(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s1.adm",
-                         min_y = 0, max_y = 0.4)
+                         min_y = 0, max_y = 0.4,yas1 = 0.38,yas2 = 0.35)
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s1.adm",
+                         min_y = 0, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_color = "time_pulse_s2")
 ```
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s2.adm",
-                         min_y = 0, max_y = 0.4)
+                         min_y = -0.01, max_y = 0.4,yas1 = 0.38,yas2 = 0.35)
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s2.adm",
+                         min_y = -0.01, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_color = "time_pulse_s2")
 ```
 
 ```{r}
@@ -263,21 +272,33 @@ plot_adm_ponctuel_ne_cst_minus(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "f3",
-                         min_y = -0.05,max_y = 0.8)
+                         min_y = -0.05,max_y = 0.8,yas1 = 0.75,yas2 = 0.69)
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "f3",
+                         min_y = -0.05,max_y = 0.8,yas1 = 0.75,yas2 = 0.69,
+                         name_color = "time_pulse_s2")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "var.adm.props",
-                         min_y = -0.01, max_y = 0.15)
+                         min_y = -0.01, max_y = 0.15,yas1 = 0.14,yas2 = 0.125)
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "var.adm.props",
+                         min_y = -0.01, max_y = 0.15,yas1 = 0.14,yas2 = 0.125,
+                         name_color = "time_pulse_s2")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "delta.adm.gen.0",
-                         min_y = -0.4, max_y = 0.4)
+                         min_y = -0.4, max_y = 0.4,yas1 = 0.38,yas2 = 0.35)
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "delta.adm.gen.0",
+                         min_y = -0.4, max_y = 0.4,name_color = "time_pulse_s2",
+                         yas1 = 0.38,yas2 = 0.35)
 ```
 
 ##Ne croissant
@@ -368,6 +389,13 @@ plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
 ```{r}
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         name_stat = "var.adm.props", min_y = -0.01, max_y = 0.15)
+```
+
+
+```{r}
+plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          name_stat = "delta.adm.gen.0", min_y = -0.3, max_y = 0.5)
 ```
 
@@ -451,6 +479,13 @@ plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"),
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
                          name_stat = "perc50.adm.props",min_y = -0.1,max_y = 1)
+```
+
+```{r}
+plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         seq_alpha = c(0.1),seq_bot = c(20,50,80),
+                         name_stat = "var.adm.props",min_y = -0.01,max_y = 0.15)
 ```
 
 

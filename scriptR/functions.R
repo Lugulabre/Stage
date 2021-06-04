@@ -539,6 +539,12 @@ write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y, name_x = "Gen
                     str_c(name_stat, " en fonction des générations\n selon différentes Ne initiales"))
   p = p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE)
   p = p+xlab(name_x)+ylab(name_stat)
+  if (name_stat == "mean.het.adm") {
+    p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.063,label="s1",color = "#DFAF2C")
+    p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.048,label="s2",color = "#318CE7")
+  }
   ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p)
 }
 
@@ -563,6 +569,12 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y, name_x =
                           lab_line = labline, vec_linetype = c("solid", "longdash", "dotted"))
   p = p + ylim(min_y, max_y)
   p = p+xlab(name_x)+ylab(name_stat)
+  if (name_stat == "mean.het.adm") {
+    p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.063,label="s1",color = "#DFAF2C")
+    p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.048,label="s2",color = "#318CE7")
+  }
   ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p)
 }
 
@@ -592,6 +604,12 @@ write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y,
                           vec_linetype = c("solid", "longdash", "dotted", "dotdash", "dashed"))
   p = p+ylim(min_y, max_y)
   p = p+xlab(name_x)+ylab(name_stat)
+  if (name_stat == "mean.het.adm") {
+    p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.063,label="s1",color = "#DFAF2C")
+    p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.048,label="s2",color = "#318CE7")
+  }
   ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p)
 }
 
@@ -673,7 +691,7 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
 # (admixture récurrente et admixture two pulses)
 
 plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
-                                    name_color = "time_pulse_s1"){
+                                    name_color = "time_pulse_s1",yas1 = 0.027,yas2=0.022){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
@@ -703,8 +721,13 @@ plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, m
         p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
         p = p+geom_point(aes_string(x=pos_x_s2, y=pos_y_s2), colour="green", shape = 19)
       }
+      
+      p=p+annotate("text", x=5.5,y=yas1,label="s1", color = "blue")
+      p=p+annotate("point", x=2,y=yas1, color = "blue",shape=17)
+      p=p+annotate("text", x=5.5,y=yas2,label="s2", color = "green")
+      p=p+annotate("point", x=2,y=yas2, color = "green")
 
-      return(p)
+      print(p)
     }
   }
 }
@@ -725,7 +748,7 @@ plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_sta
       p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
       p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
       p=p+ylim(min_y, max_y)
-      return(p)
+      print(p)
       
     }
   }
@@ -748,7 +771,7 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat, mi
       p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
       p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
       p=p+ylim(min_y, max_y)
-      return(p)
+      print(p)
       
     }
   }
