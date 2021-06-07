@@ -285,7 +285,8 @@ data.frame.mean = function(df_stat, max_gen, seq_ne, col_mean, col_cstt){
   lrow = length(seq_ne)
   df_mean = matrix(data = NA, nrow = lrow*max_gen, ncol = ncol(df_stat))
   df_mean = as.data.frame(df_mean)
-  df_var = df_mean
+  df_ic = df_mean
+  df_sd = df_mean
   cpt = 0
   
   for (ne in seq_ne) {
@@ -297,28 +298,33 @@ data.frame.mean = function(df_stat, max_gen, seq_ne, col_mean, col_cstt){
     for (cstt in col_cstt) {
       # print(as.character(df_tmp[1, cstt]))
       df_mean[row_min:row_max, cstt] = as.character(df_tmp[1, cstt])
-      df_var[row_min:row_max, cstt] = as.character(df_tmp[1, cstt])
+      df_ic[row_min:row_max, cstt] = as.character(df_tmp[1, cstt])
+      df_sd[row_min:row_max, cstt] = as.character(df_tmp[1, cstt])
     }
     
     cpt = cpt+1
     
     for (gen in 0:(max_gen-1) ) {
       df_mean[row_min+gen, 3] = gen
-      df_var[row_min+gen, 3] = gen
+      df_ic[row_min+gen, 3] = gen
       df_mean[row_min+gen, col_mean] = apply(df_tmp[which(df_tmp$Generation == gen), col_mean], 2, mean)
-      df_var[row_min+gen, col_mean] = apply(df_tmp[which(df_tmp$Generation == gen), col_mean], 2, IC_95)
+      df_ic[row_min+gen, col_mean] = apply(df_tmp[which(df_tmp$Generation == gen), col_mean], 2, IC_95)
+      df_sd[row_min+gen, col_mean] = apply(df_tmp[which(df_tmp$Generation == gen), col_mean], 2, sd)
     }
   }
   
   colnames(df_mean) = colnames(df_stat)
-  # df_mean$Ne = factor(as.factor(df_mean$Ne), levels = as.character(seq_ne))
   df_mean$Ne = as.factor(df_mean$Ne)
   df_mean$Generation = as.integer(df_mean$Generation)
   
-  colnames(df_var) = colnames(df_stat)
-  df_var$Ne = as.factor(df_var$Ne)
-  df_var$Generation = as.integer(df_var$Generation)
-  return(list(df_mean, df_var))
+  colnames(df_ic) = colnames(df_stat)
+  df_ic$Ne = as.factor(df_ic$Ne)
+  df_ic$Generation = as.integer(df_ic$Generation)
+  
+  colnames(df_sd) = colnames(df_stat)
+  df_sd$Ne = as.factor(df_sd$Ne)
+  df_sd$Generation = as.integer(df_sd$Generation)
+  return(list(df_mean, df_ic, df_sd))
 }
 
 
@@ -330,15 +336,18 @@ data.frame.mean.u = function(df_stat, max_gen, seq_combi, seq_u, col_mean, col_c
                              col_mean = col_mean, col_cstt = col_cstt)
     if (u == seq_u[1]) {
       df_tot_mean = all_df[[1]]
-      df_tot_var = all_df[[2]]
+      df_tot_ic = all_df[[2]]
+      df_tot_sd = all_df[[3]]
     }else{
       df_tot_mean = rbind(df_tot_mean, all_df[[1]])
-      df_tot_var = rbind(df_tot_var, all_df[[2]])
+      df_tot_ic = rbind(df_tot_ic, all_df[[2]])
+      df_tot_sd = rbind(df_tot_sd, all_df[[3]])
     }
   }
   df_tot_mean$U = as.factor(as.numeric(df_tot_mean$U))
-  df_tot_var$U = as.factor(as.numeric(df_tot_var$U))
-  return(list(df_tot_mean, df_tot_var))
+  df_tot_ic$U = as.factor(as.numeric(df_tot_ic$U))
+  df_tot_sd$U = as.factor(as.numeric(df_tot_sd$U))
+  return(list(df_tot_mean, df_tot_ic, df_tot_sd))
 }
 
 
@@ -346,25 +355,21 @@ data.frame.mean.bottle = function(df_stat, max_gen, seq_combi, seq_u,
                                   seq_alpha, seq_bottle, col_mean, col_cstt){
   for (alpha in seq_alpha) {
     df_alpha = df_stat[which(df_stat$alpha == alpha),]
-    # print("alpha")
-    # print(df_alpha[1,1])
     for (u in seq_u) {
       df_u = df_alpha[which(df_alpha$U == u),]
-      # print("u")
-      # print(df_u[1,1])
       for (bottle in seq_bottle) {
         df_bot = df_u[which(df_u$time_botl == bottle),]
-        # print("bott")
-        # print(df_bot[1,1])
         all_df = data.frame.mean(df_stat = df_bot, max_gen = max_gen,
                                  seq_ne = seq_combi, col_mean = col_mean,
                                  col_cstt = col_cstt)
         if (alpha == seq_alpha[1] && u == seq_u[1] && bottle == seq_bottle[1]) {
           df_tot_mean = all_df[[1]]
-          df_tot_var = all_df[[2]]
+          df_tot_ic = all_df[[2]]
+          df_tot_sd = all_df[[3]]
         }else{
           df_tot_mean = rbind(df_tot_mean, all_df[[1]])
-          df_tot_var = rbind(df_tot_var, all_df[[2]])
+          df_tot_ic = rbind(df_tot_ic, all_df[[2]])
+          df_tot_sd = rbind(df_tot_sd, all_df[[2]])
         }
       }
     }
@@ -375,12 +380,18 @@ data.frame.mean.bottle = function(df_stat, max_gen, seq_combi, seq_u,
   df_tot_mean$bott_u = as.factor(df_tot_mean$bott_u)
   df_tot_mean$u_alpha = as.factor(df_tot_mean$u_alpha)
   
-  df_tot_var$U = as.factor(as.numeric(df_tot_var$U))
-  df_tot_var$alpha = as.factor(as.numeric(df_tot_var$alpha))
-  df_tot_var$time_botl = as.factor(df_tot_var$time_botl)
-  df_tot_var$bott_u = as.factor(df_tot_var$bott_u)
-  df_tot_var$u_alpha = as.factor(df_tot_var$u_alpha)
-  return(list(df_tot_mean, df_tot_var))
+  df_tot_ic$U = as.factor(as.numeric(df_tot_ic$U))
+  df_tot_ic$alpha = as.factor(as.numeric(df_tot_ic$alpha))
+  df_tot_ic$time_botl = as.factor(df_tot_ic$time_botl)
+  df_tot_ic$bott_u = as.factor(df_tot_ic$bott_u)
+  df_tot_ic$u_alpha = as.factor(df_tot_ic$u_alpha)
+  
+  df_tot_sd$U = as.factor(as.numeric(df_tot_sd$U))
+  df_tot_sd$alpha = as.factor(as.numeric(df_tot_sd$alpha))
+  df_tot_sd$time_botl = as.factor(df_tot_sd$time_botl)
+  df_tot_sd$bott_u = as.factor(df_tot_sd$bott_u)
+  df_tot_sd$u_alpha = as.factor(df_tot_sd$u_alpha)
+  return(list(df_tot_mean, df_tot_ic, df_tot_sd))
 }
 
 
@@ -468,7 +479,8 @@ improve_plot_bottle = function(p, vec_abline, lab_col, lab_line, vec_linetype, v
     vec_abtype = rep(vec_abtype, length(vec_abline))
   }
   for (rg_abl in 1:length(vec_abline)) {
-    p = p + geom_vline(xintercept = vec_abline[rg_abl], size = 0.4, color = "orange", linetype = vec_abtype[rg_abl])
+    p = p + geom_vline(xintercept = vec_abline[rg_abl], size = 0.4,
+                       color = "orange", linetype = vec_abtype[rg_abl])
   }
   p = p + labs(color = lab_col, linetype = lab_line) + scale_linetype_manual(values=vec_linetype)
   return(p)
@@ -541,11 +553,12 @@ write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y, name_x = "Gen
   p = p+xlab(name_x)+ylab(name_stat)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
-    p=p+annotate(geom = "text",x = 1,y = 0.063,label="s1",color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
     p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
-    p=p+annotate(geom = "text",x = 1,y = 0.048,label="s2",color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
-  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p)
+  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p,
+         width = 6, height = 5)
 }
 
 
@@ -571,11 +584,12 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y, name_x =
   p = p+xlab(name_x)+ylab(name_stat)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
-    p=p+annotate(geom = "text",x = 1,y = 0.063,label="s1",color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
     p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
-    p=p+annotate(geom = "text",x = 1,y = 0.048,label="s2",color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
-  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p)
+  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p,
+         width = 6, height = 5)
 }
 
 
@@ -585,7 +599,8 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y, name_x =
 write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y,
                              name_x = "Generation", time_bott = c(21, 51, 81),
                              name_color = "u_alpha", name_line = "time_botl",
-                             labcol = "U/alpha", labline = "tb"){
+                             labcol = "U/alpha", labline = "tb",
+                             vec_abtype = c("solid")){
 
   num_col_y = which(colnames(mat) == name_stat)
   num_col_x = which(colnames(mat) == name_x)
@@ -601,16 +616,18 @@ write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y,
   p = improve_plot_bottle(p =p, vec_abline = time_bott,
                           lab_col = labcol,
                           lab_line = labline,
-                          vec_linetype = c("solid", "longdash", "dotted", "dotdash", "dashed"))
+                          vec_linetype = c("solid", "longdash", "dotted", "dotdash", "dashed"),
+                          vec_abtype = vec_abtype)
   p = p+ylim(min_y, max_y)
   p = p+xlab(name_x)+ylab(name_stat)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
-    p=p+annotate(geom = "text",x = 1,y = 0.063,label="s1",color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
     p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
-    p=p+annotate(geom = "text",x = 1,y = 0.048,label="s2",color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
-  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p)
+  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p,
+         width = 6, height = 5)
 }
 
 
@@ -641,12 +658,18 @@ boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott,size_pop = 1000
 write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
                              ylim_inf, ylim_sup, lgd_txt, name_file_1,
                              ylim_inf_2, ylim_sup_2, var_axis, name_file_2,
-                             line_t = c("solid")){
+                             line_t = c("solid"), bot = c()){
   p = plot_stat_gen(df, xaxis, yaxis, group_col, color_col, ligne = T,
                     title, legd = TRUE,line_t = line_t)
   p = p + ylim(ylim_inf, ylim_sup)
   p = p + guides(linetype = FALSE)
   p = p + labs(color = lgd_txt)
+  if (!is.null(bot)) {
+    for (i in c(1:length(bot))) {
+      p = p + geom_vline(xintercept = bot[i], size = 0.4,
+                         color = "orange", linetype = "solid")
+    }
+  }
   print(p)
   ggsave(filename =  str_c("../../../Images/", name_file_1, ".png"), plot = p)
   
@@ -654,7 +677,6 @@ write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
   p = p+geom_errorbar(aes(ymin = yaxis - var_axis, ymax = yaxis + var_axis), width=0.6)
   
   ggsave(filename =  str_c("../../../Images/", name_file_2, ".png"),plot = p)
-  
   return(p)
 }
 

@@ -34,13 +34,14 @@ setwd("../multi_new_methis_pop_size_diff/")
 mat_cstt_multi = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 100)
 
 mat_cstt_multi = delta.adm.props(mat_cstt_multi)
+mat_cstt_multi = delta.adm.gen.0(mat_cstt_multi)
 ```
 
 
 ```{r}
 list_mean = data.frame.mean(mat_cstt_multi, max_gen = 101,
                             seq_ne = c(100,1000,10000),
-                            col_cstt = c(1:3), col_mean = c(4:67))
+                            col_cstt = c(1:3), col_mean = c(4:68))
 mat_cstt_multi_mean = list_mean[[1]]
 mat_cstt_multi_var = list_mean[[2]]
 remove(list_mean)
@@ -115,6 +116,15 @@ write_ic_var_plot(mat_cstt_multi_mean, mat_cstt_multi_mean$Generation,
                   -0.1, 0, "Ne", "100_simu/delta.mean.adm/ne_cstt_mean",
                   -0.12, 0, mat_cstt_multi_var$delta.mean.adm.props,
                   "100_simu/delta.mean.adm/ne_cstt_mean_IC95")
+
+####################
+write_ic_var_plot(mat_cstt_multi_mean, mat_cstt_multi_mean$Generation,
+                  mat_cstt_multi_mean$delta.adm.gen.0,
+                  mat_cstt_multi_mean$Ne, mat_cstt_multi_mean$Ne,
+                  "Delta adm gen 0 en fonction des générations",
+                  -0.12, 0.03, "Ne", "100_simu/delta.adm0.adm/delta_adm0_ne_cstt_multi",
+                  -0.1, 0.03, mat_cstt_multi_var$delta.adm.gen.0,
+                  "100_simu/delta.adm0.adm/delta_adm0_ne_cstt_multi_IC95")
 ```
 
 ## Simulations multiples : populations croissantes
@@ -133,6 +143,7 @@ mat_inc_multi = data.frame.increase.nu(seq_ne_ini = seq_ne_ini_multi,
                                        seq_nu = seq_nu_multi, max_simu = 100)
 
 mat_inc_multi = delta.adm.props(mat_inc_multi)
+mat_inc_multi = delta.adm.gen.0(mat_inc_multi)
 ```
 
 
@@ -146,7 +157,7 @@ list_mean = data.frame.mean.u(df_stat = mat_inc_multi,
                               max_gen = 101,
                               seq_combi = seq_combi_multi,
                               seq_u = c(0.01, 0.25, 0.49), 
-                              col_mean = c(4:68,70:71),
+                              col_mean = c(4:68,70:72),
                               col_cstt = c(1:3,69))
 mat_inc_multi_mean = list_mean[[1]]
 mat_inc_multi_var = list_mean[[2]]
@@ -169,8 +180,18 @@ write_ic_var_plot(mat_inc_multi_mean, mat_inc_multi_mean$Generation,
                   mat_inc_multi_mean$U, mat_inc_multi_mean$U,
                   "Delta mean adm props en fonction des générations",
                   -0.1, 0, "U", "100_simu/delta.mean.adm/ne_inc_mean",
-                  -0.12, 0, mat_inc_multi_var$delta.mean.adm.props,
+                  -0.12, 0.03, mat_inc_multi_var$delta.mean.adm.props,
                   "100_simu/delta.mean.adm/ne_inc_mean_IC95")
+
+####################
+
+write_ic_var_plot(mat_inc_multi_mean, mat_inc_multi_mean$Generation,
+                  mat_inc_multi_mean$delta.adm.gen.0,
+                  mat_inc_multi_mean$U, mat_inc_multi_mean$U,
+                  "Delta mean adm props en fonction des générations",
+                  -0.1, 0, "U", "100_simu/delta.adm0.adm/delta_adm0_ne_inc_mean",
+                  -0.1, 0.03, mat_inc_multi_var$delta.adm.gen.0,
+                  "100_simu/delta.adm0.adm/delta_adm0_ne_inc_mean_IC95")
 
 ####################
 
@@ -193,6 +214,7 @@ mat_bot_multi = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000),
                                       lst_bottle = c(20, 50, 80), max_simu = 100)
 
 mat_bot_multi = delta.adm.props(mat_bot_multi)
+mat_bot_multi = delta.adm.gen.0(mat_bot_multi)
 ```
 
 ```{r}
@@ -202,7 +224,7 @@ list_mean = data.frame.mean.bottle(df_stat = mat_bot_multi,
                                             seq_u = c(0.01, 0.25, 0.49),
                                             seq_alpha = c(0.1),
                                             seq_bottle = c(80),
-                                            col_mean = c(4:68,74:75),
+                                            col_mean = c(4:68,74:76),
                                             col_cstt = c(1:3, 69:73))
 mat_bot_multi_mean = list_mean[[1]]
 mat_bot_multi_var = list_mean[[2]]
@@ -220,7 +242,6 @@ write_bottle_plot("delta.var.adm.props", mat_bot_multi_mean,
 ```
 
 ```{r}
-
 write_ic_var_plot(mat_bot_multi_mean, mat_bot_multi_mean$Generation,
                   mat_bot_multi_mean$delta.mean.adm.props,
                   mat_bot_multi_mean$U, mat_bot_multi_mean$U,
@@ -230,7 +251,15 @@ write_ic_var_plot(mat_bot_multi_mean, mat_bot_multi_mean$Generation,
                   "100_simu/delta.mean.adm/ne_bott_mean_IC95")
 
 ####################
+write_ic_var_plot(mat_bot_multi_mean, mat_bot_multi_mean$Generation,
+                  mat_bot_multi_mean$delta.adm.gen.0,
+                  mat_bot_multi_mean$U, mat_bot_multi_mean$U,
+                  "Delta mean adm props en fonction des générations",
+                  -0.1, 0, "U", "100_simu/delta.adm0.adm/delta_adm0_ne_bott_mean",
+                  -0.1, 0.03, mat_bot_multi_var$delta.adm.gen.0,
+                  "100_simu/delta.adm0.adm/delta_adm0_ne_bott_mean_IC95", bot = c(80))
 
+####################
 write_one_gen(mat_bot_multi_100, mat_bot_multi$s1.0[which(mat_bot_multi$Generation == 0)],
               mat_bot_multi_100$delta.mean.adm.props,
               mat_bot_multi_100$U, "s1.0", "delta mean adm props",
