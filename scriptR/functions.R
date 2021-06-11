@@ -434,6 +434,8 @@ plot_stat_gen = function(df, gen, stat, group_col = c(), color_col, titre, ligne
   }
   p = p + scale_fill_OkabeIto()
   p = p + theme_classic()
+  p = p + theme(axis.title.x = element_text(size = 16),
+                axis.title.y = element_text(size = 16))
   p = p + theme(panel.grid.major.y = element_line(size = 0.5,
                                                   linetype = 'solid',
                                                   colour = "#BABABA"),
@@ -543,21 +545,22 @@ hist.gif.props.adm = function(mat, select_stat, select_seq, title, title_leg,
 # Fonctions d'écriture des plots dans des fichiers
 # - Pour des populations de taille constante
 
-write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y, name_x = "Generation"){
+write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y, name_x = "Generation",
+                           xlab = "Génération", ylab = ""){
   num_col_y = which(colnames(mat) == name_stat)
   num_col_x = which(colnames(mat) == name_x)
   p = plot_stat_gen(mat, mat[,num_col_x], 
                     mat[,num_col_y], mat$Ne, mat$Ne,ligne = T,
                     str_c(name_stat, " en fonction des générations\n selon différentes Ne initiales"))
   p = p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE)
-  p = p+xlab(name_x)+ylab(name_stat)
+  p = p+xlab(xlab)+ylab(ylab)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
     p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
     p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
     p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
-  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p,
+  ggsave(filename =  str_c("../../Images/", name_file, ".png"), plot = p,
          width = 6, height = 5)
 }
 
@@ -566,7 +569,8 @@ write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y, name_x = "Gen
 
 write_increase_plot = function(name_stat, mat, name_file, min_y, max_y, name_x = "Generation",
                                name_color = "Ne", name_line = "U",
-                               labcolor = "ne0-nef", labline = "U"){
+                               labcolor = "ne0-nef", labline = "U",
+                               xlab = "Génération", ylab = ""){
   num_col_y = which(colnames(mat) == name_stat)
   num_col_x = which(colnames(mat) == name_x)
   num_col_color = which(colnames(mat) == name_color)
@@ -581,14 +585,14 @@ write_increase_plot = function(name_stat, mat, name_file, min_y, max_y, name_x =
   p = improve_plot_bottle(p =p, vec_abline = c(), lab_col = labcolor,
                           lab_line = labline, vec_linetype = c("solid", "longdash", "dotted"))
   p = p + ylim(min_y, max_y)
-  p = p+xlab(name_x)+ylab(name_stat)
+  p = p+xlab(xlab)+ylab(ylab)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
     p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
     p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
     p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
-  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p,
+  ggsave(filename =  str_c("../../Images/", name_file, ".png"), plot = p,
          width = 6, height = 5)
 }
 
@@ -600,7 +604,8 @@ write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y,
                              name_x = "Generation", time_bott = c(21, 51, 81),
                              name_color = "u_alpha", name_line = "time_botl",
                              labcol = "U/alpha", labline = "tb",
-                             vec_abtype = c("solid")){
+                             vec_abtype = c("solid", "dashed", "dotted"),
+                             xlab = "Génération", ylab = ""){
 
   num_col_y = which(colnames(mat) == name_stat)
   num_col_x = which(colnames(mat) == name_x)
@@ -619,14 +624,14 @@ write_bottle_plot = function(name_stat, mat, name_file, min_y, max_y,
                           vec_linetype = c("solid", "longdash", "dotted", "dotdash", "dashed"),
                           vec_abtype = vec_abtype)
   p = p+ylim(min_y, max_y)
-  p = p+xlab(name_x)+ylab(name_stat)
+  p = p+xlab(xlab)+ylab(ylab)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
     p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
     p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
     p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
-  ggsave(filename =  str_c("../../../Images/", name_file, ".png"), plot = p,
+  ggsave(filename =  str_c("../../Images/", name_file, ".png"), plot = p,
          width = 6, height = 5)
 }
 
@@ -658,7 +663,8 @@ boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott,size_pop = 1000
 write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
                              ylim_inf, ylim_sup, lgd_txt, name_file_1,
                              ylim_inf_2, ylim_sup_2, var_axis, name_file_2,
-                             line_t = c("solid"), bot = c()){
+                             line_t = c("solid"), bot = c(),xlab="Génération",
+                             ylab="stat"){
   p = plot_stat_gen(df, xaxis, yaxis, group_col, color_col, ligne = T,
                     title, legd = TRUE,line_t = line_t)
   p = p + ylim(ylim_inf, ylim_sup)
@@ -670,13 +676,14 @@ write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
                          color = "orange", linetype = "solid")
     }
   }
+  p = p + xlab(xlab) + ylab(ylab)
   print(p)
-  ggsave(filename =  str_c("../../../Images/", name_file_1, ".png"), plot = p)
+  ggsave(filename =  str_c("../../Images/", name_file_1, ".png"), plot = p)
   
   p = p + ylim(ylim_inf_2, ylim_sup_2)
   p = p+geom_errorbar(aes(ymin = yaxis - var_axis, ymax = yaxis + var_axis), width=0.6)
   
-  ggsave(filename =  str_c("../../../Images/", name_file_2, ".png"),plot = p)
+  ggsave(filename =  str_c("../../Images/", name_file_2, ".png"),plot = p)
   return(p)
 }
 
@@ -705,7 +712,7 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
       p = p+annotate(geom="text", x=0, y=line_txt_pos[i], label=line_txt[i], color=line_col[i])
     }
   }
-  ggsave(filename =  str_c("../../../Images/",t_file, ".png"), plot = p)
+  ggsave(filename =  str_c("../../Images/",t_file, ".png"), plot = p)
   return(p)
 }
 
@@ -713,7 +720,8 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
 # (admixture récurrente et admixture two pulses)
 
 plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
-                                    name_color = "time_pulse_s1",yas1 = 0.027,yas2=0.022){
+                                    name_color = "time_pulse_s1",yas1 = 0.027,yas2=0.022,
+                                    name_dir = "",xlab="Génération",ylab="stat"){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
@@ -748,6 +756,16 @@ plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, m
       p=p+annotate("point", x=2,y=yas1, color = "blue",shape=17)
       p=p+annotate("text", x=5.5,y=yas2,label="s2", color = "green")
       p=p+annotate("point", x=2,y=yas2, color = "green")
+      
+      p = p + xlab(xlab) + ylab(ylab)
+      p = p+ ggtitle(label = element_blank())
+      
+      if (name_dir == "") {
+        name_file = str_c(name_dir,"/Ne_cst/",name_stat,"_cst_s10_", seq_s1[i],
+                          "_ne_",ne,"_",name_color)
+        ggsave(filename =  str_c("../../Images/pulse_ponctuel/", name_file, ".png"), plot = p,
+               width = 6, height = 5)
+      }
 
       print(p)
     }
@@ -755,7 +773,8 @@ plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, m
 }
 
 
-plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation"){
+plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_stat,
+                                               min_y, max_y, name_x = "Generation"){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
@@ -771,13 +790,14 @@ plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_sta
       p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
       p=p+ylim(min_y, max_y)
       print(p)
-      
+
     }
   }
 }
 
 
-plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation"){
+plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat,
+                                          min_y, max_y, name_x = "Generation"){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
@@ -798,6 +818,102 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat, mi
     }
   }
 }
+
+plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
+                                    min_y, max_y, name_x = "Generation",name_dir="",
+                                    xlab="Génération",ylab="stat"){
+  for (i in 1:length(lst_mat)) {
+    for (ne in seq_ne) {
+      for (u in seq_u) {
+        mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
+        mat_tmp = mat_tmp[which(mat_tmp$U ==  u),]
+        num_col_y = which(colnames(mat_tmp) == name_stat)
+        num_col_x = which(colnames(mat_tmp) == name_x)
+        
+        p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
+                        stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu), 
+                        color_col = mat_tmp$time_pulse_s1, titre = str_c(name_stat," en fonction de ",name_x,
+                                                                         ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne,
+                                                                         ", U = ",u))
+        p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
+        p=p+labs(color = "time pulse s1")  + guides(linetype = FALSE)
+        p=p+ylim(min_y, max_y)
+        
+        vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
+        for (rg_pulse in c(1:length(vec_s1))) {
+          pos_x_s1 = vec_s1[rg_pulse]
+          pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
+          p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
+        }
+        
+        p = p + xlab(xlab) + ylab(ylab)
+        p = p+ ggtitle(label = element_blank())
+        
+        if (name_dir != "") {
+          name_file = str_c(name_dir,"/Ne_inc/",name_stat,"_cst_s10_", seq_s1[i],
+                            "_ne_",ne,"_u_",u)
+          ggsave(filename =  str_c("../../Images/pulse_ponctuel/", name_file, ".png"), plot = p,
+                 width = 6, height = 5)
+        }
+
+        print(p)
+      }
+    }
+  }
+}
+
+plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
+                                    seq_bot, name_stat, min_y, max_y, name_x = "Generation",
+                                    name_dir = "",xlab="Génération",ylab="stat"){
+  for (i in 1:length(lst_mat)) {
+    for (ne in seq_ne) {
+      for (u in seq_u) {
+        for (alpha in seq_alpha) {
+          for (bot in seq_bot) {
+            mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
+            mat_tmp = mat_tmp[which(mat_tmp$U ==  u),]
+            mat_tmp = mat_tmp[which(mat_tmp$alpha ==  alpha),]
+            mat_tmp = mat_tmp[which(mat_tmp$time_botl ==  bot),]
+            num_col_y = which(colnames(mat_tmp) == name_stat)
+            num_col_x = which(colnames(mat_tmp) == name_x)
+            
+            p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
+                            stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu), 
+                            color_col = mat_tmp$time_pulse_s1,
+                            titre = str_c(name_stat," en fonction de ",name_x,
+                                          ", \ns1.0=", seq_s1[i], ",Ne=", ne,
+                                          ",U=",u, ",a=",alpha,",b=",bot))
+            p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
+            p=p+labs(color = "time pulse s1")  + guides(linetype = FALSE)
+            p=p+ylim(min_y, max_y)
+            
+            vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
+            for (rg_pulse in c(1:length(vec_s1))) {
+              pos_x_s1 = vec_s1[rg_pulse]
+              pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
+              p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
+            }
+            p=p+geom_vline(xintercept = bot+1, size = 0.4,color = "orange")
+            
+            p = p + xlab(xlab) + ylab(ylab)
+            p = p+ ggtitle(label = element_blank())
+            
+            if (name_dir != "") {
+              name_file = str_c(name_dir,"/Ne_bot/",name_stat,"_cst_s10_", seq_s1[i],
+                                "_ne_",ne,"_u_",u,"_alpha_", alpha, "_bot_", bot)
+              ggsave(filename =  str_c("../../Images/pulse_ponctuel/", name_file, ".png"), plot = p,
+                     width = 6, height = 5)
+            }
+            
+            print(p)
+          }
+        }
+        
+      }
+    }
+  }
+}
+
 
 # Affichage des histogrammes pour comparer MetHis et ADMIXTURE
 
@@ -868,6 +984,5 @@ hist_only_admixture = function(lst, vec_col, seq_gen){
     abline(v = mean(lst[[i]][,vec_col[i]]), col = "#F9429E", lty = 2, lwd=3)
   }
 }
-
 
 
