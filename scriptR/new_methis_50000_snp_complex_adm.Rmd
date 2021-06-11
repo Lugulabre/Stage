@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_adm_multi/")
 # knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
 
 ```
@@ -17,7 +17,7 @@ time.ini = Sys.time()
 
 Chargement des libraries et fonctions
 ```{r}
-source("../../../scriptR/functions.R")
+source("../../scriptR/functions.R")
 ```
 
 ### Enregistrement des fonctions
@@ -29,7 +29,7 @@ print(difftime(Sys.time(), time.ini))
 
 ###Ne constant
 ```{r}
-setwd("../../SNP_YRI_GBR_adm_multi/pulse_recurrent/Ne_cst/")
+setwd("pulse_recurrent/Ne_cst/")
 
 lst_ne_cst_adm_rec = list()
 cpt = 1
@@ -52,31 +52,36 @@ for (i in c(1:3)) {
   write_cstt_plot(name_stat = "mean.het.adm", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/mean.he/Ne_cst/he_mean_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = 0.05,max_y = 0.065)
+                  min_y = 0.047,max_y = 0.065,
+                  ylab="He moyenne")
   write_cstt_plot(name_stat = "Fst.s1.adm", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/Fst.s1.adm/Ne_cst/fst_s1_adm_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = 0,max_y = 0.1)
+                  min_y = 0,max_y = 0.1,
+                  ylab=expression(paste(F[ST], " s1-adm", sep = "")))
   write_cstt_plot(name_stat = "Fst.s2.adm", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/Fst.s2.adm/Ne_cst/fst_s2_adm_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = 0,max_y = 0.1)
+                  min_y = 0,max_y = 0.1,
+                  ylab=expression(paste(F[ST], " s2-adm", sep = "")))
   write_cstt_plot(name_stat = "mean.F.adm", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/mean.F/Ne_cst/F_mean_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = -0.03,max_y = 0.02)
+                  min_y = -0.03,max_y = 0.02,ylab="F")
   write_cstt_plot(name_stat = "f3", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/f3/Ne_cst/f3_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = -0.05,max_y = 0.05)
+                  min_y = -0.05,max_y = 0.05,ylab="f3")
   write_cstt_plot(name_stat = "perc50.adm.props", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/mean.adm/Ne_cst/mean_adm_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = 0,max_y = 0.8)
+                  min_y = 0,max_y = 0.8,
+                  ylab="Médiane du taux d'admixture")
   write_cstt_plot(name_stat = "delta.adm.gen.0", mat = lst_ne_cst_adm_rec[[i]],
                   name_file =  str_c("pulse_recurrent/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_multi_s10_",
                                      vec_val_s10[i]),
-                  min_y = -0.8,max_y = 0.8)
+                  min_y = -0.8,max_y = 0.8,
+                  ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
 
 }
 
@@ -85,11 +90,11 @@ for (i in c(1:3)) {
 
 ###Ne croissant
 ```{r}
-setwd("../../SNP_YRI_GBR_adm_multi/pulse_recurrent/Ne_inc/")
+setwd("pulse_recurrent/Ne_inc/")
 
 seq_nu = sprintf("%.2f", c(0.01, 0.25, 0.49))
 seq_ne_ini = c(100)
-seq_ne_fin = c(500,1000,10000)
+seq_ne_fin = c(400,1000,10000)
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
 seq_combi = as.data.frame.vector(unlist(seq_combi))[[1]]
 
@@ -112,38 +117,43 @@ for (i in c(1:3)) {
   write_increase_plot(name_stat = "mean.het.adm", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/mean.he/Ne_inc/he_mean_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = 0.05,max_y = 0.065)
+                      min_y = 0.047,max_y = 0.065,
+                      ylab="He moyenne")
   write_increase_plot(name_stat = "Fst.s1.adm", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/Fst.s1.adm/Ne_inc/fst_s1_adm_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = 0,max_y = 0.1)
+                      min_y = 0,max_y = 0.1,
+                      ylab=expression(paste(F[ST], " s1-adm", sep = "")))
   write_increase_plot(name_stat = "Fst.s2.adm", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/Fst.s2.adm/Ne_inc/fst_s2_adm_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = 0,max_y = 0.1)
+                      min_y = 0,max_y = 0.1,
+                      ylab=expression(paste(F[ST], " s2-adm", sep = "")))
   write_increase_plot(name_stat = "mean.F.adm", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/mean.F/Ne_inc/F_mean_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = -0.03,max_y = 0.02)
+                      min_y = -0.03,max_y = 0.02,ylab="F")
   write_increase_plot(name_stat = "f3", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/f3/Ne_inc/f3_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = -0.05,max_y = 0.05)
+                      min_y = -0.05,max_y = 0.05,ylab="f3")
   write_increase_plot(name_stat = "perc50.adm.props", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/mean.adm/Ne_inc/mean_adm_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = 0,max_y = 0.8)
+                      min_y = 0,max_y = 0.8,
+                      ylab="Médiane du taux d'admixture")
   write_increase_plot(name_stat = "delta.adm.gen.0", mat = lst_ne_inc_adm_rec[[i]],
                       name_file =  str_c("pulse_recurrent/delta.adm0.adm/Ne_inc/delta_adm0_adm_ne_inc_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = -0.8,max_y = 0.8)
+                      min_y = -0.8,max_y = 0.8,
+                      ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
 }
 ```
 
 
 ###Ne bottleneck
 ```{r}
-setwd("../../SNP_YRI_GBR_adm_multi/pulse_recurrent/Ne_bot/")
+setwd("pulse_recurrent/Ne_bot/")
 
 lst_ne_bot_adm_rec = list()
 cpt = 1
@@ -167,31 +177,36 @@ for (i in c(1:3)) {
   write_bottle_plot(name_stat = "mean.het.adm", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/mean.he/Ne_bot/he_mean_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                    min_y = 0.05,max_y = 0.065)
+                    min_y = 0.047,max_y = 0.065,
+                    ylab="He moyenne")
   write_bottle_plot(name_stat = "Fst.s1.adm", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/Fst.s1.adm/Ne_bot/fst_s1_adm_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                      min_y = 0,max_y = 0.1)
+                    min_y = 0,max_y = 0.1,
+                    ylab=expression(paste(F[ST], " s1-adm", sep = "")))
   write_bottle_plot(name_stat = "Fst.s2.adm", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/Fst.s2.adm/Ne_bot/fst_s2_adm_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                    min_y = 0,max_y = 0.1)
+                    min_y = 0,max_y = 0.1,
+                    ylab=expression(paste(F[ST], " s2-adm", sep = "")))
   write_bottle_plot(name_stat = "mean.F.adm", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/mean.F/Ne_bot/F_mean_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                    min_y = -0.03,max_y = 0.02)
+                    min_y = -0.03,max_y = 0.02,ylab="F")
   write_bottle_plot(name_stat = "f3", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/f3/Ne_bot/f3_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                    min_y = -0.05,max_y = 0.05)
+                    min_y = -0.05,max_y = 0.05,ylab="f3")
   write_bottle_plot(name_stat = "perc50.adm.props", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/mean.adm/Ne_bot/mean_adm_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                    min_y = 0,max_y = 0.8)
+                    min_y = 0,max_y = 0.8,
+                    ylab="Médiane du taux d'admixture")
   write_bottle_plot(name_stat = "delta.adm.gen.0", mat = lst_ne_bot_adm_rec[[i]],
                     name_file =  str_c("pulse_recurrent/delta.adm0.adm/Ne_bot/delta_adm0_adm_ne_bot_multi_s10_",
                                          vec_val_s10[i]),
-                    min_y = -0.8,max_y = 0.8)
+                    min_y = -0.8,max_y = 0.8,
+                    ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 }
 ```
 
@@ -200,7 +215,7 @@ for (i in c(1:3)) {
 
 ###Ne constante
 ```{r}
-setwd("../../SNP_YRI_GBR_adm_multi/pulse_ponctuel/Ne_cst/")
+setwd("pulse_ponctuel/Ne_cst/")
 
 lst_ne_cst_adm_pct = list()
 cpt = 1
@@ -221,11 +236,26 @@ for (val_s10 in vec_val_s10) {
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
-                         min_y = 0.02, max_y = 0.063)
-# plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
-#                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
-#                          min_y = 0.02, max_y = 0.063, name_color = "time_pulse_s2")
+                         min_y = 0.02, max_y = 0.063, name_dir = "mean.he",
+                         ylab = "He moyenne")
+
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
+                         min_y = 0.02, max_y = 0.063, name_color = "time_pulse_s2",
+                         name_dir = "mean.he",ylab="He moyenne")
 ```
+
+```{r}
+ne_tot = rbind(lst_ne_cst_adm_pct[[1]], lst_ne_cst_adm_pct[[2]], lst_ne_cst_adm_pct[[3]])
+ne_tot$flag = rep(c(1:180), each = 101)
+```
+
+```{r}
+plot_stat_gen(df = ne_tot, gen = ne_tot$Generation, stat = ne_tot$mean.het.adm,
+              group_col = ne_tot$flag, color_col = ne_tot$Ne,
+              titre = "He en fonction gen")
+```
+
 
 
 ```{r}
@@ -244,13 +274,29 @@ plot_adm_ponctuel_ne_cst_minus(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s1.adm",
-                         min_y = 0, max_y = 0.4)
+                         min_y = 0, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_dir = "Fst.s1.adm",
+                         ylab = expression(paste(F[ST], " s1-adm", sep = "")))
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s1.adm",
+                         min_y = 0, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_color = "time_pulse_s2",
+                         name_dir = "Fst.s1.adm",
+                         ylab = expression(paste(F[ST], " s1-adm", sep = "")))
 ```
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s2.adm",
-                         min_y = 0, max_y = 0.4)
+                         min_y = -0.01, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_dir = "Fst.s2.adm",
+                         ylab = expression(paste(F[ST], " s2-adm", sep = "")))
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "Fst.s2.adm",
+                         min_y = -0.01, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_color = "time_pulse_s2",
+                         name_dir = "Fst.s2.adm",
+                         ylab = expression(paste(F[ST], " s2-adm", sep = "")))
 ```
 
 ```{r}
@@ -263,26 +309,45 @@ plot_adm_ponctuel_ne_cst_minus(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "f3",
-                         min_y = -0.05,max_y = 0.8)
+                         min_y = -0.05,max_y = 0.8,yas1 = 0.75,yas2 = 0.69,
+                         name_dir = "f3",ylab="f3")
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "f3",
+                         min_y = -0.05,max_y = 0.8,yas1 = 0.75,yas2 = 0.69,
+                         name_color = "time_pulse_s2",
+                         name_dir = "f3",ylab="f3")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "var.adm.props",
-                         min_y = -0.01, max_y = 0.15)
+                         min_y = -0.01, max_y = 0.15,yas1 = 0.14,yas2 = 0.125,
+                         name_dir = "var.adm",ylab="var.adm")
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "var.adm.props",
+                         min_y = -0.01, max_y = 0.15,yas1 = 0.14,yas2 = 0.125,
+                         name_color = "time_pulse_s2",
+                         name_dir = "var.adm",ylab="var.adm")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "delta.adm.gen.0",
-                         min_y = -0.4, max_y = 0.4)
+                         min_y = -0.4, max_y = 0.4,yas1 = 0.38,yas2 = 0.35,
+                         name_dir = "delta.adm0.adm",
+                         ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.1, 0.5, 0.75), name_stat = "delta.adm.gen.0",
+                         min_y = -0.4, max_y = 0.4,name_color = "time_pulse_s2",
+                         yas1 = 0.38,yas2 = 0.35, name_dir = "delta.adm0.adm",
+                         ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 ```
 
 ##Ne croissant
 ```{r}
-setwd("../../SNP_YRI_GBR_adm_multi/pulse_ponctuel/Ne_inc/")
+setwd("pulse_ponctuel/Ne_inc/")
 
 lst_ne_inc_adm_pct = list()
 cpt = 1
@@ -307,74 +372,55 @@ for (val_s10 in vec_val_s10) {
 
 
 ```{r}
-plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat, min_y, max_y, name_x = "Generation"){
-  for (i in 1:length(lst_mat)) {
-    for (ne in seq_ne) {
-      for (u in seq_u) {
-        mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
-        mat_tmp = mat_tmp[which(mat_tmp$U ==  u),]
-        num_col_y = which(colnames(mat_tmp) == name_stat)
-        num_col_x = which(colnames(mat_tmp) == name_x)
-    
-        p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
-                        stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu), 
-                        color_col = mat_tmp$time_pulse_s1, titre = str_c(name_stat," en fonction de ",name_x,
-                                                               ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne,
-                                                               ", U = ",u))
-        p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-        p=p+labs(color = "time pulse s1")  + guides(linetype = FALSE)
-        p=p+ylim(min_y, max_y)
-        
-        vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
-        for (rg_pulse in c(1:length(vec_s1))) {
-          pos_x_s1 = vec_s1[rg_pulse]
-          pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
-          p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
-        }
-        print(p)
-      }
-    }
-  }
-}
+plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         name_stat = "mean.het.adm", min_y = 0.01, max_y = 0.065,
+                         name_dir = "mean.he",ylab="He moyenne")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
-                         name_stat = "mean.het.adm", min_y = 0.01, max_y = 0.065)
+                         name_stat = "Fst.s1.adm", min_y = -0.01, max_y = 0.5,
+                         name_dir = "Fst.s1.adm",
+                         ylab = expression(paste(F[ST], " s1-adm", sep = "")))
+```
+
+```{r}
+plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         name_stat = "f3", min_y = -0.1, max_y = 1.1,name_dir = "f3",ylab="f3")
+```
+
+```{r}
+plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         name_stat = "mean.adm.props", min_y = -0.1, max_y = 1,
+                         name_dir = "mean.adm",ylab="Moyenne du taux d'admixture")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
-                         name_stat = "Fst.s1.adm", min_y = -0.01, max_y = 0.5)
-```
-
-```{r}
-plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
-                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
-                         name_stat = "f3", min_y = -0.1, max_y = 1.1)
-```
-
-```{r}
-plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
-                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
-                         name_stat = "perc50.adm.props", min_y = -0.1, max_y = 1)
+                         name_stat = "var.adm.props", min_y = -0.01, max_y = 0.15,
+                         name_dir = "var.adm",ylab = "Var adm props")
 ```
 
 
 ```{r}
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
-                         name_stat = "delta.adm.gen.0", min_y = -0.3, max_y = 0.5)
+                         name_stat = "delta.adm.gen.0", min_y = -0.3, max_y = 0.5,
+                         name_dir = "delta.adm0.adm",
+                         ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 ```
 
 
 ##Ne bottleneck
 ```{r}
-setwd("../../SNP_YRI_GBR_adm_multi/pulse_ponctuel/Ne_bot/")
+setwd("pulse_ponctuel/Ne_bot/")
 
 lst_ne_bot_adm_pct = list()
 cpt = 1
@@ -397,45 +443,20 @@ for (val_s10 in vec_val_s10) {
 
 
 ```{r}
-plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
-                                    seq_bot, name_stat, min_y, max_y, name_x = "Generation"){
-  for (i in 1:length(lst_mat)) {
-    for (ne in seq_ne) {
-      for (u in seq_u) {
-        for (alpha in seq_alpha) {
-          for (bot in seq_bot) {
-            mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
-            mat_tmp = mat_tmp[which(mat_tmp$U ==  u),]
-            mat_tmp = mat_tmp[which(mat_tmp$alpha ==  alpha),]
-            mat_tmp = mat_tmp[which(mat_tmp$time_botl ==  bot),]
-            num_col_y = which(colnames(mat_tmp) == name_stat)
-            num_col_x = which(colnames(mat_tmp) == name_x)
-        
-            p=plot_stat_gen(df = mat_tmp, gen = mat_tmp[,num_col_x],
-                            stat = mat_tmp[,num_col_y], group_col = as.factor(mat_tmp$simu), 
-                            color_col = mat_tmp$time_pulse_s1,
-                            titre = str_c(name_stat," en fonction de ",name_x,
-                                          ", \ns1.0=", seq_s1[i], ",Ne=", ne,
-                                          ",U=",u, ",a=",alpha,",b=",bot))
-            p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-            p=p+labs(color = "time pulse s1")  + guides(linetype = FALSE)
-            p=p+ylim(min_y, max_y)
-            
-            vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
-            for (rg_pulse in c(1:length(vec_s1))) {
-              pos_x_s1 = vec_s1[rg_pulse]
-              pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
-              p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
-            }
-            
-            print(p)
-          }
-        }
+plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         seq_alpha = c(0.1),seq_bot = c(20,50,80),
+                         name_stat = "mean.het.adm",min_y = 0.01,max_y = 0.07,
+                         name_dir = "mean.he",ylab="He moyenne")
+```
 
-      }
-    }
-  }
-}
+```{r}
+plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
+                         seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
+                         seq_alpha = c(0.1),seq_bot = c(20,50,80),
+                         name_stat = "Fst.s1.adm",min_y = 0,max_y = 0.4,
+                         name_dir = "Fst.s1.adm",
+                         ylab = expression(paste(F[ST], " s1-adm", sep = "")))
 ```
 
 
@@ -443,14 +464,16 @@ plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
 plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
-                         name_stat = "mean.het.adm",min_y = 0.01,max_y = 0.07)
+                         name_stat = "mean.adm.props",min_y = -0.1,max_y = 1,
+                         name_dir = "mean.adm",ylab="Moyenne du taux d'admixture")
 ```
 
 ```{r}
 plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
-                         name_stat = "perc50.adm.props",min_y = -0.1,max_y = 1)
+                         name_stat = "var.adm.props",min_y = -0.01,max_y = 0.15,
+                         name_dir = "var.adm",ylab="var adm props")
 ```
 
 
@@ -458,7 +481,9 @@ plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"),
 plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
-                         name_stat = "delta.adm.gen.0",min_y = -0.3,max_y = 0.5)
+                         name_stat = "delta.adm.gen.0",min_y = -0.3,max_y = 0.5,
+                         name_dir = "delta.adm0.adm",
+                         ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 ```
 
 

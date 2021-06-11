@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_pop_size_diff_50000_snp")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR")
 # knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
 
 ```
@@ -17,7 +17,7 @@ time.ini = Sys.time()
 
 Chargement des libraries et fonctions
 ```{r}
-source("../../../scriptR/functions.R")
+source("../../scriptR/functions.R")
 ```
 
 ### Enregistrement des fonctions
@@ -31,6 +31,8 @@ print(difftime(Sys.time(), time.ini))
 Calcul des matrices de stats pour de populations constantes de tailles initiales différentes.
 
 ```{r}
+setwd("new_methis_pop_size_diff_50000_snp")
+
 seq_1024_16384 = 2**seq(10,14,1)
 seq_50_1000 = c(seq(50,1000,1), 10000)
 seq_tot = sort(c(seq_50_1000, seq_1024_16384))
@@ -89,25 +91,35 @@ plot_stat_gen(mat_1024_16384, mat_1024_16384$Generation,
 Ajout delta mean et var des proportions d'admixture pour les effectifs efficaces constants.
 ```{r}
 mat_64_100_16384 = delta.adm.props(mat_64_100_16384)
+mat_64_100_16384 = delta.adm.gen.0(mat_64_100_16384)
 ```
 
 Écriture de différents graphiques pour différentes statistiques choisies. La matrice choisie est la mat3 cstt pour des raisons de lisibilité. Cette matrice permet également d'observer l'évolution des statistiques choisies pour des Ne = 100 et Ne = 1000, valeurs qui seront reprises dans d'autres scénarios ultérieurement.^
-
+δ
 ```{r}
-
-write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.062)
-write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5)
-write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5)
-write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03)
-write_cstt_plot("mean.adm.props", mat_64_100_16384, "adm.props/adm_props_ne_cst", 0, 1)
-write_cstt_plot("delta.mean.adm.props", mat_64_100_16384, "delta_mean_adm/delta_mean_ne_cstt", -0.25, 0.25)
-write_cstt_plot("delta.var.adm.props", mat_64_100_16384, "delta_var_adm/delta_var_ne_cstt", -0.2, 0.05)
-write_cstt_plot("f3", mat_64_100_16384, "f3/f3_ne_cstt", -0.3, 2)
+write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.064,ylab = "He moyenne")
+write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5,
+                ylab = expression(paste(F[ST], " s1-adm", sep = "")))
+write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5,
+                ylab = expression(paste(F[ST], " s2-adm", sep = "")))
+write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03,
+                ylab = "F")
+write_cstt_plot("mean.adm.props", mat_64_100_16384, "adm.props/adm_props_ne_cst", 0, 1,
+                ylab = "Moyenne du taux d'admixture")
+write_cstt_plot("delta.mean.adm.props", mat_64_100_16384, "delta_mean_adm/delta_mean_ne_cstt",
+                -0.25, 0.25,
+                ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+write_cstt_plot("delta.var.adm.props", mat_64_100_16384, "delta_var_adm/delta_var_ne_cstt", -0.2, 0.05,
+                ylab = expression(paste(δ[σ2["observée"] - σ2["théorique"]], sep = "")))
+write_cstt_plot("f3", mat_64_100_16384, "f3/f3_ne_cstt", -0.3, 2,ylab = "f3")
+write_cstt_plot("delta.adm.gen.0", mat_64_100_16384, "delta_adm_gen0/delta_gen0_ne_cstt",
+                -0.2, 0.17,
+                ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 ```
 
 
 ```{r}
-setwd("../../../Images/")
+setwd("../../Images/")
 
 hist.gif.props.adm(mat = mat_64_100_16384, select_stat = "Ne", select_seq = c(100,1000,10000),
                    title = "adm.props/hist_cstt", title_leg = "Ne")
@@ -126,7 +138,7 @@ Lecture des data frame pour les combinaison de Ne entre ne0 (ne_ini) et nef (ne_
 On extrait ensuite les stats pour lesquelles on a un nef de 10000.
 
 ```{r}
-setwd("../new_methis_pop_increase_50000_snp/")
+setwd("new_methis_pop_increase_50000_snp/")
 seq_ne_ini = seq(50,100,2)
 seq_ne_fin = c(seq(100, 10000, 200), 10000)
 seq_combi = as.data.frame(outer(seq_ne_ini, seq_ne_fin, FUN="paste", sep="-"))
@@ -180,7 +192,7 @@ Le U déterminant l'inflexion de la courbe de croissance est ici connu et fixé 
 
 
 ```{r}
-setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+setwd("new_methis_pop_increase_50000_snp_Nu_var/")
 
 #Détermination des paramètres initiaux
 seq_nu = sprintf("%.2f", seq(0.05, 0.45, 0.05))
@@ -299,7 +311,7 @@ scatter3D(x = mat_pop_nu$Generation, y = mat_pop_nu$ne_gen,
 
 ```{r}
 
-setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+setwd("new_methis_pop_increase_50000_snp_Nu_var/")
 seq_nu_bis = sprintf("%.2f", c(0.01, 0.25, 0.49))
 seq_ne_ini = c(100)
 seq_ne_fin = c(200, 400, seq(1000, 10000, 1000))
@@ -332,7 +344,7 @@ scatter3D(x = mat_pop_nu_reduce$Generation, y = mat_pop_nu_reduce$nf,
 ```
 
 ```{r}
-setwd("../new_methis_pop_increase_50000_snp_Nu_var/")
+setwd("new_methis_pop_increase_50000_snp_Nu_var/")
 
 seq_ne_ini3 = seq(100,100,0)
 seq_multi3 = c(2,4,10,100)
@@ -347,22 +359,31 @@ mat_pop_nu_reduce_3 = data.frame.increase.nu(seq_ne_ini3, seq_combi3, seq_nu_bis
 Ajout delta mean et var des proportions d'admixture pour les populations croissantes.
 ```{r}
 mat_pop_nu_reduce_3 = delta.adm.props(mat_pop_nu_reduce_3)
+mat_pop_nu_reduce_3 = delta.adm.gen.0(mat_pop_nu_reduce_3)
+```
+
+
+```{r}
+write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.064,ylab = "He moyenne")
+write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5,ylab = expression(paste(F[ST], " s1-adm", sep = "")))
+write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5,ylab = expression(paste(F[ST], " s2-adm", sep = "")))
+write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03,ylab="F")
+write_increase_plot("mean.adm.props", mat_pop_nu_reduce_3, "adm.props/adm_props_ne_inc", -0.032, 1, ylab = "Moyenne du taux d'admixture")
+write_increase_plot("delta.mean.adm.props", mat_pop_nu_reduce_3,
+                    "delta_mean_adm/delta_mean_pop_inc_nu_va", -0.25, 0.25,
+                    ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+write_increase_plot("delta.var.adm.props", mat_pop_nu_reduce_3,
+                    "delta_var_adm/delta_var_pop_inc_nu_va", -0.2, 0.05,
+                    ylab = expression(paste(δ[σ2["observée"] - σ2["théorique"]], sep = "")))
+write_increase_plot("ne_gen", mat_pop_nu_reduce_3, "Ne/Ne_inc_all", 99, 10000,ylab="Ne")
+write_increase_plot("f3", mat_pop_nu_reduce_3, "f3/f3_ne_inc", -0.3, 2,ylab="f3")
+write_increase_plot("delta.adm.gen.0", mat_pop_nu_reduce_3,
+                    "delta_adm_gen0/delta_gen0_ne_inc", -0.2, 0.15,
+                    ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 ```
 
 ```{r}
-write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.062)
-write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5)
-write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5)
-write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03)
-write_increase_plot("mean.adm.props", mat_pop_nu_reduce_3, "adm.props/adm_props_ne_inc", 0, 1)
-write_increase_plot("delta.mean.adm.props", mat_pop_nu_reduce_3, "delta_mean_adm/delta_mean_pop_inc_nu_va", -0.25, 0.25)
-write_increase_plot("delta.var.adm.props", mat_pop_nu_reduce_3, "delta_var_adm/delta_var_pop_inc_nu_va", -0.2, 0.05)
-write_increase_plot("ne_gen", mat_pop_nu_reduce_3, "Ne/Ne_inc_all", 99, 10000)
-write_increase_plot("f3", mat_pop_nu_reduce_3, "f3/f3_ne_inc", -0.3, 2)
-```
-
-```{r}
-setwd("../../../Images/")
+setwd("../../Images/")
 
 mat_pop_nu_reduce_100_10000 = mat_pop_nu_reduce_3[which(mat_pop_nu_reduce_3$Ne == "100-10000"),]
 
@@ -384,7 +405,7 @@ print(difftime(Sys.time(), time.ini))
 #### N0 = Nf = 1000
 
 ```{r}
-setwd("../new_methis_bottleneck_50000_snp/")
+setwd("new_methis_bottleneck_50000_snp/")
 
 mat_bottle = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000),
                                    lst_alpha = c(0.1, 0.5, 0.9),
@@ -492,6 +513,7 @@ print(p)
 Ajout delta mean et var des proportions d'admixture pour les effectifs efficaces constants.
 ```{r}
 mini_mat_bottle = delta.adm.props(mini_mat_bottle)
+mini_mat_bottle = delta.adm.gen.0(mini_mat_bottle)
 mini_mat_bottle_20 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 20),]
 mini_mat_bottle_50 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 50),]
 mini_mat_bottle_80 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 80),]
@@ -500,123 +522,87 @@ mini_mat_bottle_80 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 80),]
 
 ```{r}
 write_bottle_plot("mean.het.adm", mini_mat_bottle,
-                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.062)
-write_bottle_plot("mean.het.adm", mini_mat_bottle,
-                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.062)
-write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5)
-write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5)
-write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03)
-write_bottle_plot("mean.adm.props", mini_mat_bottle, "adm.props/adm_props_ne_bot", 0, 1)
-write_bottle_plot("delta.mean.adm.props", mini_mat_bottle, "delta_mean_adm/delta_mean_bottleneck", -0.25, 0.25)
+                  "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.064,
+                  vec_abtype = c("solid", "dashed", "dotted"),ylab="He moyenne")
+write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5,
+                  ylab = expression(paste(F[ST], " s1-adm", sep = "")))
+write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5,
+                  ylab = expression(paste(F[ST], " s2-adm", sep = "")))
+write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03,
+                  ylab="F")
+write_bottle_plot("mean.adm.props", mini_mat_bottle, "adm.props/adm_props_ne_bot", 0, 1,
+                  ylab = "Moyenne du taux d'admixture")
+write_bottle_plot("delta.mean.adm.props", mini_mat_bottle,
+                  "delta_mean_adm/delta_mean_bottleneck", -0.25, 0.25,
+                  ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
 write_bottle_plot("delta.var.adm.props", mini_mat_bottle,
-                  "delta_var_adm/delta_var_bottleneck", -0.2, 0.05)
+                  "delta_var_adm/delta_var_bottleneck", -0.2, 0.05,
+                  ylab="delta.var.adm.props")
 mini_mat_bottle$log.delta.var = log2(abs(mini_mat_bottle$delta.var.adm.props))
 write_bottle_plot("log.delta.var", mini_mat_bottle,
-                  "delta_var_adm/log_delta_var_bottleneck", -15, 0)
-write_bottle_plot("ne_gen", mini_mat_bottle, "Ne/Ne_bot_all", 100, 1000)
-write_bottle_plot("f3", mini_mat_bottle, "f3/f3_ne_bot", -0.3, 2)
-
+                  "delta_var_adm/log_delta_var_bottleneck", -15, 0,ylab = "log.delta.var")
+write_bottle_plot("ne_gen", mini_mat_bottle, "Ne/Ne_bot_all", 100, 1000,ylab="Ne")
+write_bottle_plot("f3", mini_mat_bottle, "f3/f3_ne_bot", -0.3, 2,ylab = "Ne")
+write_bottle_plot("delta.adm.gen.0", mini_mat_bottle, "delta_adm_gen0/delta_gen0_ne_bott", -0.2, 0.15,ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
 ```
 
+
 ```{r}
-###Matrice tb = 20
 
-write_bottle_plot(name_stat = "mean.het.adm", mat = mini_mat_bottle_20,
-                  name_file = "moyenne_heterozygotie/moy_He_bottleneck_20", 
-                  min_y = 0.01, max_y = 0.062, time_bott = c(21),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "Fst.s1.adm", mat = mini_mat_bottle_20,
-                  name_file = "Fsts1adm/fst_s1_adm_bottleneck_20", 
-                  min_y = 0, max_y = 0.5, time_bott = c(21),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "Fst.s2.adm", mat = mini_mat_bottle_20,
-                  name_file = "Fsts2adm/fst_s2_adm_bottleneck_20", 
-                  min_y = 0, max_y = 0.5, time_bott = c(21),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "mean.F.adm", mat = mini_mat_bottle_20,
-                  name_file = "Fadm/f_adm_bottleneck_20", 
-                  min_y = -0.03, max_y = 0.03, time_bott = c(21),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "delta.mean.adm.props", mat = mini_mat_bottle_20,
-                  name_file = "delta_mean_adm/delta_mean_bottleneck_20", 
-                  min_y = -0.25, max_y = 0.25, time_bott = c(21),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "delta.var.adm.props", mat = mini_mat_bottle_20,
-                  name_file = "delta_var_adm/delta_var_bottleneck_20", 
-                  min_y = -0.25, max_y = 0.25, time_bott = c(21),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
+lst_bot = list(mini_mat_bottle_20, mini_mat_bottle_50, mini_mat_bottle_80)
+vec_bot = c(20,50,80)
 
-###Matrice tb = 50
-
-write_bottle_plot(name_stat = "mean.het.adm", mat = mini_mat_bottle_50,
-                  name_file = "moyenne_heterozygotie/moy_He_bottleneck_50", 
-                  min_y = 0.01, max_y = 0.062, time_bott = c(51),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "Fst.s1.adm", mat = mini_mat_bottle_50,
-                  name_file = "Fsts1adm/fst_s1_adm_bottleneck_50", 
-                  min_y = 0, max_y = 0.5, time_bott = c(51),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "Fst.s2.adm", mat = mini_mat_bottle_50,
-                  name_file = "Fsts2adm/fst_s2_adm_bottleneck_50", 
-                  min_y = 0, max_y = 0.5, time_bott = c(51),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "mean.F.adm", mat = mini_mat_bottle_50,
-                  name_file = "Fadm/f_adm_bottleneck_50", 
-                  min_y = -0.03, max_y = 0.03, time_bott = c(51),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "delta.mean.adm.props", mat = mini_mat_bottle_50,
-                  name_file = "delta_mean_adm/delta_mean_bottleneck_50", 
-                  min_y = -0.25, max_y = 0.25, time_bott = c(51),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "delta.var.adm.props", mat = mini_mat_bottle_50,
-                  name_file = "delta_var_adm/delta_var_bottleneck_50", 
-                  min_y = -0.25, max_y = 0.25, time_bott = c(51),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-
-###Matrice tb = 80
-
-write_bottle_plot(name_stat = "mean.het.adm", mat = mini_mat_bottle_80,
-                  name_file = "moyenne_heterozygotie/moy_He_bottleneck_80", 
-                  min_y = 0.01, max_y = 0.062, time_bott = c(81),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "Fst.s1.adm", mat = mini_mat_bottle_80,
-                  name_file = "Fsts1adm/fst_s1_adm_bottleneck_80", 
-                  min_y = 0, max_y = 0.5, time_bott = c(81),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "Fst.s2.adm", mat = mini_mat_bottle_80,
-                  name_file = "Fsts2adm/fst_s2_adm_bottleneck_80", 
-                  min_y = 0, max_y = 0.5, time_bott = c(81),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "mean.F.adm", mat = mini_mat_bottle_80,
-                  name_file = "Fadm/f_adm_bottleneck_80", 
-                  min_y = -0.03, max_y = 0.03, time_bott = c(81),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "delta.mean.adm.props", mat = mini_mat_bottle_80,
-                  name_file = "delta_mean_adm/delta_mean_bottleneck_80", 
-                  min_y = -0.25, max_y = 0.25, time_bott = c(81),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
-write_bottle_plot(name_stat = "delta.var.adm.props", mat = mini_mat_bottle_80,
-                  name_file = "delta_var_adm/delta_var_bottleneck_80", 
-                  min_y = -0.25, max_y = 0.25, time_bott = c(81),
-                  name_color = "alpha", name_line = "U",
-                  labcol = "alpha", labline = "U")
+for (i in c(1:3)) {
+  write_bottle_plot(name_stat = "mean.het.adm", mat = lst_bot[[i]],
+                    name_file = str_c("moyenne_heterozygotie/moy_He_bottleneck_",vec_bot[i]), 
+                    min_y = 0.01, max_y = 0.063, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = "He moyenne")
+  write_bottle_plot(name_stat = "Fst.s1.adm", mat = lst_bot[[i]],
+                    name_file = str_c("Fsts1adm/fst_s1_adm_bottleneck_",vec_bot[i]), 
+                    min_y = 0, max_y = 0.5, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = expression(paste(F[ST], " s1-adm", sep = "")))
+  write_bottle_plot(name_stat = "Fst.s2.adm", mat = lst_bot[[i]],
+                    name_file = str_c("Fsts2adm/fst_s2_adm_bottleneck_",vec_bot[i]), 
+                    min_y = 0, max_y = 0.5, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = expression(paste(F[ST], " s2-adm", sep = "")))
+  write_bottle_plot(name_stat = "mean.F.adm", mat = lst_bot[[i]],
+                    name_file = str_c("Fadm/f_adm_bottleneck_",vec_bot[i]), 
+                    min_y = -0.03, max_y = 0.03, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = "F")
+  write_bottle_plot(name_stat = "delta.mean.adm.props", mat = lst_bot[[i]],
+                    name_file = str_c("delta_mean_adm/delta_mean_bottleneck_",vec_bot[i]), 
+                    min_y = -0.25, max_y = 0.25, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+  write_bottle_plot(name_stat = "delta.var.adm.props", mat = lst_bot[[i]],
+                    name_file = str_c("delta_var_adm/delta_var_bottleneck_",vec_bot[i]), 
+                    min_y = -0.25, max_y = 0.25, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = "delta.var.adm.props")
+  write_bottle_plot(name_stat = "delta.adm.gen.0", mat = lst_bot[[i]],
+                    name_file = str_c("delta_adm_gen0/delta_gen0_ne_bott_",vec_bot[i]), 
+                    min_y = -0.2, max_y = 0.15, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
+  write_bottle_plot(name_stat = "mean.adm.props", mat = lst_bot[[i]],
+                    name_file = str_c("adm.props/adm_props_ne_bottleneck_",vec_bot[i]),
+                    min_y = -0.03, max_y = 1, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = "Moyenne du taux d'admixture")
+}
+remove(lst_bot)
 
 ```
 
@@ -647,7 +633,7 @@ remove(vec_tmp)
 
 ```{r}
 
-setwd("../../../Images/")
+setwd("../../Images/")
 
 mat_bottle_time_80_alpha_0.1 = mat_bottle_time_80[which(mat_bottle_time_80$alpha == 0.1),]
 mat_bottle_time_80_u_0.01 = mat_bottle_time_80[which(mat_bottle_time_80$U == 0.01),]
@@ -723,7 +709,7 @@ print(difftime(Sys.time(), time.ini))
 #### N0 = Nf = 10.000
 
 ```{r}
-setwd("../new_methis_bottleneck_50000_snp/")
+setwd("new_methis_bottleneck_50000_snp/")
 
 mat_bottle_10.000 = data.frame.bottleneck(lst_ne0 = c(10000), lst_nef = c(10000),
                                            lst_alpha = c(0.01, 0.1, 0.5, 0.9),
@@ -764,7 +750,7 @@ print(difftime(Sys.time(), time.ini))
 #### N0 = Nf = 100.000
 
 ```{r}
-setwd("../new_methis_bottleneck_50000_snp")
+setwd("new_methis_bottleneck_50000_snp")
 options( "scipen"=100) 
 #/alpha0.1/Nu0.01/bottle10/Ne100000-XXX/Ne100000-100000/simu_1/
 
