@@ -35,4 +35,3 @@ Quels sont les paramètres sur lesquels on peut jouer :
 9 scénarios avec modification de la contribution, par pulse ou récurrent (croissant/décroissant)
 Possibilité modifier taille de la population hybride au fur et à mesure des générations -> pôint focus
 
-

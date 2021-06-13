@@ -1,0 +1,27 @@
+PLINK v1.90b6.22 64-bit (16 Apr 2021)
+Options in effect:
+  --file simu_1_g50
+  --make-bed
+  --out simu_1_g50
+
+Hostname: gphadmin-GORILLA
+Working directory: /home/maelpretet/Documents/git_repository/Stage/tools/admixture_alexander/dist/test_adm_075
+Start time: Wed May 26 15:00:55 2021
+
+Random number seed: 1622034055
+128846 MB RAM detected; reserving 64423 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (50000 variants, 150 people).
+--file: simu_1_g50-temporary.bed + simu_1_g50-temporary.bim +
+simu_1_g50-temporary.fam written.
+50000 variants loaded from .bim file.
+150 people (0 males, 0 females, 150 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to simu_1_g50.nosex .
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 150 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+50000 variants and 150 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to simu_1_g50.bed + simu_1_g50.bim + simu_1_g50.fam ... done.
+
+End time: Wed May 26 15:00:56 2021

@@ -1,0 +1,33 @@
+vcftools --vcf simu_1_g4.vcf --plink --out simu_1_g4
+
+../../../plink/plink --file simu_1_g4 --make-bed --out simu_1_g4
+
+./admixture simu_1_g4.bed 2
+
+vcftools --vcf simu_1_g6.vcf --plink --out simu_1_g6
+
+../../../plink/plink --file simu_1_g6 --make-bed --out simu_1_g6
+
+./admixture simu_1_g6.bed 2
+
+vcftools --vcf simu_1_g8.vcf --plink --out simu_1_g8
+
+../../../plink/plink --file simu_1_g8 --make-bed --out simu_1_g8
+
+./admixture simu_1_g8.bed 2
+
+vcftools --vcf simu_1_g10.vcf --plink --out simu_1_g10
+
+../../../plink/plink --file simu_1_g10 --make-bed --out simu_1_g10
+
+./admixture simu_1_g10.bed 2
+
+./admixture simu_1_g0.bed 3
+./admixture simu_1_g2.bed 3
+./admixture simu_1_g4.bed 3
+./admixture simu_1_g6.bed 3
+./admixture simu_1_g8.bed 3
+./admixture simu_1_g10.bed 3
+./admixture simu_1_g20.bed 3
+./admixture simu_1_g50.bed 3
+./admixture simu_1_g80.bed 3
