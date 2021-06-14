@@ -375,7 +375,7 @@ for (val_s10 in vec_val_s10) {
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          name_stat = "mean.het.adm", min_y = 0.01, max_y = 0.065,
-                         name_dir = "mean.he",ylab="He moyenne")
+                         name_dir = "mean.he",ylab="He moyenne",yas1=0.017)
 ```
 
 
