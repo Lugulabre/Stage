@@ -821,7 +821,7 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat,
 
 plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
                                     min_y, max_y, name_x = "Generation",name_dir="",
-                                    xlab="Génération",ylab="stat"){
+                                    xlab="Génération",ylab="stat",yas1 = 0.027){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       for (u in seq_u) {
@@ -849,6 +849,9 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
         p = p + xlab(xlab) + ylab(ylab)
         p = p+ ggtitle(label = element_blank())
         
+        p=p+annotate("text", x=5.5,y=yas1,label="s1", color = "blue")
+        p=p+annotate("point", x=2,y=yas1, color = "blue",shape=17)
+        
         if (name_dir != "") {
           name_file = str_c(name_dir,"/Ne_inc/",name_stat,"_cst_s10_", seq_s1[i],
                             "_ne_",ne,"_u_",u)
@@ -864,7 +867,8 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
 
 plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
                                     seq_bot, name_stat, min_y, max_y, name_x = "Generation",
-                                    name_dir = "",xlab="Génération",ylab="stat"){
+                                    name_dir = "",xlab="Génération",ylab="stat",
+                                    yas1 = 0.027){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       for (u in seq_u) {
@@ -897,6 +901,9 @@ plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
             
             p = p + xlab(xlab) + ylab(ylab)
             p = p+ ggtitle(label = element_blank())
+            
+            p=p+annotate("text", x=5.5,y=yas1,label="s1", color = "blue")
+            p=p+annotate("point", x=2,y=yas1, color = "blue",shape=17)
             
             if (name_dir != "") {
               name_file = str_c(name_dir,"/Ne_bot/",name_stat,"_cst_s10_", seq_s1[i],
