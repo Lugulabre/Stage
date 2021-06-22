@@ -97,7 +97,7 @@ mat_64_100_16384 = delta.adm.gen.0(mat_64_100_16384)
 Écriture de différents graphiques pour différentes statistiques choisies. La matrice choisie est la mat3 cstt pour des raisons de lisibilité. Cette matrice permet également d'observer l'évolution des statistiques choisies pour des Ne = 100 et Ne = 1000, valeurs qui seront reprises dans d'autres scénarios ultérieurement.^
 δ
 ```{r}
-write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.064,ylab = "He moyenne")
+write_cstt_plot("mean.het.adm", mat_64_100_16384, "moyenne_heterozygotie/moy_He_ne_cst", 0.01, 0.064,ylab = "mean He")
 write_cstt_plot("Fst.s1.adm", mat_64_100_16384, "Fsts1adm/fst_s1_adm_ne_cst", -0.01, 0.5,
                 ylab = expression(paste(F[ST], " s1-adm", sep = "")))
 write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0.01, 0.5,
@@ -105,7 +105,9 @@ write_cstt_plot("Fst.s2.adm", mat_64_100_16384, "Fsts2adm/fst_s2_adm_ne_cst", -0
 write_cstt_plot("mean.F.adm", mat_64_100_16384, "Fadm/f_adm_ne_cst", -0.03, 0.03,
                 ylab = "F")
 write_cstt_plot("mean.adm.props", mat_64_100_16384, "adm.props/adm_props_ne_cst", 0, 1,
-                ylab = "Moyenne du taux d'admixture")
+                ylab = "Average admixture rate")
+write_cstt_plot("var.adm.props", mat_64_100_16384, "var_adm/var_adm_ne_cst", 0, 0.2,
+                ylab = "Variance du taux d'admixture")
 write_cstt_plot("delta.mean.adm.props", mat_64_100_16384, "delta_mean_adm/delta_mean_ne_cstt",
                 -0.25, 0.25,
                 ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
@@ -347,7 +349,7 @@ scatter3D(x = mat_pop_nu_reduce$Generation, y = mat_pop_nu_reduce$nf,
 setwd("new_methis_pop_increase_50000_snp_Nu_var/")
 
 seq_ne_ini3 = seq(100,100,0)
-seq_multi3 = c(2,4,10,100)
+seq_multi3 = c(4,10,100)
 seq_ne_fin3 = seq_multi3*seq_ne_ini3
 seq_combi3 = as.data.frame(outer(seq_ne_ini3, seq_ne_fin3, FUN="paste", sep="-"))
 seq_combi3 = as.data.frame.vector(unlist(seq_combi3))[[1]]
@@ -364,11 +366,12 @@ mat_pop_nu_reduce_3 = delta.adm.gen.0(mat_pop_nu_reduce_3)
 
 
 ```{r}
-write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.064,ylab = "He moyenne")
+write_increase_plot("mean.het.adm", mat_pop_nu_reduce_3, "moyenne_heterozygotie/moy_He_pop_inc_nu_var",0.01,0.064,ylab = "mean He")
 write_increase_plot("Fst.s1.adm", mat_pop_nu_reduce_3, "Fsts1adm/fst_s1_adm_pop_inc_nu_var", 0, 0.5,ylab = expression(paste(F[ST], " s1-adm", sep = "")))
 write_increase_plot("Fst.s2.adm", mat_pop_nu_reduce_3, "Fsts2adm/fst_s2_adm_pop_inc_nu_var", 0, 0.5,ylab = expression(paste(F[ST], " s2-adm", sep = "")))
 write_increase_plot("mean.F.adm", mat_pop_nu_reduce_3, "Fadm/f_adm_pop_inc_nu_var", -0.03, 0.03,ylab="F")
-write_increase_plot("mean.adm.props", mat_pop_nu_reduce_3, "adm.props/adm_props_ne_inc", -0.032, 1, ylab = "Moyenne du taux d'admixture")
+write_increase_plot("mean.adm.props", mat_pop_nu_reduce_3, "adm.props/adm_props_ne_inc", -0.032, 1, ylab = "Average admixture rate")
+write_increase_plot("var.adm.props", mat_pop_nu_reduce_3, "var_adm/var_adm_ne_inc", -0.032, 1, ylab = "Variance du taux d'admixture")
 write_increase_plot("delta.mean.adm.props", mat_pop_nu_reduce_3,
                     "delta_mean_adm/delta_mean_pop_inc_nu_va", -0.25, 0.25,
                     ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
@@ -523,15 +526,15 @@ mini_mat_bottle_80 = mini_mat_bottle[which(mini_mat_bottle$time_botl == 80),]
 ```{r}
 write_bottle_plot("mean.het.adm", mini_mat_bottle,
                   "moyenne_heterozygotie/moy_He_bottleneck", 0.01, 0.064,
-                  vec_abtype = c("solid", "dashed", "dotted"),ylab="He moyenne")
+                  vec_abtype = c("solid", "dashed", "dotted"),ylab="mean He")
 write_bottle_plot("Fst.s1.adm", mini_mat_bottle, "Fsts1adm/fst_s1_adm_bottleneck", 0, 0.5,
                   ylab = expression(paste(F[ST], " s1-adm", sep = "")))
 write_bottle_plot("Fst.s2.adm", mini_mat_bottle, "Fsts2adm/fst_s2_adm_bottleneck", 0, 0.5,
                   ylab = expression(paste(F[ST], " s2-adm", sep = "")))
 write_bottle_plot("mean.F.adm", mini_mat_bottle, "Fadm/f_adm_bottleneck", -0.03, 0.03,
                   ylab="F")
-write_bottle_plot("mean.adm.props", mini_mat_bottle, "adm.props/adm_props_ne_bot", 0, 1,
-                  ylab = "Moyenne du taux d'admixture")
+write_bottle_plot("mean.adm.props", mini_mat_bottle, "adm.props/adm_props_ne_bot", -0.02, 1,
+                  ylab = "Average admixture rate")
 write_bottle_plot("delta.mean.adm.props", mini_mat_bottle,
                   "delta_mean_adm/delta_mean_bottleneck", -0.25, 0.25,
                   ylab = expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
@@ -558,7 +561,7 @@ for (i in c(1:3)) {
                     min_y = 0.01, max_y = 0.063, time_bott = vec_bot[i]+1,
                     name_color = "alpha", name_line = "U",
                     labcol = "alpha", labline = "U",
-                    ylab = "He moyenne")
+                    ylab = "mean He")
   write_bottle_plot(name_stat = "Fst.s1.adm", mat = lst_bot[[i]],
                     name_file = str_c("Fsts1adm/fst_s1_adm_bottleneck_",vec_bot[i]), 
                     min_y = 0, max_y = 0.5, time_bott = vec_bot[i]+1,
@@ -600,7 +603,13 @@ for (i in c(1:3)) {
                     min_y = -0.03, max_y = 1, time_bott = vec_bot[i]+1,
                     name_color = "alpha", name_line = "U",
                     labcol = "alpha", labline = "U",
-                    ylab = "Moyenne du taux d'admixture")
+                    ylab = "Average admixture rate")
+  write_bottle_plot(name_stat = "var.adm.props", mat = lst_bot[[i]],
+                    name_file = str_c("var_adm/var_adm_ne_bottleneck_",vec_bot[i]),
+                    min_y = 0, max_y = 0.2, time_bott = vec_bot[i]+1,
+                    name_color = "alpha", name_line = "U",
+                    labcol = "alpha", labline = "U",
+                    ylab = "Variance du taux d'admixture")
 }
 remove(lst_bot)
 
