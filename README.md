@@ -29,4 +29,4 @@ Les outils utilisés pour les simulations (nb : MetHis_save est l'outil MetHis m
 Les scripts implémentés sont "bottleneck_param.py" et "bottleneck_param_s10_adm_cst.py" dans le répertoire Methis_save. Les scripts modifiés sont "generate_params_nu.py", "src/simul.c" et "src/sumstats.c" dans le répertoire Methis_save.
 
 # IMPORTANT
-Il est possible que ce github subisse des modifications postérieurement au 20/06 (date de rendu du mémoire), en raison de travaux toujours en cours. J'essaierai de faire en sorte que la branche principale soit le moins modifiée possible jusqu'au rendu des notes, mais il est possible que des fusions de branche me soit nécessaire.
+Il est possible que ce github subisse des modifications postérieurement au 20/06 (date de rendu du mémoire), en raison de travaux toujours en cours. J'essaierai de faire en sorte que la branche principale soit le moins modifiée possible jusqu'au rendu des notes, mais il est possible que des fusions de branche soit nécessaire.
