@@ -172,8 +172,8 @@ vec_val_s10 = c(0.1, 0.5, 0.75)
 for (val_s10 in vec_val_s10) {
   setwd(str_c("s1.0_", val_s10,"/"))
   lst_ne_bot_adm_rec[[cpt]] = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000),
-                                                    lst_alpha = c(0.1, 0.5, 0.9),
-                                                    lst_nu = c(0.01, 0.25, 0.49),
+                                                    lst_alpha = c(0.1, 0.5),
+                                                    lst_nu = c(0.01, 0.25),
                                                     lst_bottle = c(20, 50, 80), max_simu = 1)
   lst_ne_bot_adm_rec[[cpt]] = delta.adm.gen.0(lst_ne_bot_adm_rec[[cpt]])
   cpt = cpt + 1
@@ -367,13 +367,13 @@ plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.adm.props",
                          min_y = 0.2, max_y = 0.75,yas1 = 0.235,yas2 = 0.21,
-                         name_dir = "mean.adm",
+                         name_dir = "mean.adm",title = TRUE,
                          ylab = "Average admixture rate")
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.adm.props",
                          min_y = 0.2, max_y = 0.75,name_color = "time_pulse_s2",
                          yas1 = 0.235,yas2 = 0.21, name_dir = "mean.adm",
-                         ylab = "Average admixture rate")
+                         ylab = "Average admixture rate",title = TRUE)
 ```
 
 
@@ -551,7 +551,7 @@ plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"),
 plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"), 
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01,0.25,0.49),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
-                         name_stat = "mean.adm.props",min_y = 0.2,max_y = 0.75,
+                         name_stat = "mean.adm.props",min_y = 0.2,max_y = 0.77,
                          name_dir = "mean.adm",ylab="Average admixture rate",
                          yas1=0.2,title=TRUE)
 ```

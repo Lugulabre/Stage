@@ -70,6 +70,7 @@ typedef struct param{
 typedef struct arg{
   int help;
   int save_data;
+  int save_all_gen;
   unsigned nb_snp;
   unsigned max_Ne;
   unsigned nb_generation;

@@ -16,7 +16,7 @@ void print_sumstats(sumstats_datast *sumstats, arg *args, param *params, unsigne
   /* first we create the files for each pop */
   sprintf(buff, "./%s/simu_%u/final_sumstats.txt", args->prefix, params->current_simul);
 
-  if (idx_gen == 0)
+  if (idx_gen == 0 || !args->save_all_gen)
   {
     f = safe_open(buff, "w");
     fprintf(f, "Generation\tFst.s1.adm\tFst.s2.adm\tFst.s1.s2\tmean.ASD.s1.adm\tvar.ASD.s1.adm\tmean.ASD.s2.adm\tvar.ASD.s2.adm\tmean.ASD.s1.s2\tvar.ASD.s1.s2\tf3\tmean.ASD.s1\tvar.ASD.s1\tmean.ASD.s2\tvar.ASD.s2\tmean.ASD.adm\tvar.ASD.adm\tmean.het.s1\tvar.het.s1\tmean.het.s2\tvar.het.s2\tmean.het.adm\tvar.het.adm\tmean.F.s1\tvar.F.s1\tmean.F.s2\tvar.F.s2\tmean.F.adm\tvar.F.adm\tmean.adm.props\tvar.adm.props\tskew.adm.props\tkurt.adm.props\tmode.adm.props\tmean.adm.angles\tvar.adm.angles\tskew.adm.angles\tkurt.adm.angles\tmode.adm.angles");
@@ -397,6 +397,8 @@ void write_arguments(arg *args, FILE *log){
   fprintf(log, "Command line interpreted as:\n");
   fprintf(stderr, "\tsave-data: %s\n", t_or_f(args->save_data));
   fprintf(log, "\tsave-data: %s\n", t_or_f(args->save_data));
+  fprintf(stderr, "\tsave-all-gen: %s\n", t_or_f(args->save_all_gen));
+  fprintf(log, "\tsave-all-gen: %s\n", t_or_f(args->save_all_gen));
   fprintf(stderr, "\tnb-snp: %u\n", args->nb_snp);
   fprintf(log, "\tnb-snp: %u\n", args->nb_snp);
   fprintf(stderr, "\tmax-Ne: %u\n", args->max_Ne);
