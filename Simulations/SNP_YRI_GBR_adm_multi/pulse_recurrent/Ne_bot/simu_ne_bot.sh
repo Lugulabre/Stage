@@ -58,7 +58,7 @@ for s1 in 1 5 75; do
 
                         ../../../../tools/MetHis_modif/generate_params_nu.py -S 1 -N $tps_gen -P "s1.0_0.$s1/alpha$alpha/Nu$nu/bottle$tps_gen/Ne$ne0-XXX/Ne$ne0-$nen" --Ne "$ne0red/Inc/$nen-$nen" --contrib_s1 0.$s1/Con/$pop1-$pop1/$pop1-$pop1 --contrib_s2 0.$s2/Con/$pop2-$pop2/$pop2-$pop2 --Nu $nu --force-rewrite
 
-                        ../../../../tools/MetHis_modif/bottleneck_param_s10_adm_cst.py -S10 $s1 -A $alpha -U $nu -ne0 $ne0 -nef $nen -B $tps_gen -G 100 -S 2 -S1 $pop1 -S2 $pop2
+                        ../../../../tools/MetHis_modif/bottleneck_param_s10_adm_cst.py -S10 $s1 -A $alpha -U $nu -ne0 $ne0 -nef $nen -B $tps_gen -G 100 -S 2 -S1 $pop1 -S2 $pop2 --type-adm recurrent
 
                         ../../../../tools/MetHis_modif/MetHis --sampling 25/25/25 --nb-snp 50000 --max-Ne $size_max_ne --prefix "s1.0_0.$s1/alpha$alpha/Nu$nu/bottle$tps_gen/Ne$ne0-XXX/Ne$ne0-$nen/" --nb-simul 1 --nb-thread 20 --input-path ../../../../tools/MetHis_modif/example_dataset/data_50k.arp
 

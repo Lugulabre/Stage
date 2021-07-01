@@ -99,7 +99,7 @@ data.frame.ne.gen = function(seq_ne){
   return(mat_ne_inc)
 }
 
-
+# Fonction de lecture des stats pour des populations croissantes
 
 data.frame.increase = function(seq_ne_ini, seq_combi, max_simu = 1){
   mat_inc = c()
@@ -130,6 +130,8 @@ data.frame.increase = function(seq_ne_ini, seq_combi, max_simu = 1){
   return(na.omit(mat_inc))
 }
 
+# Fonction de lecture des stats pour des populations croissantes avec U fixé
+# Les répertoires doivent être de la forme Nu0.01/Ne100-XXX/Ne100-1000/simu_1
 
 data.frame.increase.nu = function(seq_ne_ini, seq_combi, seq_nu, max_simu = 1){
   for (nu in seq_nu) {
@@ -154,6 +156,8 @@ data.frame.increase.nu = function(seq_ne_ini, seq_combi, seq_nu, max_simu = 1){
 
 }
 
+# Fonction de lecture des stats pour des populations avec goulot d'étranglement
+# Les répertoires doivent être de la forme alpha0.1/Nu0.01/bottle20/Ne1000-XXX/Ne1000-1000/simu_1
 
 data.frame.bottleneck = function(lst_ne0, lst_nef, lst_alpha, lst_nu, lst_bottle, max_simu = 1){
   lst_combi = as.data.frame(outer(lst_ne0, lst_nef, FUN="paste", sep="-"))
@@ -234,16 +238,6 @@ delta.adm.props = function(mat){
   return(mat)
 }
 
-delta.adm.props.s2.0 = function(mat){
-  mat$delta.mean.adm.props.s2.0 = NA
-  
-  for (i in 1:nrow(mat)) {
-    ref_adm = mat$s1.0[i]
-    mat$delta.mean.adm.props.s2.0[i] =  ref_adm - mat$mean.adm.props[i]
-  }
-  return(mat)
-}
-
 
 # - Par rapport à la génération 0
 
@@ -273,8 +267,6 @@ IC_95 = function(vec){
   n_vec = length(vec)
   return(1.96*(sd_vec/sqrt(n_vec)))
 }
-
-
 
 #Passage en moyenne
 data.frame.mean = function(df_stat, max_gen, seq_ne, col_mean, col_cstt){
@@ -327,7 +319,7 @@ data.frame.mean = function(df_stat, max_gen, seq_ne, col_mean, col_cstt){
   return(list(df_mean, df_ic, df_sd))
 }
 
-
+# Même fonction pour les populations croissantes
 
 data.frame.mean.u = function(df_stat, max_gen, seq_combi, seq_u, col_mean, col_cstt){
   for (u in seq_u){
@@ -350,6 +342,7 @@ data.frame.mean.u = function(df_stat, max_gen, seq_combi, seq_u, col_mean, col_c
   return(list(df_tot_mean, df_tot_ic, df_tot_sd))
 }
 
+# Même fonction pour les populations avec goulot d'étranglement
 
 data.frame.mean.bottle = function(df_stat, max_gen, seq_combi, seq_u,
                                   seq_alpha, seq_bottle, col_mean, col_cstt){
@@ -658,7 +651,8 @@ boucle_plot_bottle = function(mat, vec_stat, name_stat, vec_bott,size_pop = 1000
 }
 
 
-# - Ajout de l'IC 95 quand calcul de moyenne
+# - Ajout de l'IC 95 quand calcul de moyenne au plot 
+# (nécessite la matrice de moyenne et d'IC95)
 
 write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
                              ylim_inf, ylim_sup, lgd_txt, name_file_1,
@@ -719,8 +713,7 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
   return(p)
 }
 
-# Fonction d'affichage de graphique pour des admixtures complexes 
-# (admixture récurrente et admixture two pulses)
+# Fonction d'affichage de graphique pour des admixtures ponctuelles (2 pulses)
 
 plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
                                     name_color = "time_pulse_s1",yas1 = 0.027,yas2=0.022,
@@ -827,6 +820,8 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat,
   }
 }
 
+# Fonction d'affichage de graphique pour des admixtures ponctuelles (1 pulse)
+
 plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
                                     min_y, max_y, name_x = "Generation",name_dir="",
                                     xlab="Generation",ylab="stat",yas1 = 0.027,
@@ -882,6 +877,8 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
     }
   }
 }
+
+# Fonction d'affichage de graphique pour des admixtures ponctuelles (1 pulse)
 
 plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
                                     seq_bot, name_stat, min_y, max_y, name_x = "Generation",
