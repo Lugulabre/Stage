@@ -32,32 +32,53 @@ Dans chacun des répertoires de statistiques sont présents 3 sous-répertoires 
 - Ne_cst : pour des populations constantes
 - Ne_inc : pour des populations croissantes
 
+##rapport&presentations
+Le répertoire contient le rapport final ainsi que deux présentations effectuées pendant le stage.
+
 ## scriptR
 Scripts en R permettant de traiter les données des simulations.
 Les fonctions utilisées sont dans le script "functions.R".
+
 Le rmarkdown "new_methis_50000_snp_simple_adm.Rmd" contient les scripts permettant de travailler sur le scénario d'admixture à la fondation pour des simulations simples.
+
 Le rmarkdown "new_methis_50000_snp_simple_adm_multi.Rmd" contient les scripts permettant de travailler sur le scénario d'admixture à la fondation pour des simulations multiples et moyennées.
+
 Le rmarkdown "new_methis_50000_snp_complex_adm.Rmd" contient les scripts permettant de travailler sur les scénarios d'admixture récurrente et ponctuelle.
+
+Le rmarkdown "comparaison_admixture.Rmd" contient les scripts permettant de comparer le calcul du taux d'admixture de MetHis et de ADMIXTURE.
 
 ## Simulations
 Le répertoire "SNP_YRI_GBR_foundation_adm" contient les simulations pour un scénario d'admixture à la fondation.
 Sont présents dans ce répertoire les simulations pour des populations constantes ("Ne_cst"), des populations croissantes ("Ne_inc") et avec goulot d'étranglement ("Ne_bot").
+
 Pour des populations croissantes, le suffixe "U_fix" est ajouté pour les populations croissantes où le u déterminant l'incurvation est fixé.
+
 Le suffixe "multi" est ajouté pour les simulations multiples (100 simulations).
+
 "ns_modif" est le répertoire où la taille d'échantillonage est modifiée.
+
 "s1.0_modif" est le répertoire où le s1.0 est modifié et fixé (0.1, 0.5, 0.75 et 0.9).
+
 "test_logiciel_admixture" contient les simulations utilisées pour la comparaison avec le logiciel ADMIXTURE.
+
 Les répertoires "old_methis" sont ceux avec les simulations effectuées avec MetHis qui n'est pas en séquentiel.
 
 Le répertoire "SNP_YRI_GBR_complex_adm" contient les simulations pour les scénarios d'admixture récurrente et ponctuelle.
 Le sous-répertoire "pulse_ponctuel" contient les simulations avec : 
 - un pulse de s1 et un pulse de s2 à 0.25 pour Ne_cst
 - un pulse de s1 à 0.25 pour Ne_inc et Ne_bot
+
 Le sous-répertoire "pulse_recurrent" contient les simulations avec des pulses récurrents à chaque génération avec des taux entre 0.05 et 0.1 (cf rapport&presentations/Rapport -> Matériel et méthodes).
+
 Le sous-répertoire "pulse_recurrent" contient les simulations avec des pulses récurrents à chaque génération avec des taux entre 0.01 et 0.02.
 
 (! Les simulations ne sont pas disponibles sur le répertoire github pour des raisons de taille de stockage)
 
 ## tools
-Les outils utilisés pour les simulations (nb : MetHis_save est l'outil MetHis modifié pour être utilisé en séquentiel + modification du U + implémentation du bottleneck).
-Les scripts implémentés sont "bottleneck_param.py" et "bottleneck_param_s10_adm_cst.py" dans le répertoire Methis_save. Les scripts modifiés sont "generate_params_nu.py", "src/simul.c" et "src/sumstats.c" dans le répertoire Methis_save.
+"MetHis" contient l'outil MetHis initial.
+
+"MetHis_modif" contient l'outil MetHis modifié pour être utilisé en séquentiel hard-codé.
+
+"MetHis_save" contient l'outil MetHis modifié pour être utilisé en séquentiel de manière optionnelle, en plus des scripts utilisés pour générer une population avec goulot d'étranglement. Les modifications implémentées sont indiquées dans le document "MetHis_save/modifications_methis.txt".
+
+"admixture_alexander" contient les tests effectués avec ADMIXTURE qui sont analysés avec le script "comparaison_admixture.Rmd"
