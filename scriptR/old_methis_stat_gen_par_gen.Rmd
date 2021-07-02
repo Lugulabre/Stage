@@ -5,7 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/old_methis_pop_size_diff/")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_foundation_adm/old_methis_pop_size_diff/")
 ```
 
 ## Librairies utilisées

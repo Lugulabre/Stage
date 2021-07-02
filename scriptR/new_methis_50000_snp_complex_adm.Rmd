@@ -5,8 +5,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_adm_multi/")
-# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_complex_adm/")
+# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR/Ne_bot/alpha0.1/Nu0.01/bottle10/")
 
 ```
 
@@ -252,23 +252,23 @@ for (val_s10 in vec_val_s10) {
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
                          min_y = 0.02, max_y = 0.064, name_dir = "mean.he",
-                         ylab = "mean He",title = TRUE)
+                         ylab = "mean He")
 
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.het.adm",
                          min_y = 0.02, max_y = 0.064, name_color = "time_pulse_s2",
-                         name_dir = "mean.he",ylab="mean He",title = TRUE)
+                         name_dir = "mean.he",ylab="mean He")
 ```
 
 ```{r}
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(1000,10000),
                          seq_s1 = c(0.1, 0.5,0.75), name_stat = "mean.het.adm",
                          min_y = 0.047, max_y = 0.064, name_dir = "mean.he",
-                         ylab = "mean He",yas1 = 0.051,yas2 = 0.050, title=TRUE)
+                         ylab = "mean He",yas1 = 0.051,yas2 = 0.050)
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(1000,10000),
                          seq_s1 = c(0.1, 0.5,0.75), name_stat = "mean.het.adm",
                          min_y = 0.047, max_y = 0.064, name_dir = "mean.he",
-                         ylab = "mean He",yas1 = 0.051,yas2 = 0.050, title=TRUE,name_color = "time_pulse_s2")
+                         ylab = "mean He",yas1 = 0.051,yas2 = 0.050,name_color = "time_pulse_s2")
 ```
 
 
@@ -367,13 +367,13 @@ plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.adm.props",
                          min_y = 0.2, max_y = 0.75,yas1 = 0.235,yas2 = 0.21,
-                         name_dir = "mean.adm",title = TRUE,
+                         name_dir = "mean.adm",
                          ylab = "Average admixture rate")
 plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct, seq_ne = c(100,1000,10000),
                          seq_s1 = c(0.1, 0.5, 0.75), name_stat = "mean.adm.props",
                          min_y = 0.2, max_y = 0.75,name_color = "time_pulse_s2",
                          yas1 = 0.235,yas2 = 0.21, name_dir = "mean.adm",
-                         ylab = "Average admixture rate",title = TRUE)
+                         ylab = "Average admixture rate")
 ```
 
 
@@ -449,7 +449,7 @@ for (val_s10 in vec_val_s10) {
 plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          name_stat = "mean.het.adm", min_y = 0.025, max_y = 0.065,
-                         name_dir = "mean.he",ylab="mean He",yas1=0.017,title=TRUE)
+                         name_dir = "mean.he",ylab="mean He",yas1=0.017)
 ```
 
 
@@ -474,7 +474,7 @@ plot_adm_ponctuel_ne_inc(lst_mat = lst_ne_inc_adm_pct, seq_ne = seq_combi,
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          name_stat = "mean.adm.props", min_y = 0.2, max_y = 0.75,
                          name_dir = "mean.adm",ylab="Average admixture rate",
-                         yas1=0.21,title=TRUE)
+                         yas1=0.21)
 ```
 
 
@@ -524,7 +524,7 @@ plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"),
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.01, 0.25, 0.49),
                          seq_alpha = c(0.1,0.5),seq_bot = c(20,50,80),
                          name_stat = "mean.het.adm",min_y = 0.01,max_y = 0.07,
-                         name_dir = "mean.he",ylab="mean He",yas1=0.017,title=TRUE)
+                         name_dir = "mean.he",ylab="mean He",yas1=0.017)
 ```
 
 ```{r}
@@ -532,7 +532,7 @@ plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"),
                          seq_s1 = c(0.1, 0.5, 0.75), seq_u = c(0.25, 0.49),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
                          name_stat = "mean.het.adm",min_y = 0.035,max_y = 0.07,
-                         name_dir = "mean.he",ylab="mean He",yas1=0.017,title=TRUE)
+                         name_dir = "mean.he",ylab="mean He",yas1=0.017)
 ```
 
 
@@ -553,7 +553,7 @@ plot_adm_ponctuel_ne_bot(lst_mat = lst_ne_bot_adm_pct, seq_ne = c("1000-1000"),
                          seq_alpha = c(0.1),seq_bot = c(20,50,80),
                          name_stat = "mean.adm.props",min_y = 0.2,max_y = 0.77,
                          name_dir = "mean.adm",ylab="Average admixture rate",
-                         yas1=0.2,title=TRUE)
+                         yas1=0.2)
 ```
 
 ```{r}

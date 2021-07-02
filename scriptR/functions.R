@@ -717,7 +717,7 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
 
 plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
                                     name_color = "time_pulse_s1",yas1 = 0.027,yas2=0.022,
-                                    name_dir = "",xlab="Generation",ylab="stat",title = FALSE){
+                                    name_dir = "",xlab="Generation",ylab="stat",title = TRUE){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
@@ -825,7 +825,7 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat,
 plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
                                     min_y, max_y, name_x = "Generation",name_dir="",
                                     xlab="Generation",ylab="stat",yas1 = 0.027,
-                                    title=FALSE){
+                                    title=TRUE){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       for (u in seq_u) {
@@ -883,7 +883,7 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
 plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
                                     seq_bot, name_stat, min_y, max_y, name_x = "Generation",
                                     name_dir = "",xlab="Generation",ylab="stat",
-                                    yas1 = 0.027,title=FALSE){
+                                    yas1 = 0.027,title=TRUE){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       for (u in seq_u) {

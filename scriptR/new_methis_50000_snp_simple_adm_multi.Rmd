@@ -5,8 +5,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR")
-# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/new_methis_bottleneck_50000_snp/alpha0.1/Nu0.01/bottle10/")
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_foundation_adm/")
+# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_foundation_adm/Ne_bot/alpha0.1/Nu0.01/bottle10/")
 
 ```
 
@@ -29,7 +29,7 @@ print(difftime(Sys.time(), time.ini))
 ## Simulations multiples : populations constantes
 
 ```{r}
-setwd("multi_new_methis_pop_size_diff/")
+setwd("Ne_cst_multi/")
 
 mat_cstt_multi = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 100)
 
@@ -133,7 +133,7 @@ write_ic_var_plot(mat_cstt_multi_mean, mat_cstt_multi_mean$Generation,
 ## Simulations multiples : populations croissantes
 
 ```{r}
-setwd("multi_new_methis_pop_increase_Nu_var/")
+setwd("Ne_inc_U_fix_multi/")
 
 seq_nu_multi = sprintf("%.2f", c(0.01, 0.25, 0.49))
 seq_ne_ini_multi = c(100)
@@ -211,7 +211,7 @@ write_one_gen(mat_inc_multi_100, mat_inc_multi$s1.0[which(mat_inc_multi$Generati
 ## Simulations multiples : bottleneck
 
 ```{r}
-setwd("multi_new_methis_bottleneck/")
+setwd("Ne_bot_multi/")
 
 mat_bot_multi = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000),
                                       lst_alpha = c(0.1),
@@ -284,12 +284,12 @@ print(difftime(Sys.time(), time.ini))
 
 ### Multi simulations ns modifiés
 ```{r}
-setwd("ns_modif/new_methis_pop_size_diff_ns_50/")
+setwd("ns_modif/Ne_cst_ns_50/")
 
 mat_cstt_ns_50 = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 100)
 mat_cstt_ns_50 = delta.adm.props(mat_cstt_ns_50)
 
-setwd("../new_methis_pop_size_diff_ns_75/")
+setwd("../Ne_cst_ns_75/")
 
 mat_cstt_ns_75 = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 100)
 mat_cstt_ns_75 = delta.adm.props(mat_cstt_ns_75)
@@ -370,7 +370,7 @@ cor.test(mat_cstt_multi_gen0$mean.adm.props[which(mat_cstt_multi_gen0$Ne == 100)
 
 - Populations constantes
 ```{r}
-setwd("s1.0_modif/multi_new_methis_pop_size_diff/s1.0_0.1/")
+setwd("s1.0_modif/Ne_cst_multi/s1.0_0.1/")
 
 mat_cstt_multi_s1.0_0.1 = data.frame.stat(seq_ne = c(100,1000,10000), 
                                           max_gen = 101, max_simu = 100)
@@ -490,7 +490,7 @@ remove(vec_s10)
 
 - Populations croissantes
 ```{r}
-setwd("s1.0_modif/multi_new_methis_pop_increase_Nu_var/s1.0_0.1/")
+setwd("s1.0_modif/Ne_inc_U_fix_multi/s1.0_0.1/")
 mat_inc_multi_s1.0_0.1 = data.frame.increase.nu(seq_ne_ini = c("100"),
                                                 seq_combi = c("100-10000"),
                                                 seq_nu = c(0.01, 0.25, 0.49),
@@ -602,7 +602,7 @@ remove(lst_var)
 
 - Bottleneck
 ```{r}
-setwd("s1.0_modif/multi_new_methis_bottleneck/s1.0_0.1/")
+setwd("s1.0_modif/Ne_bot_multi/s1.0_0.1/")
 mat_bot_multi_s1.0_0.1 = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000), 
                                                lst_alpha = c(0.1),
                                                lst_nu = c(0.01, 0.25, 0.49),
