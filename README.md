@@ -1,7 +1,7 @@
 # Descriptif des répertoires
 
 ## Biblio
-Deux sous-répertoires : "articles" dans lequel sont présents les articles de référence, et "notes" dans lequel sont listés la majorité des articles vus, avec des notes résumant l'article
+Trois sous-répertoires : "articles" dans lequel sont présents les articles de référence, "notes_biblio" dans lequel sont listés la majorité des articles vus, avec des notes résumant l'article et "notes_perso".
 
 ## Images
 Plot générés par les script R.
@@ -32,9 +32,6 @@ Dans chacun des répertoires de statistiques sont présents 3 sous-répertoires 
 - Ne_cst : pour des populations constantes
 - Ne_inc : pour des populations croissantes
 
-## Journal
-Suivi personnel du stage
-
 ## scriptR
 Scripts en R permettant de traiter les données des simulations.
 Les fonctions utilisées sont dans le script "functions.R".
@@ -53,4 +50,3 @@ Les répertoires les plus essentiels sont ceux utilisant 50000 SNP sur les data 
 ## tools
 Les outils utilisés pour les simulations (nb : MetHis_save est l'outil MetHis modifié pour être utilisé en séquentiel + modification du U + implémentation du bottleneck).
 Les scripts implémentés sont "bottleneck_param.py" et "bottleneck_param_s10_adm_cst.py" dans le répertoire Methis_save. Les scripts modifiés sont "generate_params_nu.py", "src/simul.c" et "src/sumstats.c" dans le répertoire Methis_save.
-

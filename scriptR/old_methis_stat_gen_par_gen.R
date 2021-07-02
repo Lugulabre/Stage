@@ -4,7 +4,7 @@
 library(stringr)
 library(ggplot2)
 
-setwd("Documents/git_repository/Stage/Simulations/SNP_AFR_EUR/old_methis_pop_size_diff")
+setwd("Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_foundation_adm/old_methis_pop_size_diff")
 
 #Paramètres modifiables
 min_ne = 6
