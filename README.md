@@ -40,11 +40,22 @@ Le rmarkdown "new_methis_50000_snp_simple_adm_multi.Rmd" contient les scripts pe
 Le rmarkdown "new_methis_50000_snp_complex_adm.Rmd" contient les scripts permettant de travailler sur les scénarios d'admixture récurrente et ponctuelle.
 
 ## Simulations
-Le répertoire SNP_AFR_EUR contient les simulations pour un scénario d'admixture à la fondation.
-Le répertoire SNP_YRI_GBR_multi contient les simulations pour les scénarios d'admixture récurrente et ponctuelle.
-Chaque sous-répertoire contient un type de simulation et de scénario simulés selon des paramètres pouvant être modifiés.
-Scénarios démographiques simulés : populations constantes de différentes tailles initiales, populations croissantes et bottleneck.
-Les répertoires les plus essentiels sont ceux utilisant 50000 SNP sur les data utilisées.
+Le répertoire "SNP_YRI_GBR_foundation_adm" contient les simulations pour un scénario d'admixture à la fondation.
+Sont présents dans ce répertoire les simulations pour des populations constantes ("Ne_cst"), des populations croissantes ("Ne_inc") et avec goulot d'étranglement ("Ne_bot").
+Pour des populations croissantes, le suffixe "U_fix" est ajouté pour les populations croissantes où le u déterminant l'incurvation est fixé.
+Le suffixe "multi" est ajouté pour les simulations multiples (100 simulations).
+"ns_modif" est le répertoire où la taille d'échantillonage est modifiée.
+"s1.0_modif" est le répertoire où le s1.0 est modifié et fixé (0.1, 0.5, 0.75 et 0.9).
+"test_logiciel_admixture" contient les simulations utilisées pour la comparaison avec le logiciel ADMIXTURE.
+Les répertoires "old_methis" sont ceux avec les simulations effectuées avec MetHis qui n'est pas en séquentiel.
+
+Le répertoire "SNP_YRI_GBR_complex_adm" contient les simulations pour les scénarios d'admixture récurrente et ponctuelle.
+Le sous-répertoire "pulse_ponctuel" contient les simulations avec : 
+- un pulse de s1 et un pulse de s2 à 0.25 pour Ne_cst
+- un pulse de s1 à 0.25 pour Ne_inc et Ne_bot
+Le sous-répertoire "pulse_recurrent" contient les simulations avec des pulses récurrents à chaque génération avec des taux entre 0.05 et 0.1 (cf rapport&presentations/Rapport -> Matériel et méthodes).
+Le sous-répertoire "pulse_recurrent" contient les simulations avec des pulses récurrents à chaque génération avec des taux entre 0.01 et 0.02.
+
 (! Les simulations ne sont pas disponibles sur le répertoire github pour des raisons de taille de stockage)
 
 ## tools
