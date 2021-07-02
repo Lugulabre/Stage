@@ -32,7 +32,7 @@ Dans chacun des répertoires de statistiques sont présents 3 sous-répertoires 
 - Ne_cst : pour des populations constantes
 - Ne_inc : pour des populations croissantes
 
-##rapport&presentations
+## rapport&presentations
 Le répertoire contient le rapport final ainsi que deux présentations effectuées pendant le stage.
 
 ## scriptR
