@@ -54,14 +54,16 @@ void make_one_simul(param *params, arg *args){
     make_multithreaded_reproduction(params, couples, args->nb_thread, args->nb_snp);
     /* we sample individuals if we need them */
     
+    if (idx_gen == args->nb_generation || args->save_all_gen){
       /* sample individuals */
-    wanted_samples = sample_individuals(params, args, couples);
-    compute_all_sumstats(params, args, wanted_samples, idx_gen);
-      
-    if (args->save_data)
-      write_vcf_file(params, args, wanted_samples, idx_gen);
+      wanted_samples = sample_individuals(params, args, couples);
+      compute_all_sumstats(params, args, wanted_samples, idx_gen);
+        
+      if (args->save_data)
+        write_vcf_file(params, args, wanted_samples, idx_gen);
 
-    free_unsigned_matrix(wanted_samples, args->sample_size_s1 + args->sample_size_s2 + args->sample_size_adm);
+      free_unsigned_matrix(wanted_samples, args->sample_size_s1 + args->sample_size_s2 + args->sample_size_adm);
+    }
 
     /* a little bit of cleanup */
     if (idx_gen != 0){

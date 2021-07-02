@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import sys
 
 # creates parser for command line arguments and parses them
 def parse_args():
@@ -55,9 +56,13 @@ def parse_args():
                         default = 0,
                         dest = 's2',
                         help = 'constant contribution of s2')
+    parser.add_argument('--type-adm',
+                        default='foundation',
+                        dest="type_adm",
+                        help="type of admixture (foundation, recurrent, punctual)")
 
     values = parser.parse_args()
-    return values.s10, values.alpha, values.nu, values.ne0, values.nef, values.bottle, values.gen, values.simu, values.s1, values.s2
+    return values.s10, values.alpha, values.nu, values.ne0, values.nef, values.bottle, values.gen, values.simu, values.s1, values.s2, values.type_adm
 
 #Read file with only increase population
 def read_file(path_tot):
@@ -66,14 +71,20 @@ def read_file(path_tot):
     return lines
 
 #Create bottleneck before/after actual lines
-def write_file(lines, path_tot, ne0, nef, gen, s1, s2):
+def write_file(lines, path_tot, ne0, nef, gen, s1, s2, t_adm):
     with open(path_tot, "w") as filout:
         filout.write(lines[0])
         #New generation 0 with a larger population define by ne0
         old_line = lines[1].split()
         old_line_2 = lines[2].split()
         filout.write("0\t{}\t{}\t{}\n".format(ne0, old_line[2], old_line[3]))
-        filout.write("1\t{}\t{}\t{}\n".format(old_line[1], 0, 0))
+        if t_adm=="recurrent":
+            filout.write("1\t{}\t{}\t{}\n".format(old_line[1], old_line_2[2], old_line_2[3]))
+        elif t_adm=="punctual" or t_adm=="foundation":
+            filout.write("1\t{}\t{}\t{}\n".format(old_line[1], 0, 0))
+        else:
+            print("ERROR : type of admixture")
+            sys.exit()
 
         for rg_l in range(2, len(lines)):
             line_tmp = lines[rg_l].split()
@@ -85,11 +96,11 @@ def write_file(lines, path_tot, ne0, nef, gen, s1, s2):
 
 #main function
 def main():
-    s10, alpha, nu, ne0, nef, bottle, gen, simu, s1, s2 = parse_args()
+    s10, alpha, nu, ne0, nef, bottle, gen, simu, s1, s2, t_adm = parse_args()
     for nb_simu in range(1,simu+1):
         path = "s1.0_0."+s10+"/alpha"+alpha+"/Nu"+nu+"/bottle"+bottle+"/Ne"+ne0+"-XXX/Ne"+ne0+"-"+nef+"/simu_"+str(nb_simu)+"/simu_"+str(nb_simu)+".par"
         pre_file = read_file(path)
-        write_file(pre_file, path, ne0, nef, gen, s1, s2)
+        write_file(pre_file, path, ne0, nef, gen, s1, s2, t_adm)
 
 if __name__ == '__main__':
     main()

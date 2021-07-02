@@ -241,6 +241,7 @@ arg *allocation_arg(void){
   a->prefix = allocation_char_vector(MEDIUM_BUFF_SIZE);
   a->input_path[0] = '\0';
   a->prefix[0] = '\0';
+  a->save_all_gen = 0;
   return a;
 }
 
@@ -304,6 +305,8 @@ void print_usage(char *progname){
   fprintf(stderr, "\t\tDisplay this help and exit\n");
   fprintf(stderr, "\t--save-data\n");
   fprintf(stderr, "\t\tSave sampled genotypes at last generation (default=False)\n");
+  fprintf(stderr, "\t--save-all-gen\n");
+  fprintf(stderr, "\t\tCalculate summary statistics for all generations (default=False)\n");
   fprintf(stderr, "\t--sampling S1/ADM/S2\n");
   fprintf(stderr, "\t\tNumber of individuals to sample for summary statistics computations (default=100/100/100)\n");
   fprintf(stderr, "\t--nb-snp N\n");

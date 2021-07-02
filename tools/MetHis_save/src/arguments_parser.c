@@ -23,6 +23,7 @@ arg *parse_arguments(int argc, char **argv){
     /* flag */
     {"help", no_argument, &(args->help), 1},
     {"save-data", no_argument, &(args->save_data), 1},
+    {"save-all-gen", no_argument, &(args->save_all_gen), 1},
     /* require arguments */
     {"nb-snp", required_argument, 0, 'a'},
     {"nb-simul", required_argument, 0, 'c'},

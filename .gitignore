@@ -2,9 +2,6 @@
 .#*
 **/.DS_Store
 **/simu_*/
-**/Ne*/
-**/Nu*/
-**/alpha*/
 **/data_50k.arp
 **/new_methis*/
 **/*.RData
@@ -20,5 +17,7 @@
 **/*.bim
 **/*.P
 **/*.eps
+**/*.log
 **/new_methis_50000_snp_complex_adm.html
 **/.Rhistory
+**/new_methis_pop_size*/

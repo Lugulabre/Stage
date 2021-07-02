@@ -1,0 +1,26 @@
+## Modifications du code de MetHis pour permettre le calcul des statistiques résumées à chaque génération optionnel
+
+src/misc.h
+l.73 ajout de "save_all_gen" à la structure arg
+
+src/arguments_parser.c
+l.26 ajout de "save_all_gen" à la structure long_options
+
+src/io.c
+l.19-30 le fichier est ouvert en écriture et ajoute la première ligne indiquant le nom des colonnes des statistiques si l'indice de génération est à 0 (écriture à la première génération) ou si "save_all_gen" = FALSE (car la fonction n'est appelée qu'à la dernière génération dans ce cas). Sinon, le fichier est ouvert pour écrire les statistiques des autres générations à la suite
+l.400-401 ajout de "save-all-gen" au log général
+
+src/main.c
+l.244 "save_all_gen" est mis à 0 (FALSE) par défaut
+l.308 ajout de "save-all-gen" dans la fonction d'aide
+
+src/simul.c
+l.53 Calcul des statistiques si le rang est celui de la dernière génération ou si "save_all_gen" est TRUE
+
+## Fichiers supplémentaires
+
+- generate_params_nu.py
+Permet de donner la valeur du U qui conbtrôle l'incurvation de la croissance en paramètres
+
+- bottleneck_param_s10_adm_cst.py
+Permet de modifier un fichier de paramètres pour une population croissante en population avec goulot d'étranglement
