@@ -52,7 +52,5 @@ Les répertoires les plus essentiels sont ceux utilisant 50000 SNP sur les data 
 
 ## tools
 Les outils utilisés pour les simulations (nb : MetHis_save est l'outil MetHis modifié pour être utilisé en séquentiel + modification du U + implémentation du bottleneck).
-Les scriptsnew_methis_50000_snp_simple_adm implémentés sont "bottleneck_param.py" et "bottleneck_param_s10_adm_cst.py" dans le répertoire Methis_save. Les scripts modifiés sont "generate_params_nu.py", "src/simul.c" et "src/sumstats.c" dans le répertoire Methis_save.
+Les scripts implémentés sont "bottleneck_param.py" et "bottleneck_param_s10_adm_cst.py" dans le répertoire Methis_save. Les scripts modifiés sont "generate_params_nu.py", "src/simul.c" et "src/sumstats.c" dans le répertoire Methis_save.
 
-# IMPORTANT
-Il est possible que ce github subisse des modifications postérieurement au 20/06 (date de rendu du mémoire), en raison de travaux toujours en cours. J'essaierai de faire en sorte que la branche principale soit le moins modifiée possible jusqu'au rendu des notes, mais il est possible que des fusions de branche soit nécessaire.
