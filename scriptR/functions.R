@@ -3,6 +3,7 @@ library(colorspace)
 library(colorblindr)
 library(ggplot2)
 library(ggthemes)
+library(knitr)
 library(lattice)
 library(plot3D)
 library(rriskDistributions)
@@ -658,7 +659,7 @@ write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
                              ylim_inf, ylim_sup, lgd_txt, name_file_1,
                              ylim_inf_2, ylim_sup_2, var_axis, name_file_2,
                              line_t = c("solid"), bot = c(),xlab="Generation",
-                             ylab="stat",line_bot=FALSE){
+                             ylab="stat",line_bot=FALSE,line_het=FALSE){
   p = plot_stat_gen(df, xaxis, yaxis, group_col, color_col, ligne = T,
                     title, legd = TRUE,line_t = line_t)
   p = p + ylim(ylim_inf, ylim_sup)
@@ -669,6 +670,12 @@ write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
       p = p + geom_vline(xintercept = bot[i], size = 0.4,
                          color = "orange", linetype = "solid")
     }
+  }
+  if (line_het) {
+    p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
+    p=p+annotate(geom = "text",x = 1,y = 0.0635,label="s1",color = "#DFAF2C")
+    p=p+geom_hline(yintercept = 0.049, linetype = "dashed", color = "#318CE7")
+    p=p+annotate(geom = "text",x = 1,y = 0.0475,label="s2",color = "#318CE7")
   }
   p = p + xlab(xlab) + ylab(ylab)
   if (line_bot==TRUE) {
@@ -717,7 +724,7 @@ write_one_gen = function(df, xaxis, yaxis, color_group, xlab, ylab, t_file, t_pl
 
 plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, max_y, name_x = "Generation",
                                     name_color = "time_pulse_s1",yas1 = 0.027,yas2=0.022,
-                                    name_dir = "",xlab="Generation",ylab="stat",title = TRUE){
+                                    name_dir = "",xlab="Generation",ylab="stat",title = TRUE,print_p=TRUE,s2=TRUE){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       mat_tmp = lst_mat[[i]][which(lst_mat[[i]]$Ne == ne),]
@@ -740,20 +747,24 @@ plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, m
       }
       
       vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
-      vec_s2 = mat_tmp$time_pulse_s2[which(mat_tmp$Generation == 0)]
       for (rg_pulse in c(1:length(vec_s1))) {
         pos_x_s1 = vec_s1[rg_pulse]
         pos_y_s1 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s1, num_col_y]
-        pos_x_s2 = vec_s2[rg_pulse]
-        pos_y_s2 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s2, num_col_y]
         p = p+geom_point(aes_string(x=pos_x_s1, y=pos_y_s1), colour="blue", shape = 17)
-        p = p+geom_point(aes_string(x=pos_x_s2, y=pos_y_s2), colour="green", shape = 19)
       }
-      
       p=p+annotate("text", x=5.5,y=yas1,label="s1", color = "blue")
       p=p+annotate("point", x=2,y=yas1, color = "blue",shape=17)
-      p=p+annotate("text", x=5.5,y=yas2,label="s2", color = "green")
-      p=p+annotate("point", x=2,y=yas2, color = "green")
+      
+      if (s2) {
+        vec_s2 = mat_tmp$time_pulse_s2[which(mat_tmp$Generation == 0)]
+        for (rg_pulse in c(1:length(vec_s2))) {
+          pos_x_s2 = vec_s2[rg_pulse]
+          pos_y_s2 = mat_tmp[(rg_pulse-1)*101+1+pos_x_s2, num_col_y]
+          p = p+geom_point(aes_string(x=pos_x_s2, y=pos_y_s2), colour="green", shape = 19)
+        }
+        p=p+annotate("text", x=5.5,y=yas2,label="s2", color = "green")
+        p=p+annotate("point", x=2,y=yas2, color = "green")
+      }
       
       p = p + xlab(xlab) + ylab(ylab)
 
@@ -764,11 +775,13 @@ plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, m
       if (name_dir != "") {
         name_file = str_c(name_dir,"/Ne_cst/",name_stat,"_cst_s10_", seq_s1[i],
                           "_ne_",ne,"_",name_color)
-        ggsave(filename =  str_c("../../Images/pulse_ponctuel/", name_file, ".png"), plot = p,
+        ggsave(filename =  str_c("../../Images/", name_file, ".png"), plot = p,
                width = 6, height = 5)
       }
-
-      print(p)
+      
+      if (print_p) {
+        print(p)
+      }
     }
   }
 }
@@ -825,7 +838,7 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat,
 plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
                                     min_y, max_y, name_x = "Generation",name_dir="",
                                     xlab="Generation",ylab="stat",yas1 = 0.027,
-                                    title=TRUE){
+                                    title=TRUE,print_p=TRUE){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       for (u in seq_u) {
@@ -868,11 +881,13 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
         if (name_dir != "") {
           name_file = str_c(name_dir,"/Ne_inc/",name_stat,"_cst_s10_", seq_s1[i],
                             "_ne_",ne,"_u_",u)
-          ggsave(filename =  str_c("../../Images/pulse_ponctuel/", name_file, ".png"), plot = p,
+          ggsave(filename =  str_c("../../Images/", name_file, ".png"), plot = p,
                  width = 6, height = 5)
         }
-
-        print(p)
+        
+        if (print_p) {
+          print(p)
+        }
       }
     }
   }
@@ -883,7 +898,7 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
 plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
                                     seq_bot, name_stat, min_y, max_y, name_x = "Generation",
                                     name_dir = "",xlab="Generation",ylab="stat",
-                                    yas1 = 0.027,title=TRUE){
+                                    yas1 = 0.027,title=TRUE,print_p=TRUE){
   for (i in 1:length(lst_mat)) {
     for (ne in seq_ne) {
       for (u in seq_u) {
@@ -931,11 +946,13 @@ plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
             if (name_dir != "") {
               name_file = str_c(name_dir,"/Ne_bot/",name_stat,"_cst_s10_", seq_s1[i],
                                 "_ne_",ne,"_u_",u,"_alpha_", alpha, "_bot_", bot)
-              ggsave(filename =  str_c("../../Images/pulse_ponctuel/", name_file, ".png"), plot = p,
+              ggsave(filename =  str_c("../../Images/", name_file, ".png"), plot = p,
                      width = 6, height = 5)
             }
             
-            print(p)
+            if (print_p) {
+              print(p)
+            }
           }
         }
         
