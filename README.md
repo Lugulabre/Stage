@@ -77,7 +77,7 @@ Le sous-répertoire "pulse_recurrent" contient les simulations avec des pulses r
 ## tools
 "MetHis" contient l'outil MetHis initial.
 
-"MetHis_modif" contient l'outil MetHis modifié pour être utilisé en séquentiel hard-codé.
+"MetHis_modif" contient l'outil MetHis modifié pour être utilisé en séquentiel uniquement.
 
 "MetHis_save" contient l'outil MetHis modifié pour être utilisé en séquentiel de manière optionnelle, en plus des scripts utilisés pour générer une population avec goulot d'étranglement. Les modifications implémentées sont indiquées dans le document "MetHis_save/modifications_methis.txt".
 

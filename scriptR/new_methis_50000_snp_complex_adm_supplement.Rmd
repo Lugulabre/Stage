@@ -1,0 +1,332 @@
+---
+title: "Représentation des stats calculées par MetHis (50 000 SNP) pour des scénarios d'admixture complexes avec simulations multiples"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR_complex_adm/")
+# knitr::opts_knit$set(root.dir = "~/Documents/git_repository/Stage/Simulations/SNP_YRI_GBR/Ne_bot/alpha0.1/Nu0.01/bottle10/")
+
+```
+
+## Indicateur de temps
+```{r}
+time.ini = Sys.time()
+```
+
+Chargement des libraries et fonctions
+```{r}
+source("../../scriptR/functions.R")
+```
+
+### Enregistrement des fonctions
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+## Admixture décroissante
+
+Taux d'admixture symétriques des deux populations sources, de 0.4 (génération 1) à 0.01 (génération 100) avec un taux de 0.5 à la fondation (analyse pour 1 simulation).
+
+### Admixture décroissante Ne constant
+```{r}
+setwd("pulse_decroissant/Ne_cst/")
+
+lst_ne_cst_adm_dec = list()
+cpt = 1
+vec_val_s10 = c(0.5)
+
+for (val_s10 in vec_val_s10) {
+  setwd(str_c("s1.0_", val_s10,"/"))
+  lst_ne_cst_adm_dec[[cpt]] = data.frame.stat(seq_ne = c(100,1000,10000),
+                                               max_gen = 101, max_simu = 1)
+  lst_ne_cst_adm_dec[[cpt]] = delta.adm.gen.0(lst_ne_cst_adm_dec[[cpt]])
+  cpt = cpt + 1
+  setwd("../")
+}
+
+```
+
+
+```{r}
+
+for (i in c(1)) {
+  write_cstt_plot(name_stat = "mean.het.adm", mat = lst_ne_cst_adm_dec[[i]],
+                  name_file =  str_c("pulse_decroissant/mean.he/Ne_cst/he_mean_ne_cst_adm_dec_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0.047,max_y = 0.065,
+                  ylab="mean He")
+  write_cstt_plot(name_stat = "Fst.s1.adm", mat = lst_ne_cst_adm_dec[[i]],
+                  name_file =  str_c("pulse_decroissant/Fst.s1.adm/Ne_cst/fst_s1_adm_ne_cst_adm_dec_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 0.12,
+                  ylab=expression(paste(F[ST], " s1-adm", sep = "")))
+  write_cstt_plot(name_stat = "mean.adm.props", mat = lst_ne_cst_adm_dec[[i]],
+                  name_file =  str_c("pulse_decroissant/mean.adm/Ne_cst/mean_adm_ne_cst_adm_dec_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 1,
+                  ylab="Average admixture rate")
+  write_cstt_plot(name_stat = "f3", mat = lst_ne_cst_adm_dec[[i]],
+                  name_file =  str_c("pulse_decroissant/f3/Ne_cst/f3_ne_cst_adm_dec_s10_",
+                                     vec_val_s10[i]),
+                  min_y = -0.02,max_y = 0.1,
+                  ylab="f3")
+  write_cstt_plot(name_stat = "delta.adm.gen.0", mat = lst_ne_cst_adm_dec[[i]],
+                  name_file =  str_c("pulse_decroissant/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_adm_dec_s10_",
+                                     vec_val_s10[i]),
+                  min_y = -0.8,max_y = 0.8,
+                  ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+  write_cstt_plot(name_stat = "var.adm.props", mat = lst_ne_cst_adm_dec[[i]],
+                  name_file =  str_c("pulse_decroissant/var.adm/Ne_cst/var_adm_ne_cst_adm_dec_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 0.2,
+                  ylab="Variance du taux d'admixture")
+
+}
+
+```
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+## Simulations multiples : admixture décroissante
+
+Taux d'admixture symétriques des deux populations sources, de 0.4 (génération 1) à 0.01 (génération 100) avec un taux de 0.5 à la fondation (analyse pour 50 simulations).
+
+### Admixture décroissante multi Ne cst
+
+```{r}
+setwd("pulse_decroissant/Ne_cst/s1.0_0.5/")
+
+mat_cstt_adm_dec_multi = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 50)
+
+mat_cstt_adm_dec_multi = delta.adm.props(mat_cstt_adm_dec_multi)
+mat_cstt_adm_dec_multi = delta.adm.gen.0(mat_cstt_adm_dec_multi)
+```
+
+```{r}
+list_mean = data.frame.mean(mat_cstt_adm_dec_multi, max_gen = 101,
+                            seq_ne = c(100,1000,10000),
+                            col_cstt = c(1:3), col_mean = c(4:68))
+mat_cstt_adm_dec_multi_mean = list_mean[[1]]
+mat_cstt_adm_dec_multi_var = list_mean[[2]]
+remove(list_mean)
+
+```
+
+```{r}
+p = write_ic_var_plot(mat_cstt_adm_dec_multi_mean, mat_cstt_adm_dec_multi_mean$Generation,
+                      mat_cstt_adm_dec_multi_mean$mean.het.adm,
+                      mat_cstt_adm_dec_multi_mean$Ne, mat_cstt_adm_dec_multi_mean$Ne,
+                      "He moyenne en fonction des générations",
+                      0.047, 0.065, "Ne", 
+                      str_c("pulse_decroissant_multi_simu/mean.he/Ne_cst/he_mean_ne_cst_adm_dec_s10_0.5"),
+                      0.047, 0.065, mat_cstt_adm_dec_multi_var$mean.het.adm,
+                      "pulse_decroissant_multi_simu/mean.he/Ne_cst/he_mean_ne_cst_adm_dec_s10_0.5_ic_95",
+                      ylab="mean He",line_het=TRUE)
+write_cstt_plot(name_stat = "Fst.s1.adm", mat = mat_cstt_adm_dec_multi_mean,
+                name_file =  "pulse_decroissant_multi_simu/Fst.s1.adm/Ne_cst/fst_s1_adm_ne_cst_adm_dec_s10_0.5",
+                min_y = 0,max_y = 0.12,
+                ylab=expression(paste(F[ST], " s1-adm", sep = "")))
+p = write_ic_var_plot(mat_cstt_adm_dec_multi_mean, mat_cstt_adm_dec_multi_mean$Generation,
+                      mat_cstt_adm_dec_multi_mean$mean.adm.props,
+                      mat_cstt_adm_dec_multi_mean$Ne, mat_cstt_adm_dec_multi_mean$Ne,
+                      "Admixture moyenne en fonction des générations",
+                      0.4, 0.6, "Ne", 
+                      str_c("pulse_decroissant_multi_simu/mean.adm/Ne_cst/mean_adm_ne_cst_adm_dec_s10_0.5"),
+                      0.3, 0.7, mat_cstt_adm_dec_multi_var$mean.adm.props,
+                      "pulse_decroissant_multi_simu/mean.adm/Ne_cst/mean_adm_ne_cst_adm_dec_s10_0.5_ic_95",
+                      ylab="Average admixture rate",line_het=TRUE)
+write_cstt_plot(name_stat = "f3", mat = mat_cstt_adm_dec_multi_mean,
+                name_file =  "pulse_decroissant_multi_simu/f3/Ne_cst/f3_ne_cst_adm_dec_s10_0.5",
+                min_y = -0.02,max_y = 0.1,
+                ylab="f3")
+write_cstt_plot(name_stat = "delta.adm.gen.0", mat = mat_cstt_adm_dec_multi_mean,
+                name_file =  "pulse_decroissant_multi_simu/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_adm_dec_s10_0.5",
+                min_y = -0.8,max_y = 0.8,
+                ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+write_cstt_plot(name_stat = "var.adm.props", mat = mat_cstt_adm_dec_multi_mean,
+                name_file =  "pulse_decroissant_multi_simu/var.adm/Ne_cst/var_adm_ne_cst_adm_dec_s10_0.5",
+                min_y = 0,max_y = 0.2,
+                ylab="Variance du taux d'admixture")
+```
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+##Admixture récurrente 2ème schéma
+
+```{r}
+table_tmp = data.frame(A = c(0.1,0.02,0.01), B = c(0.5,0.02,0.02), C = c(0.75,0.01,0.02))
+rownames(table_tmp) = c("s1,0", "s1,r", "s2,r")
+print(table_tmp)
+remove(table_tmp)
+```
+
+
+###Admixture récurrente 2ème schéma Ne constant
+```{r}
+setwd("pulse_recurrent_0.02/Ne_cst/")
+
+lst_ne_cst_adm_rec_0.02 = list()
+cpt = 1
+vec_val_s10 = c(0.1, 0.5, 0.75)
+
+for (val_s10 in vec_val_s10) {
+  setwd(str_c("s1.0_", val_s10,"/"))
+  lst_ne_cst_adm_rec_0.02[[cpt]] = data.frame.stat(seq_ne = c(100,1000,10000),
+                                               max_gen = 101, max_simu = 1)
+  lst_ne_cst_adm_rec_0.02[[cpt]] = delta.adm.gen.0(lst_ne_cst_adm_rec_0.02[[cpt]])
+  cpt = cpt + 1
+  setwd("../")
+}
+
+```
+
+
+```{r}
+
+for (i in c(1:3)) {
+  write_cstt_plot(name_stat = "mean.het.adm", mat = lst_ne_cst_adm_rec_0.02[[i]],
+                  name_file =  str_c("pulse_recurrent_0.02/mean.he/Ne_cst/he_mean_ne_cst_multi_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0.047,max_y = 0.065,
+                  ylab="mean He")
+  write_cstt_plot(name_stat = "Fst.s1.adm", mat = lst_ne_cst_adm_rec_0.02[[i]],
+                  name_file =  str_c("pulse_recurrent_0.02/Fst.s1.adm/Ne_cst/fst_s1_adm_ne_cst_multi_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 0.12,
+                  ylab=expression(paste(F[ST], " s1-adm", sep = "")))
+  write_cstt_plot(name_stat = "mean.adm.props", mat = lst_ne_cst_adm_rec_0.02[[i]],
+                  name_file =  str_c("pulse_recurrent_0.02/mean.adm/Ne_cst/mean_adm_ne_cst_multi_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 0.8,
+                  ylab="Average admixture rate")
+  write_cstt_plot(name_stat = "f3", mat = lst_ne_cst_adm_rec_0.02[[i]],
+                  name_file =  str_c("pulse_recurrent_0.02/f3/Ne_cst/f3_ne_cst_multi_s10_",
+                                     vec_val_s10[i]),
+                  min_y = -0.02,max_y = 0.1,
+                  ylab="f3")
+  write_cstt_plot(name_stat = "delta.adm.gen.0", mat = lst_ne_cst_adm_rec_0.02[[i]],
+                  name_file =  str_c("pulse_recurrent_0.02/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_multi_s10_",
+                                     vec_val_s10[i]),
+                  min_y = -0.8,max_y = 0.8,
+                  ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+  write_cstt_plot(name_stat = "var.adm.props", mat = lst_ne_cst_adm_rec_0.02[[i]],
+                  name_file =  str_c("pulse_recurrent_0.02/var.adm/Ne_cst/var_adm_ne_cst_multi_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 0.2,
+                  ylab="Variance du taux d'admixture")
+
+}
+
+```
+
+
+###Admixture récurrente 2ème schéma Ne bottleneck
+```{r}
+setwd("pulse_recurrent_0.02/Ne_bot/")
+
+lst_ne_bot_adm_rec_0.02 = list()
+cpt = 1
+vec_val_s10 = c(0.1, 0.5, 0.75)
+
+for (val_s10 in vec_val_s10) {
+  setwd(str_c("s1.0_", val_s10,"/"))
+  lst_ne_bot_adm_rec_0.02[[cpt]] = data.frame.bottleneck(lst_ne0 = c(1000), lst_nef = c(1000),
+                                                    lst_alpha = c(0.1, 0.5,0.9),
+                                                    lst_nu = c(0.01, 0.25),
+                                                    lst_bottle = c(20, 50, 80), max_simu = 1)
+  lst_ne_bot_adm_rec_0.02[[cpt]] = delta.adm.gen.0(lst_ne_bot_adm_rec_0.02[[cpt]])
+  cpt = cpt + 1
+  setwd("../")
+}
+
+```
+
+```{r}
+for (i in c(1:3)) {
+  df_tmp = lst_ne_bot_adm_rec_0.02[[i]]
+  for (bot in c(20,50,80)) {
+    write_bottle_plot(name_stat = "mean.het.adm", mat = df_tmp[which(df_tmp$time_botl == bot),],
+                      name_file =  str_c("pulse_recurrent_0.02/mean.he/Ne_bot/he_mean_ne_bot_multi_s10_",
+                                         vec_val_s10[i],"_bot_",bot),
+                      min_y = 0.047,max_y = 0.065,
+                      time_bott = bot+1, name_color = "alpha", name_line = "U",
+                      labcol = "alpha", labline = "U",ylab="mean He")
+    write_bottle_plot(name_stat = "Fst.s1.adm", mat = df_tmp[which(df_tmp$time_botl == bot),],
+                      name_file =  str_c("pulse_recurrent_0.02/Fst.s1.adm/Ne_bot/fst_s1_adm_ne_bot_multi_s10_",
+                                         vec_val_s10[i],"_bot_",bot),
+                      min_y = 0,max_y = 0.1,
+                      time_bott = bot+1, name_color = "alpha", name_line = "U",
+                      labcol = "alpha", labline = "U",ylab="Fst s1 adm")
+    write_bottle_plot(name_stat = "mean.adm.props", mat = df_tmp[which(df_tmp$time_botl == bot),],
+                      name_file =  str_c("pulse_recurrent_0.02/mean.adm/Ne_bot/mean_adm_ne_bot_multi_s10_",
+                                         vec_val_s10[i],"_bot_",bot),
+                      min_y = 0,max_y = 0.8,
+                      time_bott = bot+1, name_color = "alpha", name_line = "U",
+                      labcol = "alpha", labline = "U",ylab="Average admixture rate")
+    write_bottle_plot(name_stat = "delta.adm.gen.0", mat = df_tmp[which(df_tmp$time_botl == bot),],
+                      name_file =  str_c("pulse_recurrent_0.02/delta.adm0.adm/Ne_bot/delta_adm0_adm_ne_bot_multi_s10_",
+                                         vec_val_s10[i],"_bot_",bot),
+                      min_y = -0.8,max_y = 0.8,
+                      time_bott = bot+1, name_color = "alpha", name_line = "U",
+                      labcol = "alpha", labline = "U",ylab = expression(paste(δ[µ["g"]-µ[0]], sep = "")))
+    write_bottle_plot(name_stat = "var.adm.props", mat = df_tmp[which(df_tmp$time_botl == bot),],
+                      name_file =  str_c("pulse_recurrent_0.02/var.adm/Ne_bot/var_adm_ne_bot_multi_s10_",
+                                         vec_val_s10[i],"_bot_",bot),
+                      min_y = 0,max_y = 0.2,
+                      time_bott = bot+1, name_color = "alpha", name_line = "U",
+                      labcol = "alpha", labline = "U",ylab="Variance du taux d'admixture")
+  }
+}
+
+```
+
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+## Admixture ponctuelle 10 pulses
+
+### Admixture ponctuelle 10 pulses Ne constante
+```{r}
+setwd("pulse_ponctuel_10_pulses/Ne_cst/s1.0_0.5/")
+
+lst_ne_cst_adm_pct_10p = list()
+cpt = 1
+vec_val_s10 = c(0.5)
+
+df_ne_cst_adm_pct_10p = data.frame.stat(seq_ne = c(100,1000,10000),max_gen = 101, max_simu = 20)
+df_ne_cst_adm_pct_10p = delta.adm.gen.0(df_ne_cst_adm_pct_10p)
+
+id_pulses = which(df_ne_cst_adm_pct_10p$s1.0 != 0 & df_ne_cst_adm_pct_10p$Generation != 0)
+id_pulses = id_pulses[(1:(length(id_pulses)/5))*5]
+df_ne_cst_adm_pct_10p$time_pulse_s1 = rep(df_ne_cst_adm_pct_10p$Generation[id_pulses]-1, each=101)
+
+lst_ne_cst_adm_pct_10p[[1]] = df_ne_cst_adm_pct_10p
+
+```
+
+
+```{r}
+plot_adm_ponctuel_ne_cst(lst_mat = lst_ne_cst_adm_pct_10p, seq_ne = c(100,1000,10000),
+                         seq_s1 = c(0.5), name_stat = "mean.het.adm",
+                         min_y = 0.02, max_y = 0.064, name_dir = "pulse_ponctuel_10_pulses/mean.he",
+                         ylab = "mean He",print_p = F,s2=F)
+
+```
+
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+ 

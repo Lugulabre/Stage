@@ -1,5 +1,5 @@
 ---
-title: "Représentation des stats calculées par MetHis (50 000 SNP) pour des scénarios d'admixture simple multi simu"
+title: "Représentation des stats calculées par MetHis (50 000 SNP) pour des scénarios d'admixture simple avec simulations multiples"
 output: html_document
 ---
 

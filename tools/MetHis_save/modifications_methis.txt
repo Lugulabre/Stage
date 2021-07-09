@@ -1,4 +1,4 @@
-## Modifications du code de MetHis pour permettre le calcul des statistiques résumées à chaque génération optionnel
+### Modifications du code de MetHis pour permettre le calcul des statistiques résumées à chaque génération optionnel
 
 src/misc.h
 l.73 ajout de "save_all_gen" à la structure arg
@@ -17,10 +17,58 @@ l.308 ajout de "save-all-gen" dans la fonction d'aide
 src/simul.c
 l.53 Calcul des statistiques si le rang est celui de la dernière génération ou si "save_all_gen" est TRUE
 
-## Fichiers supplémentaires
+### Changements sur "generate_params_nu.py"
+Ajout de la génération d'un bottleneck comme scénario de Ne
 
-- generate_params_nu.py
-Permet de donner la valeur du U qui conbtrôle l'incurvation de la croissance en paramètres
+l.46-55
+l.64
+Modification du parser d'arguments (fonction parse_args)
 
-- bottleneck_param_s10_adm_cst.py
-Permet de modifier un fichier de paramètres pour une population croissante en population avec goulot d'étranglement
+l.88
+Ajout de 'Bot' aux types de schéma (fonction parse_Ne_str)
+
+l.202
+l.210-211
+Ajout du bottleneck pour vérifier si les paramètres sont ok (fonction make_Ne_sanity_check)
+
+l.296
+l.331-339
+Ajout du bottleneck à la génération de Ne (fonction generate_Nes)
+
+l.478
+l.486
+l.503
+Modification du main en ajoutant les paramètres aux fonctions modifiées (fonction main)
+
+
+### Changements sur "generate_params_nu_pulse_only_bot.py"
+Ajout de la génération d'un bottleneck comme scénario de Ne + possibilité d'implémenter l'admixture uniquement pendant le bottleneck
+
+l.46-59
+l.68
+Modification du parser d'arguments
+
+l.92
+Ajout de 'Bot' aux types de schéma (fonction parse_Ne_str)
+
+l.206
+l.214-215
+Ajout du bottleneck pour vérifier si les paramètres sont ok (fonction make_Ne_sanity_check)
+
+l.300
+l.335-343
+Ajout du bottleneck à la génération de Ne (fonction generate_Nes)
+
+l.350-353
+Option de générer des pulses d'admixture uniquement pendant le bottleneck (fonction generate_pulse_contribution)
+
+l.384-388
+l.399-405
+l.415-421
+Option des contributions d'admixture uniquement pendant le bottleneck (fonction generate_contribution)
+
+l.499
+l.516-519
+l.528
+l.536-541
+Modification du main en ajoutant les paramètres aux fonctions modifiées (fonction main)
