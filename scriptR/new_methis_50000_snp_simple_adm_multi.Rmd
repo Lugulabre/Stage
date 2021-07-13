@@ -707,7 +707,7 @@ for (i in c(1:4)) {
                     str_c("pulse_fondation_multi_simu/delta.adm0.adm/Ne_bot/delta_adm_ne_bot_multi_s10_",vec_s10[i]),
                     -0.15, 0.05, lst_var[[i]]$delta.adm.gen.0,
                     str_c("pulse_fondation_multi_simu/delta.adm0.adm/Ne_bot/delta_adm_ne_bot_multi_s10_",vec_s10[i],"_ic95"),
-                    ylab=expression(paste(δ[µ["g"]-µ[0]], sep = "")),line_bot = TRUE)
+                    ylab=expression(paste(δ[µ["g"]-µ[0]], sep = "")),bot = c(81))
 
 }
 remove(lst_tmp)
