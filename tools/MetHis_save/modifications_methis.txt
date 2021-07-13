@@ -18,7 +18,8 @@ src/simul.c
 l.53 Calcul des statistiques si le rang est celui de la dernière génération ou si "save_all_gen" est TRUE
 
 ### Changements sur "generate_params_nu.py"
-Ajout de la génération d'un bottleneck comme scénario de Ne
+Ajout de la génération d'un bottleneck comme scénario de Ne.
+Le bottleneck intervient toujours à la génération 1 et s'étend pendant un temps tb, pendant lequel la population va croître selon le paramètre u.
 
 l.46-55
 l.64
