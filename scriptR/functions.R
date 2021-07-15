@@ -633,7 +633,7 @@ write_cstt_plot = function(name_stat, mat, name_file,min_y, max_y, name_x = "Gen
   p = plot_stat_gen(mat, mat[,num_col_x], 
                     mat[,num_col_y], mat$Ne, mat$Ne,ligne = T,
                     str_c(name_stat, " en fonction des générations\n selon différentes Ne initiales"))
-  p = p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = FALSE)
+  p = p+ylim(min_y, max_y)+ labs(color = "Ne") + guides(linetype = "none")
   p = p+xlab(xlab)+ylab(ylab)
   if (name_stat == "mean.het.adm") {
     p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
@@ -803,7 +803,7 @@ write_ic_var_plot = function(df, xaxis, yaxis, group_col, color_col, title,
   p = plot_stat_gen(df, xaxis, yaxis, group_col, color_col, ligne = T,
                     title, legd = TRUE,line_t = line_t)
   p = p + ylim(ylim_inf, ylim_sup)
-  p = p + guides(linetype = FALSE)
+  p = p + guides(linetype = "none")
   p = p + labs(color = lgd_txt)
   if (!is.null(bot)) {
     for (i in c(1:length(bot))) {
@@ -906,7 +906,7 @@ plot_adm_ponctuel_ne_cst = function(lst_mat, seq_ne, seq_s1, name_stat, min_y, m
                       color_col = mat_tmp[,num_col_color],titre = str_c(name_stat," en fonction de ",name_x,
                                                                         ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
       p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-      p=p+labs(color = name_color) + guides(linetype = FALSE)
+      p=p+labs(color = name_color) + guides(linetype = "none")
       p=p+ylim(min_y, max_y)
       if (name_stat == "mean.het.adm") {
         p=p+geom_hline(yintercept = 0.062, linetype = "dashed", color = "#DFAF2C")
@@ -970,7 +970,7 @@ plot_adm_ponctuel_ne_cst_last_pulse = function(lst_mat, seq_ne, seq_s1, name_sta
                       titre = str_c(name_stat," en fonction de ",name_x,
                                     ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
       p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-      p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
+      p=p+labs(color = "time pulse s1") + guides(linetype = "none")
       p=p+ylim(min_y, max_y)
       print(p)
 
@@ -994,7 +994,7 @@ plot_adm_ponctuel_ne_cst_minus = function(lst_mat, seq_ne, seq_s1, name_stat,
                       titre = str_c(name_stat," en fonction de ",name_x,
                                     ", \ns1.0 = ", seq_s1[i], ", Ne = ", ne))
       p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-      p=p+labs(color = "time pulse s1") + guides(linetype = FALSE)
+      p=p+labs(color = "time pulse s1") + guides(linetype = "none")
       p=p+ylim(min_y, max_y)
       print(p)
       
@@ -1037,7 +1037,7 @@ plot_adm_ponctuel_ne_inc = function(lst_mat, seq_ne, seq_s1, seq_u, name_stat,
                                                                          ", \ns1.0 = ", seq_s1[i], ", Ne0-Nef = ", ne,
                                                                          ", U = ",u))
         p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-        p=p+labs(color = "time pulse s1")  + guides(linetype = FALSE)
+        p=p+labs(color = "time pulse s1")  + guides(linetype = "none")
         p=p+ylim(min_y, max_y)
         
         vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]
@@ -1119,7 +1119,7 @@ plot_adm_ponctuel_ne_bot = function(lst_mat, seq_ne, seq_s1, seq_u, seq_alpha,
                                           ", \ns1.0=", seq_s1[i], ",Ne0-Nef=", ne,
                                           ",U=",u, ",a=",alpha,",tb=",bot))
             p=p+scale_color_gradientn(colours = c("#F7230C","orange","#F6DC12","#D1B606","#582900"))
-            p=p+labs(color = "time pulse s1")  + guides(linetype = FALSE)
+            p=p+labs(color = "time pulse s1")  + guides(linetype = "none")
             p=p+ylim(min_y, max_y)
             
             vec_s1 = mat_tmp$time_pulse_s1[which(mat_tmp$Generation == 0)]

@@ -123,7 +123,6 @@ p = write_ic_var_plot(mat_cstt_adm_dec_multi_mean, mat_cstt_adm_dec_multi_mean$G
                       mat_cstt_adm_dec_multi_mean$Ne, mat_cstt_adm_dec_multi_mean$Ne,
                       "He moyenne en fonction des générations",
                       0.047, 0.065, "Ne", 
-                      str_c("pulse_decroissant_multi_simu/mean.he/Ne_cst/he_mean_ne_cst_adm_dec_s10_0.5"),
                       0.047, 0.065, mat_cstt_adm_dec_multi_var$mean.het.adm,
                       "pulse_decroissant_multi_simu/mean.he/Ne_cst/he_mean_ne_cst_adm_dec_s10_0.5_ic_95",
                       ylab="mean He",line_het=TRUE)
@@ -139,7 +138,7 @@ p = write_ic_var_plot(mat_cstt_adm_dec_multi_mean, mat_cstt_adm_dec_multi_mean$G
                       str_c("pulse_decroissant_multi_simu/mean.adm/Ne_cst/mean_adm_ne_cst_adm_dec_s10_0.5"),
                       0.3, 0.7, mat_cstt_adm_dec_multi_var$mean.adm.props,
                       "pulse_decroissant_multi_simu/mean.adm/Ne_cst/mean_adm_ne_cst_adm_dec_s10_0.5_ic_95",
-                      ylab="Average admixture rate",line_het=TRUE)
+                      ylab="Average admixture rate")
 write_cstt_plot(name_stat = "f3", mat = mat_cstt_adm_dec_multi_mean,
                 name_file =  "pulse_decroissant_multi_simu/f3/Ne_cst/f3_ne_cst_adm_dec_s10_0.5",
                 min_y = -0.02,max_y = 0.1,
@@ -156,6 +155,217 @@ write_cstt_plot(name_stat = "var.adm.props", mat = mat_cstt_adm_dec_multi_mean,
 
 ```{r}
 print(difftime(Sys.time(), time.ini))
+```
+
+
+## Admixture croissante
+
+Taux d'admixture symétriques des deux populations sources, de 0.01 (génération 1) à 0.4 (génération 100) avec un taux de 0.5 à la fondation (analyse pour 1 simulation).
+
+### Admixture décroissante Ne constant
+```{r}
+setwd("pulse_croissant/Ne_cst/")
+
+lst_ne_cst_adm_inc = list()
+cpt = 1
+vec_val_s10 = c(0.5)
+
+for (val_s10 in vec_val_s10) {
+  setwd(str_c("s1.0_", val_s10,"/"))
+  lst_ne_cst_adm_inc[[cpt]] = data.frame.stat(seq_ne = c(100,1000,10000),
+                                               max_gen = 101, max_simu = 1)
+  lst_ne_cst_adm_inc[[cpt]] = delta.adm.gen.0(lst_ne_cst_adm_inc[[cpt]])
+  cpt = cpt + 1
+  setwd("../")
+}
+
+```
+
+
+```{r}
+
+for (i in c(1)) {
+  write_cstt_plot(name_stat = "mean.het.adm", mat = lst_ne_cst_adm_inc[[i]],
+                  name_file =  str_c("pulse_croissant/mean.he/Ne_cst/he_mean_ne_cst_adm_inc_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0.047,max_y = 0.065,
+                  ylab="mean He")
+  write_cstt_plot(name_stat = "mean.adm.props", mat = lst_ne_cst_adm_inc[[i]],
+                  name_file =  str_c("pulse_croissant/mean.adm/Ne_cst/mean_adm_ne_cst_adm_inc_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 1,
+                  ylab="Average admixture rate")
+  write_cstt_plot(name_stat = "delta.adm.gen.0", mat = lst_ne_cst_adm_inc[[i]],
+                  name_file =  str_c("pulse_croissant/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_adm_inc_s10_",
+                                     vec_val_s10[i]),
+                  min_y = -0.8,max_y = 0.8,
+                  ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+  write_cstt_plot(name_stat = "var.adm.props", mat = lst_ne_cst_adm_inc[[i]],
+                  name_file =  str_c("pulse_croissant/var.adm/Ne_cst/var_adm_ne_cst_adm_inc_s10_",
+                                     vec_val_s10[i]),
+                  min_y = 0,max_y = 0.2,
+                  ylab="Variance du taux d'admixture")
+
+}
+
+```
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+### Admixture croissante multi Ne cst
+
+```{r}
+setwd("pulse_croissant/Ne_cst/s1.0_0.5/")
+
+mat_cstt_adm_inc_multi = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 50)
+
+mat_cstt_adm_inc_multi = delta.adm.props(mat_cstt_adm_inc_multi)
+mat_cstt_adm_inc_multi = delta.adm.gen.0(mat_cstt_adm_inc_multi)
+```
+
+```{r}
+list_mean = data.frame.mean(mat_cstt_adm_inc_multi, max_gen = 101,
+                            seq_ne = c(100,1000,10000),
+                            col_cstt = c(1:3), col_mean = c(4:68))
+mat_cstt_adm_inc_multi_mean = list_mean[[1]]
+mat_cstt_adm_inc_multi_var = list_mean[[2]]
+remove(list_mean)
+
+```
+
+```{r}
+p = write_ic_var_plot(mat_cstt_adm_inc_multi_mean, mat_cstt_adm_inc_multi_mean$Generation,
+                      mat_cstt_adm_inc_multi_mean$mean.het.adm,
+                      mat_cstt_adm_inc_multi_mean$Ne, mat_cstt_adm_inc_multi_mean$Ne,
+                      "He moyenne en fonction des générations",
+                      0.047, 0.065, "Ne", 
+                      str_c("pulse_croissant_multi_simu/mean.he/Ne_cst/he_mean_ne_cst_adm_inc_s10_0.5"),
+                      0.047, 0.065, mat_cstt_adm_inc_multi_var$mean.het.adm,
+                      "pulse_croissant_multi_simu/mean.he/Ne_cst/he_mean_ne_cst_adm_inc_s10_0.5_ic_95",
+                      ylab="mean He",line_het=TRUE)
+p = write_ic_var_plot(mat_cstt_adm_inc_multi_mean, mat_cstt_adm_inc_multi_mean$Generation,
+                      mat_cstt_adm_inc_multi_mean$mean.adm.props,
+                      mat_cstt_adm_inc_multi_mean$Ne, mat_cstt_adm_inc_multi_mean$Ne,
+                      "Admixture moyenne en fonction des générations",
+                      0.4, 0.55, "Ne", 
+                      str_c("pulse_croissant_multi_simu/mean.adm/Ne_cst/mean_adm_ne_cst_adm_inc_s10_0.5"),
+                      0.3, 0.65, mat_cstt_adm_inc_multi_var$mean.adm.props,
+                      "pulse_croissant_multi_simu/mean.adm/Ne_cst/mean_adm_ne_cst_adm_inc_s10_0.5_ic_95",
+                      ylab="Average admixture rate")
+write_cstt_plot(name_stat = "delta.adm.gen.0", mat = mat_cstt_adm_inc_multi_mean,
+                name_file =  "pulse_croissant_multi_simu/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_adm_inc_s10_0.5",
+                min_y = -0.4,max_y = 0.4,
+                ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+write_cstt_plot(name_stat = "var.adm.props", mat = mat_cstt_adm_inc_multi_mean,
+                name_file =  "pulse_croissant_multi_simu/var.adm/Ne_cst/var_adm_ne_cst_adm_inc_s10_0.5",
+                min_y = 0,max_y = 0.2,
+                ylab="Variance du taux d'admixture")
+```
+
+```{r}
+print(difftime(Sys.time(), time.ini))
+```
+
+
+### Admixture asymétrique
+
+```{r}
+setwd("pulse_asymetrique/Ne_cst_s1_inc_s2_dec/s1.0_0.5/")
+
+mat_cstt_adm_asy_1i_2d_multi = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 20)
+
+mat_cstt_adm_asy_1i_2d_multi = delta.adm.props(mat_cstt_adm_asy_1i_2d_multi)
+mat_cstt_adm_asy_1i_2d_multi = delta.adm.gen.0(mat_cstt_adm_asy_1i_2d_multi)
+```
+
+```{r}
+list_mean = data.frame.mean(mat_cstt_adm_asy_1i_2d_multi, max_gen = 101,
+                            seq_ne = c(100,1000,10000),
+                            col_cstt = c(1:3), col_mean = c(4:68))
+mat_cstt_adm_asy_1i_2d_multi_mean = list_mean[[1]]
+mat_cstt_adm_asy_1i_2d_multi_var = list_mean[[2]]
+remove(list_mean)
+
+```
+
+```{r}
+p = write_ic_var_plot(mat_cstt_adm_asy_1i_2d_multi_mean, mat_cstt_adm_asy_1i_2d_multi_mean$Generation,
+                      mat_cstt_adm_asy_1i_2d_multi_mean$mean.het.adm,
+                      mat_cstt_adm_asy_1i_2d_multi_mean$Ne, mat_cstt_adm_asy_1i_2d_multi_mean$Ne,
+                      "He moyenne en fonction des générations",
+                      0.047, 0.065, "Ne", 
+                      str_c("pulse_asymetrique_multi_simu/1i_2d/mean.he/Ne_cst/he_mean_ne_cst_adm_asy_1i_2d_s10_0.5"),
+                      0.047, 0.065, mat_cstt_adm_asy_1i_2d_multi_var$mean.het.adm,
+                      "pulse_asymetrique_multi_simu/1i_2d/mean.he/Ne_cst/he_mean_ne_cst_adm_asy_1i_2d_s10_0.5_ic_95",
+                      ylab="mean He",line_het=TRUE)
+p = write_ic_var_plot(mat_cstt_adm_asy_1i_2d_multi_mean, mat_cstt_adm_asy_1i_2d_multi_mean$Generation,
+                      mat_cstt_adm_asy_1i_2d_multi_mean$mean.adm.props,
+                      mat_cstt_adm_asy_1i_2d_multi_mean$Ne, mat_cstt_adm_asy_1i_2d_multi_mean$Ne,
+                      "Admixture moyenne en fonction des générations",
+                      0, 1, "Ne", 
+                      str_c("pulse_asymetrique_multi_simu/1i_2d/mean.adm/Ne_cst/mean_adm_ne_cst_adm_asy_1i_2d_s10_0.5"),
+                      0, 1, mat_cstt_adm_asy_1i_2d_multi_var$mean.adm.props,
+                      "pulse_asymetrique_multi_simu/1i_2d/mean.adm/Ne_cst/mean_adm_ne_cst_adm_asy_1i_2d_s10_0.5_ic_95",
+                      ylab="Average admixture rate")
+write_cstt_plot(name_stat = "delta.adm.gen.0", mat = mat_cstt_adm_asy_1i_2d_multi_mean,
+                name_file =  "pulse_asymetrique_multi_simu/1i_2d/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_adm_asy_1i_2d_s10_0.5",
+                min_y = -0.45,max_y = 0.4,
+                ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+write_cstt_plot(name_stat = "var.adm.props", mat = mat_cstt_adm_asy_1i_2d_multi_mean,
+                name_file =  "pulse_asymetrique_multi_simu/1i_2d/var.adm/Ne_cst/var_adm_ne_cst_adm_asy_1i_2d_s10_0.5",
+                min_y = 0,max_y = 0.2,
+                ylab="Variance du taux d'admixture")
+```
+
+```{r}
+setwd("pulse_asymetrique/Ne_cst_s1_dec_s2_inc/s1.0_0.5/")
+
+mat_cstt_adm_asy_1d_2i_multi = data.frame.stat(seq_ne = c(100,1000,10000), max_gen = 101, max_simu = 20)
+
+mat_cstt_adm_asy_1d_2i_multi = delta.adm.props(mat_cstt_adm_asy_1d_2i_multi)
+mat_cstt_adm_asy_1d_2i_multi = delta.adm.gen.0(mat_cstt_adm_asy_1d_2i_multi)
+```
+
+```{r}
+list_mean = data.frame.mean(mat_cstt_adm_asy_1d_2i_multi, max_gen = 101,
+                            seq_ne = c(100,1000,10000),
+                            col_cstt = c(1:3), col_mean = c(4:68))
+mat_cstt_adm_asy_1d_2i_multi_mean = list_mean[[1]]
+mat_cstt_adm_asy_1d_2i_multi_var = list_mean[[2]]
+remove(list_mean)
+
+```
+
+```{r}
+p = write_ic_var_plot(mat_cstt_adm_asy_1d_2i_multi_mean, mat_cstt_adm_asy_1d_2i_multi_mean$Generation,
+                      mat_cstt_adm_asy_1d_2i_multi_mean$mean.het.adm,
+                      mat_cstt_adm_asy_1d_2i_multi_mean$Ne, mat_cstt_adm_asy_1d_2i_multi_mean$Ne,
+                      "He moyenne en fonction des générations",
+                      0.047, 0.065, "Ne", 
+                      str_c("pulse_asymetrique_multi_simu/1d_2i/mean.he/Ne_cst/he_mean_ne_cst_adm_asy_1d_2i_s10_0.5"),
+                      0.047, 0.065, mat_cstt_adm_asy_1d_2i_multi_var$mean.het.adm,
+                      "pulse_asymetrique_multi_simu/1d_2i/mean.he/Ne_cst/he_mean_ne_cst_adm_asy_1d_2i_s10_0.5_ic_95",
+                      ylab="mean He",line_het=TRUE)
+p = write_ic_var_plot(mat_cstt_adm_asy_1d_2i_multi_mean, mat_cstt_adm_asy_1d_2i_multi_mean$Generation,
+                      mat_cstt_adm_asy_1d_2i_multi_mean$mean.adm.props,
+                      mat_cstt_adm_asy_1d_2i_multi_mean$Ne, mat_cstt_adm_asy_1d_2i_multi_mean$Ne,
+                      "Admixture moyenne en fonction des générations",
+                      0, 1, "Ne", 
+                      str_c("pulse_asymetrique_multi_simu/1d_2i/mean.adm/Ne_cst/mean_adm_ne_cst_adm_asy_1d_2i_s10_0.5"),
+                      0, 1, mat_cstt_adm_asy_1d_2i_multi_var$mean.adm.props,
+                      "pulse_asymetrique_multi_simu/1d_2i/mean.adm/Ne_cst/mean_adm_ne_cst_adm_asy_1d_2i_s10_0.5_ic_95",
+                      ylab="Average admixture rate")
+write_cstt_plot(name_stat = "delta.adm.gen.0", mat = mat_cstt_adm_asy_1d_2i_multi_mean,
+                name_file =  "pulse_asymetrique_multi_simu/1d_2i/delta.adm0.adm/Ne_cst/delta_adm0_adm_ne_cst_adm_asy_1d_2i_s10_0.5",
+                min_y = -0.45,max_y = 0.45,
+                ylab=expression(paste(δ[µ["observée"]-µ["théorique"]], sep = "")))
+write_cstt_plot(name_stat = "var.adm.props", mat = mat_cstt_adm_asy_1d_2i_multi_mean,
+                name_file =  "pulse_asymetrique_multi_simu/1d_2i/var.adm/Ne_cst/var_adm_ne_cst_adm_asy_1d_2i_s10_0.5",
+                min_y = 0,max_y = 0.2,
+                ylab="Variance du taux d'admixture")
 ```
 
 
